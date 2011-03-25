@@ -19,5 +19,6 @@ Redmine::Plugin.register :redmine_svn_plugin do
     author 'Andriy Lesyuk'
     author_url 'http://www.facebook.com/andriy.lesyuk'
     description 'Allows creating Subversion repositories using Redmine.'
+    url 'http://labs.softjourn.com/projects/redmine-svn'
     version '0.0.1'
 end
