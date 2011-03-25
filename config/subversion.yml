@@ -1,0 +1,5 @@
+production:
+  path: /var/lib/svn
+  svnadmin: /usr/bin/svnadmin
+
+development:

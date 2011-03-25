@@ -1,0 +1,8 @@
+uk:
+  button_create_new_repository: Створити новий репозиторій
+
+  activerecord:
+    errors:
+      messages:
+        should_be_of_format_local: має відповідати формату "file://{{svn_path}}/<репозиторій>/"
+        already_exists: вже існує
