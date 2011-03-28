@@ -23,7 +23,9 @@ module RepositoriesHelperPatch
                 svntags['<br />'] = ' ' + add + '<br />'
                 svntags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless params && params[:repository]
-                    svntags << javascript_tag("$('repository_url').value = 'file://#{Svn['path']}/';")
+                    path = Svn['path']
+                    path.gsub!(/\\/, "/") if Redmine::Platform.mswin?
+                    svntags << javascript_tag("$('repository_url').value = 'file://#{path}/';") # FIXME: escape
                 end
             end
             return svntags
