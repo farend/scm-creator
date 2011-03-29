@@ -26,7 +26,7 @@ module RepositoriesControllerPatch
             if request.post? && @repository
                 if params[:operation].present? && params[:operation] == 'add'
                     if params[:repository]
-                        path = Svn['path']
+                        path = Svn['path'].dup
                         path.gsub!(/\\/, "/") if Redmine::Platform.mswin?
                         matches = Regexp.new("^file://#{Regexp.escape(path)}/([^/]+)/?$").match(params[:repository]['url'])
                         if matches
