@@ -26,15 +26,17 @@ module RepositoriesControllerPatch
             if request.post? && @repository
                 if params[:operation].present? && params[:operation] == 'add'
                     if params[:repository]
-                        path = Svn['path'].dup
+                        path = SvnConfig['path'].dup
                         path.gsub!(/\\/, "/") if Redmine::Platform.mswin?
+                        RAILS_DEFAULT_LOGGER.info "path: #{path}" # FIXME
                         matches = Regexp.new("^file://#{Regexp.escape(path)}/([^/]+)/?$").match(params[:repository]['url'])
                         if matches
-                            repath = Redmine::Platform.mswin? ? "#{Svn['path']}\\#{matches[1]}" : "#{Svn['path']}/#{matches[1]}"
+                            repath = Redmine::Platform.mswin? ? "#{SvnConfig['path']}\\#{matches[1]}" : "#{SvnConfig['path']}/#{matches[1]}"
                             if File.directory?(repath)
                                 @repository.errors.add(:url, :already_exists)
                             else
-                                system(Svn['svnadmin'], 'create', repath)
+                                RAILS_DEFAULT_LOGGER.info "#{SvnConfig['svnadmin']} create #{repath}" # FIXME
+                                system(SvnConfig['svnadmin'], 'create', repath)
                             end
                         else
                             @repository.errors.add(:url, :should_be_of_format_local, :svn_path => path)

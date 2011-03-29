@@ -1,9 +1,9 @@
 require 'redmine'
 require 'dispatcher'
 
-require_dependency 'svn'
+require_dependency 'svn_config'
 
-RAILS_DEFAULT_LOGGER.info 'Starting Subversion Plugin for Redmine'
+RAILS_DEFAULT_LOGGER.info 'Starting Subversion Creator Plugin for Redmine'
 
 Dispatcher.to_prepare :redmine_svn_plugin do
     unless RepositoriesHelper.included_modules.include?(RepositoriesHelperPatch)

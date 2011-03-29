@@ -1,4 +1,4 @@
-class Svn
+class SvnConfig
 
     @@instance = nil
     @@configs = {}
