@@ -25,7 +25,7 @@ module RepositoriesHelperPatch
                 unless params && params[:repository]
                     path = SvnConfig['path'].dup
                     path.gsub!(/\\/, "/") if Redmine::Platform.mswin?
-                    svntags << javascript_tag("$('repository_url').value = 'file://#{path}/';") # FIXME: escape
+                    svntags << javascript_tag("$('repository_url').value = 'file://#{escape_javascript(path)}/#{@project.identifier}';")
                 end
             end
             return svntags
