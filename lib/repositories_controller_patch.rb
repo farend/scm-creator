@@ -23,19 +23,22 @@ module RepositoriesControllerPatch
                 @repository = Repository.factory(params[:repository_scm])
                 @repository.project = @project if @repository
             end
+            RAILS_DEFAULT_LOGGER.info '[SVN] RepositoriesControllerPatch::edit_with_add'
             if request.post? && @repository
+                RAILS_DEFAULT_LOGGER.info '[SVN] POST'
                 if params[:operation].present? && params[:operation] == 'add'
+                    RAILS_DEFAULT_LOGGER.info '[SVN] operation = add'
                     if params[:repository]
                         path = SvnConfig['path'].dup
                         path.gsub!(/\\/, "/") if Redmine::Platform.mswin?
-                        RAILS_DEFAULT_LOGGER.info "path: #{path}" # FIXME
+                        RAILS_DEFAULT_LOGGER.info "[SVN] path: #{path}" # FIXME
                         matches = Regexp.new("^file://#{Regexp.escape(path)}/([^/]+)/?$").match(params[:repository]['url'])
                         if matches
                             repath = Redmine::Platform.mswin? ? "#{SvnConfig['path']}\\#{matches[1]}" : "#{SvnConfig['path']}/#{matches[1]}"
                             if File.directory?(repath)
                                 @repository.errors.add(:url, :already_exists)
                             else
-                                RAILS_DEFAULT_LOGGER.info "#{SvnConfig['svnadmin']} create #{repath}" # FIXME
+                                RAILS_DEFAULT_LOGGER.info "[SVN] #{SvnConfig['svnadmin']} create #{repath}" # FIXME
                                 system(SvnConfig['svnadmin'], 'create', repath)
                             end
                         else
