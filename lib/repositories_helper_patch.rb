@@ -19,6 +19,7 @@ module RepositoriesHelperPatch
         def subversion_field_tags_with_add(form, repository)
             svntags = subversion_field_tags_without_add(form, repository)
             if !@project.repository && SvnConfig['path'].present?
+                RAILS_DEFAULT_LOGGER.info "[SUBVERSION_FIELD_TAGS_WITH_ADD] #{SvnConfig['svnadmin']}" # FIXME
                 add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
                 svntags['<br />'] = ' ' + add + '<br />'
                 svntags << hidden_field_tag(:operation, '', :id => 'repository_operation')

@@ -20,6 +20,7 @@ protected
                 @@configs = config[Rails.env]
             end
         end
+        RAILS_DEFAULT_LOGGER.info "[INITIALIZE] #{@@configs['svnadmin']}" # FIXME
     end
 
 end
