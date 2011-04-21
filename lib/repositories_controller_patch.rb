@@ -38,7 +38,7 @@ module RepositoriesControllerPatch
                                 system(SvnConfig['svnadmin'], 'create', repath)
                             end
                         else
-                            @repository.errors.add(:url, :should_be_of_format_local, :svn_path => path)
+                            @repository.errors.add(:url, :should_be_of_format_local, :format => "file://#{path}/<#{l(:label_repository_format)}>/")
                         end
                     end
                 end

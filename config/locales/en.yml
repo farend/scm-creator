@@ -1,8 +1,9 @@
 en:
   button_create_new_repository: Create new repository
+  label_repository_format: repository
 
   activerecord:
     errors:
       messages:
-        should_be_of_format_local: should be of format "file://{{svn_path}}/<repository>/"
+        should_be_of_format_local: should be of format "{{format}}"
         already_exists: already exists

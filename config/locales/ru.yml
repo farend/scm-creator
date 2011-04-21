@@ -1,8 +1,9 @@
 ru:
   button_create_new_repository: Создать новое хранилище
+  label_repository_format: хранилище
 
   activerecord:
     errors:
       messages:
-        should_be_of_format_local: должен соответствовать формату "file://{{svn_path}}/<хранилище>/"
+        should_be_of_format_local: должен соответствовать формату "{{format}}"
         already_exists: уже существует
