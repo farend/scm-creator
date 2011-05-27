@@ -1,5 +1,6 @@
 production:
-  auto_create: false
+  auto_create: true
+  deny_delete: true
   svn:
     path: /var/lib/svn
     svnadmin: /usr/bin/svnadmin

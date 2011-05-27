@@ -7,6 +7,7 @@ module ScmRepositoriesControllerPatch
         base.send(:include, InstanceMethods)
         base.class_eval do
             unloadable
+            before_filter :delete_scm, :only => :destroy
             alias_method_chain :edit, :add # FIXME: just alias_method?
         end
     end
@@ -15,6 +16,11 @@ module ScmRepositoriesControllerPatch
     end
 
     module InstanceMethods
+
+        def delete_scm # TODO
+            RAILS_DEFAULT_LOGGER.info " ***> DELETE_SCM"
+            #render_403
+        end
 
         # NOTE: is a copy of RepositoriesController::edit
         def edit_with_add

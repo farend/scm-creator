@@ -3,6 +3,10 @@ en:
 
   label_repository_format: repository
 
+  field_scm: SCM
+
+  text_cannot_be_changed_later: Cannot be changed later.
+
   activerecord:
     errors:
       messages:

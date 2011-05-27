@@ -3,6 +3,10 @@ ru:
 
   label_repository_format: хранилище
 
+  field_scm: Тип хранилища
+
+  text_cannot_be_changed_later: Позже невозможно будет поменять.
+
   activerecord:
     errors:
       messages:

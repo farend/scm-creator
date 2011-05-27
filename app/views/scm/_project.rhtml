@@ -1,6 +1,13 @@
-<% if @project.new_record? && ScmConfig['svn'] && ScmConfig['git'] %>
-  <p>
-    <label for="project_scm"><%= l(:label_scm_repository) %> <span class="required">*</span></label>
-    <em>FIXME: cannot be changed later</em>
-  </p>
+<% if @project.new_record? %>
+  <% if ScmConfig['svn'] && ScmConfig['git'] %>
+    <p>
+      <label for="project_scm"><%= l(:field_scm) %> <span class="required">*</span></label>
+      <%= select_tag('project[scm]', options_for_select([ [ 'Subversion' ], [ 'Git' ] ], params[:project] ? params[:project][:scm] : nil)) %><br />
+      <em><%= l(:text_cannot_be_changed_later) %></em>
+    </p>
+  <% elsif ScmConfig['svn'] %>
+    <%= hidden_field_tag('project[scm]', 'Subversion') %>
+  <% else %>
+    <%= hidden_field_tag('project[scm]', 'Git') %>
+  <% end %>
 <% end %>
