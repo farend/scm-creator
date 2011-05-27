@@ -1,13 +1,13 @@
 require_dependency 'repositories_controller'
 
-module RepositoriesControllerPatch
+module ScmRepositoriesControllerPatch
 
     def self.included(base)
         base.extend(ClassMethods)
         base.send(:include, InstanceMethods)
         base.class_eval do
             unloadable
-            alias_method_chain :edit, :add
+            alias_method_chain :edit, :add # FIXME: just alias_method?
         end
     end
 
@@ -27,34 +27,35 @@ module RepositoriesControllerPatch
                 if params[:operation].present? && params[:operation] == 'add'
                     if params[:repository]
                         if params[:repository_scm] == 'Subversion'
-                            path = SvnConfig['path'].dup
-                            path.gsub!(/\\/, "/") if Redmine::Platform.mswin?
+                            svnconf = SvnConfig['svn']
+                            path = svnconf['path'].dup
+                            path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
                             matches = Regexp.new("^file://#{Regexp.escape(path)}/([^/]+)/?$").match(params[:repository]['url'])
                             if matches
-                                repath = Redmine::Platform.mswin? ? "#{SvnConfig['path']}\\#{matches[1]}" : "#{SvnConfig['path']}/#{matches[1]}"
+                                repath = Redmine::Platform.mswin? ? "#{svnconf['path']}\\#{matches[1]}" : "#{svnconf['path']}/#{matches[1]}"
                                 if File.directory?(repath)
                                     @repository.errors.add(:url, :already_exists)
                                 else
-                                    RAILS_DEFAULT_LOGGER.info "[EDIT_WITH_ADD] #{SvnConfig['svnadmin']} create #{repath}" # FIXME
-                                    system(SvnConfig['svnadmin'], 'create', repath)
+                                    system(svnconf['svnadmin'], 'create', repath)
                                 end
                             else
                                 @repository.errors.add(:url, :should_be_of_format_local, :format => "file://#{path}/<#{l(:label_repository_format)}>/")
                             end
                         elsif params[:repository_scm] == 'Git'
-                            path = SvnConfig['gitpath'].dup
-                            path.gsub!(/\\/, "/") if Redmine::Platform.mswin?
+                            gitconf = SvnConfig['git']
+                            path = gitconf['path'].dup
+                            path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
                             matches = Regexp.new("^#{Regexp.escape(path)}/([^/]+)/?$").match(params[:repository]['url'])
                             if matches
-                                repath = Redmine::Platform.mswin? ? "#{SvnConfig['gitpath']}\\#{matches[1]}" : "#{SvnConfig['gitpath']}/#{matches[1]}"
+                                repath = Redmine::Platform.mswin? ? "#{gitconf['path']}\\#{matches[1]}" : "#{gitconf['path']}/#{matches[1]}"
                                 if File.directory?(repath)
                                     @repository.errors.add(:url, :already_exists)
                                 else
                                     # TODO: test + separate
                                     #if Redmine::Platform.mswin?
-                                    #    system("mkdir #{matches}& #{SvnConfig['git']} init --bare #{matches}& XCACLS #{matches} /G #{SvnConfig['owner']}:F /y ")
+                                    #    system("mkdir #{matches}& #{gitconf['git']} init --bare #{matches}& XCACLS #{matches} /G #{gitconf['owner']}:F /y ")
                                     #else
-                                    #    system("mkdir #{matches}; #{SvnConfig['git']} init --bare #{matches}; chown -R #{SvnConfig['owner']} #{matches}")
+                                    #    system("mkdir #{matches}; #{gitconf['git']} init --bare #{matches}; chown -R #{gitconf['owner']} #{matches}")
                                     #end
                                 end
                             else

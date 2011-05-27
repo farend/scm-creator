@@ -1,5 +1,6 @@
 en:
   button_create_new_repository: Create new repository
+
   label_repository_format: repository
 
   activerecord:

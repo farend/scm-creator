@@ -1,0 +1,6 @@
+<% if @project.new_record? && ScmConfig['svn'] && ScmConfig['git'] %>
+  <p>
+    <label for="project_scm"><%= l(:label_scm_repository) %> <span class="required">*</span></label>
+    <em>FIXME: cannot be changed later</em>
+  </p>
+<% end %>

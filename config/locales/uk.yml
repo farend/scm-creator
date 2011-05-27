@@ -1,5 +1,6 @@
 uk:
   button_create_new_repository: Створити новий репозиторій
+
   label_repository_format: репозиторій
 
   activerecord:

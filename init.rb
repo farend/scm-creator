@@ -1,24 +1,25 @@
 require 'redmine'
 require 'dispatcher'
 
-require_dependency 'svn_config'
+require_dependency 'scm_config'
+require_dependency 'scm_hook'
 
-RAILS_DEFAULT_LOGGER.info 'Starting Subversion Creator Plugin for Redmine'
+RAILS_DEFAULT_LOGGER.info 'Starting SCM Creator Plugin for Redmine'
 
-Dispatcher.to_prepare :redmine_svn_plugin do
-    unless RepositoriesHelper.included_modules.include?(RepositoriesHelperPatch)
-        RepositoriesHelper.send(:include, RepositoriesHelperPatch)
+Dispatcher.to_prepare :redmine_scm_plugin do
+    unless RepositoriesHelper.included_modules.include?(ScmRepositoriesHelperPatch)
+        RepositoriesHelper.send(:include, ScmRepositoriesHelperPatch)
     end
-    unless RepositoriesController.included_modules.include?(RepositoriesControllerPatch)
-        RepositoriesController.send(:include, RepositoriesControllerPatch)
+    unless RepositoriesController.included_modules.include?(ScmRepositoriesControllerPatch)
+        RepositoriesController.send(:include, ScmRepositoriesControllerPatch)
     end
 end
 
-Redmine::Plugin.register :redmine_svn_plugin do
-    name 'SVN Repository Creator'
+Redmine::Plugin.register :redmine_scm_plugin do
+    name 'SCM Creator'
     author 'Andriy Lesyuk'
-    author_url 'http://www.facebook.com/andriy.lesyuk'
-    description 'Allows creating Subversion repositories using Redmine.'
-    url 'http://labs.softjourn.com/projects/redmine-svn'
+    author_url 'http://www.andriylesyuk.com/'
+    description 'Allows creating Subversion/Git repositories using Redmine.'
+    url 'http://projects.andriylesyuk.com/projects/redmine-svn'
     version '0.0.2'
 end

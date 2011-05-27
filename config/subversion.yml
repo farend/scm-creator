@@ -1,7 +1,0 @@
-production:
-  path: /var/lib/svn
-  svnadmin: /usr/bin/svnadmin
-  gitpath: /var/lib/git
-  git: /usr/bin/git
-
-development:

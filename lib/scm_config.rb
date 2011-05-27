@@ -1,4 +1,4 @@
-class SvnConfig
+class ScmConfig
 
     @@instance = nil
     @@configs = {}
@@ -13,14 +13,13 @@ class SvnConfig
 protected
 
     def initialize
-        file = "#{RAILS_ROOT}/config/subversion.yml"
+        file = "#{RAILS_ROOT}/config/scm.yml"
         if File.file?(file)
             config = YAML::load_file(file)
             if config.is_a?(Hash) && config.has_key?(Rails.env)
                 @@configs = config[Rails.env]
             end
         end
-        RAILS_DEFAULT_LOGGER.info "[INITIALIZE] #{@@configs['svnadmin']}" # FIXME
     end
 
 end
