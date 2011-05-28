@@ -75,6 +75,7 @@ module ScmRepositoriesControllerPatch
                             else
                                 @repository.errors.add(:url, :should_be_of_format_local, :format => "file://#{path}/<#{l(:label_repository_format)}>/")
                             end
+
                         elsif params[:repository_scm] == 'Git'
                             gitconf = ScmConfig['git']
                             path = gitconf['path'].dup
@@ -95,6 +96,7 @@ module ScmRepositoriesControllerPatch
                             else
                                 @repository.errors.add(:url, :should_be_of_format_local, :format => "#{path}/<#{l(:label_repository_format)}>/")
                             end
+
                         else
                             @repository.errors.add_to_base(:scm_not_supported)
                         end

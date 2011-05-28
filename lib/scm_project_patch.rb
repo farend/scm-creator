@@ -47,6 +47,7 @@ module ScmProjectPatch
                         end
                         path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
                         @repository.url = "file://#{path}"
+
                     elsif @scm == 'Git'
                         gitconf = ScmConfig['git']
                         path = Redmine::Platform.mswin? ? "#{gitconf['path']}\\#{self.identifier}" : "#{gitconf['path']}/#{self.identifier}"

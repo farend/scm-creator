@@ -4,8 +4,10 @@ production:
   svn:
     path: /var/lib/svn
     svnadmin: /usr/bin/svnadmin
+    url: svn
   git:
     path: /var/lib/git
     git: /usr/bin/git
+    url: http://git.myhost.com
 
 development:
