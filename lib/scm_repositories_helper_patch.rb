@@ -24,7 +24,7 @@ module ScmRepositoriesHelperPatch
                 add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
                 svntags['<br />'] = ' ' + add + '<br />'
                 svntags << hidden_field_tag(:operation, '', :id => 'repository_operation')
-                unless params && params[:repository] # FIXME: when switching it is not present
+                unless request.post?
                     path = svnconf['path'].dup
                     path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
                     svntags << javascript_tag("$('repository_url').value = 'file://#{escape_javascript(path)}/#{@project.identifier}';")
@@ -40,10 +40,10 @@ module ScmRepositoriesHelperPatch
                 add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
                 gittags['</p>'] = ' ' + add + '</p>'
                 gittags << hidden_field_tag(:operation, '', :id => 'repository_operation')
-                unless params && params[:repository]
+                unless request.post?
                     path = gitconf['path'].dup
                     path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
-                    gittags << javascript_tag("$('repository_url').value = 'file://#{escape_javascript(path)}/#{@project.identifier}';") # FIXME: file://?
+                    gittags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}/#{@project.identifier}';")
                 end
             end
             return gittags

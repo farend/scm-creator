@@ -1,4 +1,4 @@
-<% if @project.new_record? %>
+<% if @project.new_record? && ScmConfig['auto_create'] %>
   <% if ScmConfig['svn'] && ScmConfig['git'] %>
     <p>
       <label for="project_scm"><%= l(:field_scm) %> <span class="required">*</span></label>

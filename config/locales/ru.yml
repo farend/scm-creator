@@ -6,9 +6,11 @@ ru:
   field_scm: Тип хранилища
 
   text_cannot_be_changed_later: Позже невозможно будет поменять.
+  text_cannot_be_used_redmine_auth: Вы не сможете использовать аутентификацию Redmine для этого хранилища.
 
   activerecord:
     errors:
       messages:
         should_be_of_format_local: должен соответствовать формату "{{format}}"
         already_exists: уже существует
+        scm_not_supported: Этот тип хранилища не поддерживается

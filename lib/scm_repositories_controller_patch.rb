@@ -8,7 +8,7 @@ module ScmRepositoriesControllerPatch
         base.class_eval do
             unloadable
             before_filter :delete_scm, :only => :destroy
-            alias_method_chain :edit, :add # FIXME: just alias_method?
+            alias_method :edit, :edit_with_add
         end
     end
 
@@ -17,23 +17,46 @@ module ScmRepositoriesControllerPatch
 
     module InstanceMethods
 
-        def delete_scm # TODO
-            RAILS_DEFAULT_LOGGER.info " ***> DELETE_SCM"
-            #render_403
+        def delete_scm
+            if @repository.created_with_scm && ScmConfig['deny_delete']
+                RAILS_DEFAULT_LOGGER.info "Deletion denied: #{@repository.url}"
+                render_403
+            end
         end
 
-        # NOTE: is a copy of RepositoriesController::edit
+        # Original function
+        #def edit
+        #    @repository = @project.repository
+        #    if !@repository
+        #        @repository = Repository.factory(params[:repository_scm])
+        #        @repository.project = @project if @repository
+        #    end
+        #    if request.post? && @repository
+        #        @repository.attributes = params[:repository]
+        #        @repository.save
+        #    end
+        #    render(:update) do |page|
+        #        page.replace_html("tab-content-repository", :partial => 'projects/settings/repository')
+        #        if @repository && !@project.repository
+        #            @project.reload
+        #            page.replace_html("main-menu", render_main_menu(@project))
+        #        end
+        #    end
+        #end
+
         def edit_with_add
             @repository = @project.repository
             if !@repository
                 @repository = Repository.factory(params[:repository_scm])
                 @repository.project = @project if @repository
             end
+
             if request.post? && @repository
                 if params[:operation].present? && params[:operation] == 'add'
                     if params[:repository]
+
                         if params[:repository_scm] == 'Subversion'
-                            svnconf = SvnConfig['svn']
+                            svnconf = ScmConfig['svn']
                             path = svnconf['path'].dup
                             path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
                             matches = Regexp.new("^file://#{Regexp.escape(path)}/([^/]+)/?$").match(params[:repository]['url'])
@@ -42,13 +65,18 @@ module ScmRepositoriesControllerPatch
                                 if File.directory?(repath)
                                     @repository.errors.add(:url, :already_exists)
                                 else
+                                    RAILS_DEFAULT_LOGGER.info "Creating SVN reporitory: #{repath}"
                                     system(svnconf['svnadmin'], 'create', repath)
+                                    @repository.created_with_scm = true
+                                end
+                                if matches[1] != @project.identifier
+                                    flash[:warning] = l(:text_cannot_be_used_redmine_auth)
                                 end
                             else
                                 @repository.errors.add(:url, :should_be_of_format_local, :format => "file://#{path}/<#{l(:label_repository_format)}>/")
                             end
                         elsif params[:repository_scm] == 'Git'
-                            gitconf = SvnConfig['git']
+                            gitconf = ScmConfig['git']
                             path = gitconf['path'].dup
                             path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
                             matches = Regexp.new("^#{Regexp.escape(path)}/([^/]+)/?$").match(params[:repository]['url'])
@@ -57,26 +85,30 @@ module ScmRepositoriesControllerPatch
                                 if File.directory?(repath)
                                     @repository.errors.add(:url, :already_exists)
                                 else
-                                    # TODO: test + separate
-                                    #if Redmine::Platform.mswin?
-                                    #    system("mkdir #{matches}& #{gitconf['git']} init --bare #{matches}& XCACLS #{matches} /G #{gitconf['owner']}:F /y ")
-                                    #else
-                                    #    system("mkdir #{matches}; #{gitconf['git']} init --bare #{matches}; chown -R #{gitconf['owner']} #{matches}")
-                                    #end
+                                    RAILS_DEFAULT_LOGGER.info "Creating Git reporitory: #{repath}"
+                                    system(gitconf['git'], 'init', '--bare', repath)
+                                    @repository.created_with_scm = true
+                                end
+                                if matches[1] != @project.identifier
+                                    flash[:warning] = l(:text_cannot_be_used_redmine_auth)
                                 end
                             else
-                                @repository.errors.add(:url, :should_be_of_format_local, :format => "file://#{path}/<#{l(:label_repository_format)}>/") # FIXME: file://?
+                                @repository.errors.add(:url, :should_be_of_format_local, :format => "#{path}/<#{l(:label_repository_format)}>/")
                             end
                         else
-                            # TODO: @repository.errors.add(:url, :scm_not_supported)
+                            @repository.errors.add_to_base(:scm_not_supported)
                         end
+
                     end
                 end
+
                 @repository.attributes = params[:repository]
                 if @repository.errors.empty?
+                    @repository.root_url = @repository.url
                     @repository.save
                 end
             end
+
             render(:update) do |page|
                 page.replace_html("tab-content-repository", :partial => 'projects/settings/repository')
                 if @repository && !@project.repository
