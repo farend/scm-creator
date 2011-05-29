@@ -1,5 +1,5 @@
 production:
-  auto_create: true
+  auto_create: false
   deny_delete: true
   svn:
     path: /var/lib/svn
