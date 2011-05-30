@@ -1,11 +1,11 @@
 --- /usr/share/redmine/app/views/projects/settings/_repository.rhtml	2011-03-07 21:44:37.000000000 +0200
-+++ _repository.rhtml	2011-05-28 17:32:18.000000000 +0300
++++ _repository.rhtml	2011-05-29 22:17:01.000000000 +0300
 @@ -16,7 +16,7 @@
  <%= link_to(l(:button_delete), {:controller => 'repositories', :action => 'destroy', :id => @project},
              :confirm => l(:text_are_you_sure),
              :method => :post,
 -            :class => 'icon icon-del') %>
-+            :class => 'icon icon-del') unless ScmConfig['deny_delete'] %>
++            :class => 'icon icon-del') unless @repository.created_with_scm && ScmConfig['deny_delete'] %>
  <% end %>
  </div>
  
