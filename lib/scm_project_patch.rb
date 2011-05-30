@@ -15,6 +15,7 @@ module ScmProjectPatch
             after_create :create_scm
 
             def scm=(type)
+                # FIXME: raise error and don't if exists!
                 @scm = type
             end
 
