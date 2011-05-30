@@ -71,7 +71,7 @@ module ScmRepositoriesHelperPatch
                 matches = Regexp.new("^#{Regexp.escape(path)}/([^/]+)/?$").match(@project.repository.url)
                 if matches
                     url = ''
-                    if gitconf['url'] =~ %r{^(?:https?|git)://}
+                    if gitconf['url'] =~ %r{^(?:https?|git|ssh)://}
                         url = "#{gitconf['url']}/#{matches[1]}"
                     else
                         url = "#{Setting.protocol}://#{Setting.host_name}/#{gitconf['url']}/#{matches[1]}"
