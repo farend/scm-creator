@@ -50,7 +50,7 @@ module ScmProjectPatch
 
                     elsif @scm == 'Git'
                         gitconf = ScmConfig['git']
-                        path = Redmine::Platform.mswin? ? "#{gitconf['path']}\\#{self.identifier}" : "#{gitconf['path']}/#{self.identifier}"
+                        path = Redmine::Platform.mswin? ? "#{gitconf['path']}\\#{self.identifier}.git" : "#{gitconf['path']}/#{self.identifier}.git"
                         if File.directory?(path)
                             RAILS_DEFAULT_LOGGER.info "Automatically using reporitory: #{path}"
                         else

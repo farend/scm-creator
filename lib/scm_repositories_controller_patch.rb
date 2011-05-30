@@ -90,7 +90,7 @@ module ScmRepositoriesControllerPatch
                                     system(gitconf['git'], 'init', '--bare', repath)
                                     @repository.created_with_scm = true
                                 end
-                                if matches[1] != @project.identifier
+                                if matches[1] != @project.identifier && matches[1] != "#{@project.identifier}.git"
                                     flash[:warning] = l(:text_cannot_be_used_redmine_auth)
                                 end
                             else
