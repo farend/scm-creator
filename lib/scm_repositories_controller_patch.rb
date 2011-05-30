@@ -66,8 +66,13 @@ module ScmRepositoriesControllerPatch
                                     @repository.errors.add(:url, :already_exists)
                                 else
                                     RAILS_DEFAULT_LOGGER.info "Creating SVN reporitory: #{repath}"
-                                    system(svnconf['svnadmin'], 'create', repath)
-                                    @repository.created_with_scm = true
+                                    args = [ svnconf['svnadmin'], 'create', repath ]
+                                    args += svnconf['options'] if svnconf['options']
+                                    if system(*args)
+                                        @repository.created_with_scm = true
+                                    else
+                                        RAILS_DEFAULT_LOGGER.error "Repository creation failed"
+                                    end
                                 end
                                 if matches[1] != @project.identifier
                                     flash[:warning] = l(:text_cannot_be_used_redmine_auth)
@@ -87,8 +92,14 @@ module ScmRepositoriesControllerPatch
                                     @repository.errors.add(:url, :already_exists)
                                 else
                                     RAILS_DEFAULT_LOGGER.info "Creating Git reporitory: #{repath}"
-                                    system(gitconf['git'], 'init', '--bare', repath)
-                                    @repository.created_with_scm = true
+                                    args = [ gitconf['git'], 'init' ]
+                                    args += gitconf['options'] if gitconf['options']
+                                    args += repath
+                                    if system(*args)
+                                        @repository.created_with_scm = true
+                                    else
+                                        RAILS_DEFAULT_LOGGER.error "Repository creation failed"
+                                    end
                                 end
                                 if matches[1] != @project.identifier && matches[1] != "#{@project.identifier}.git"
                                     flash[:warning] = l(:text_cannot_be_used_redmine_auth)

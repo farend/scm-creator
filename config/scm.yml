@@ -8,6 +8,7 @@ production:
   git:
     path: /var/lib/git
     git: /usr/bin/git
+    options: --bare
     url: http://git.myhost.com
 
 development:

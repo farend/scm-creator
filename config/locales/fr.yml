@@ -1,0 +1,16 @@
+fr:
+  button_create_new_repository: Créer le dépôt
+
+  label_repository_format: dépôt
+
+  field_scm: SCM
+
+  text_cannot_be_changed_later: Une fois choisi, le SCM ne pourra plus être modifié.
+  text_cannot_be_used_redmine_auth: Ce chemin ne permettra pas d'exposer le dépôt en utilisant les droits d'accès configurés dans Redmine.
+
+  activerecord:
+    errors:
+      messages:
+        should_be_of_format_local: doit respecter le format "{{format}}"
+        already_exists: existe déjà
+        scm_not_supported: La création automatique n'est pas disponible pour ce SCM

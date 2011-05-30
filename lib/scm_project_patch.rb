@@ -42,8 +42,13 @@ module ScmProjectPatch
                             RAILS_DEFAULT_LOGGER.info "Automatically using reporitory: #{path}"
                         else
                             RAILS_DEFAULT_LOGGER.info "Automatically creating SVN reporitory: #{path}"
-                            system(svnconf['svnadmin'], 'create', path)
-                            @repository.created_with_scm = true
+                            args = [ svnconf['svnadmin'], 'create', path ]
+                            args += svnconf['options'] if svnconf['options']
+                            if system(*args)
+                                @repository.created_with_scm = true
+                            else
+                                RAILS_DEFAULT_LOGGER.error "Repository creation failed"
+                            end
                         end
                         path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
                         @repository.url = "file://#{path}"
@@ -55,8 +60,14 @@ module ScmProjectPatch
                             RAILS_DEFAULT_LOGGER.info "Automatically using reporitory: #{path}"
                         else
                             RAILS_DEFAULT_LOGGER.info "Automatically creating Git reporitory: #{path}"
-                            system(gitconf['git'], 'init', '--bare', path)
-                            @repository.created_with_scm = true
+                            args = [ gitconf['git'], 'init' ]
+                            args += gitconf['options'] if gitconf['options']
+                            args += path
+                            if system(*args)
+                                @repository.created_with_scm = true
+                            else
+                                RAILS_DEFAULT_LOGGER.error "Repository creation failed"
+                            end
                         end
                         @repository.url = path
                     end
