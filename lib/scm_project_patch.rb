@@ -10,7 +10,7 @@ module ScmProjectPatch
 
             safe_attributes 'scm'
 
-            validates_presence_of :scm, :if => Proc.new { ScmConfig['auto_create'] }
+            validates_presence_of :scm, :if => Proc.new { ScmConfig['auto_create'] == 'force' }
 
             after_create :create_scm
 
