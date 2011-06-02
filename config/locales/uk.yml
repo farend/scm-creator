@@ -14,3 +14,4 @@ uk:
         should_be_of_format_local: має відповідати формату "{{format}}"
         already_exists: вже існує
         scm_not_supported: Цей тип репозиторію не підтримується
+        repository_exists_for_identifier: Репозиторій вже існує для цього ідентифікатора проекту

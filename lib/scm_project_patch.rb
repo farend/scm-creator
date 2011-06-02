@@ -12,10 +12,11 @@ module ScmProjectPatch
 
             validates_presence_of :scm, :if => Proc.new { ScmConfig['auto_create'] == 'force' }
 
+            validate :repository_exists
+
             after_create :create_scm
 
             def scm=(type)
-                # FIXME: raise error and don't if exists!
                 @scm = type
             end
 
@@ -31,7 +32,7 @@ module ScmProjectPatch
     module InstanceMethods
 
         def create_scm
-            if @scm && ScmConfig['auto_create']
+            if @scm.present? && ScmConfig['auto_create']
                 @repository = Repository.factory(@scm)
                 if @repository
                     @repository.project = self
@@ -40,7 +41,7 @@ module ScmProjectPatch
                         svnconf = ScmConfig['svn']
                         path = Redmine::Platform.mswin? ? "#{svnconf['path']}\\#{self.identifier}" : "#{svnconf['path']}/#{self.identifier}"
                         if File.directory?(path)
-                            RAILS_DEFAULT_LOGGER.info "Automatically using reporitory: #{path}"
+                            RAILS_DEFAULT_LOGGER.warn "Automatically using reporitory: #{path}"
                         else
                             RAILS_DEFAULT_LOGGER.info "Automatically creating SVN reporitory: #{path}"
                             args = [ svnconf['svnadmin'], 'create', path ]
@@ -58,7 +59,7 @@ module ScmProjectPatch
                         gitconf = ScmConfig['git']
                         path = Redmine::Platform.mswin? ? "#{gitconf['path']}\\#{self.identifier}.git" : "#{gitconf['path']}/#{self.identifier}.git"
                         if File.directory?(path)
-                            RAILS_DEFAULT_LOGGER.info "Automatically using reporitory: #{path}"
+                            RAILS_DEFAULT_LOGGER.warn "Automatically using reporitory: #{path}"
                         else
                             RAILS_DEFAULT_LOGGER.info "Automatically creating Git reporitory: #{path}"
                             args = [ gitconf['git'], 'init' ]
@@ -75,6 +76,24 @@ module ScmProjectPatch
 
                     @repository.root_url = @repository.url
                     @repository.save
+                end
+            end
+        end
+
+        def repository_exists
+            if @scm.present? && self.identifier.present? && ScmConfig['auto_create']
+                if @scm == 'Subversion'
+                    svnconf = ScmConfig['svn']
+                    path = Redmine::Platform.mswin? ? "#{svnconf['path']}\\#{self.identifier}" : "#{svnconf['path']}/#{self.identifier}"
+                    if File.directory?(path)
+                        errors.add_to_base(:repository_exists_for_identifier)
+                    end
+                elsif @scm == 'Git'
+                    gitconf = ScmConfig['git']
+                    path = Redmine::Platform.mswin? ? "#{gitconf['path']}\\#{self.identifier}" : "#{gitconf['path']}/#{self.identifier}"
+                    if File.directory?(path) || File.directory?("#{path}.git")
+                        errors.add_to_base(:repository_exists_for_identifier)
+                    end
                 end
             end
         end
