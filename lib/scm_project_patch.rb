@@ -8,7 +8,7 @@ module ScmProjectPatch
         base.class_eval do
             unloadable
 
-            safe_attributes 'scm'
+            safe_attributes 'scm' unless Redmine::VERSION::MAJOR == 1 && Redmine::VERSION::MINOR == 0 # Redmine 1.0.x
 
             validates_presence_of :scm, :if => Proc.new { ScmConfig['auto_create'] == 'force' }
 
