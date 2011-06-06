@@ -45,7 +45,13 @@ module ScmProjectPatch
                         else
                             RAILS_DEFAULT_LOGGER.info "Automatically creating SVN reporitory: #{path}"
                             args = [ svnconf['svnadmin'], 'create', path ]
-                            args += svnconf['options'] if svnconf['options']
+                            if svnconf['options']
+                                if svnconf['options'].is_a?(Array)
+                                    args += svnconf['options']
+                                else
+                                    args << svnconf['options']
+                                end
+                            end
                             if system(*args)
                                 @repository.created_with_scm = true
                             else
@@ -63,8 +69,14 @@ module ScmProjectPatch
                         else
                             RAILS_DEFAULT_LOGGER.info "Automatically creating Git reporitory: #{path}"
                             args = [ gitconf['git'], 'init' ]
-                            args += gitconf['options'] if gitconf['options']
-                            args += path
+                            if gitconf['options']
+                                if gitconf['options'].is_a?(Array)
+                                    args += gitconf['options']
+                                else
+                                    args << gitconf['options']
+                                end
+                            end
+                            args << path
                             if system(*args)
                                 @repository.created_with_scm = true
                             else

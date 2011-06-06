@@ -67,7 +67,13 @@ module ScmRepositoriesControllerPatch
                                 else
                                     RAILS_DEFAULT_LOGGER.info "Creating SVN reporitory: #{repath}"
                                     args = [ svnconf['svnadmin'], 'create', repath ]
-                                    args += svnconf['options'] if svnconf['options']
+                                    if svnconf['options']
+                                        if svnconf['options'].is_a?(Array)
+                                            args += svnconf['options']
+                                        else
+                                            args << svnconf['options']
+                                        end
+                                    end
                                     if system(*args)
                                         @repository.created_with_scm = true
                                     else
@@ -93,8 +99,14 @@ module ScmRepositoriesControllerPatch
                                 else
                                     RAILS_DEFAULT_LOGGER.info "Creating Git reporitory: #{repath}"
                                     args = [ gitconf['git'], 'init' ]
-                                    args += gitconf['options'] if gitconf['options']
-                                    args += repath
+                                    if gitconf['options']
+                                        if gitconf['options'].is_a?(Array)
+                                            args += gitconf['options']
+                                        else
+                                            args << gitconf['options']
+                                        end
+                                    end
+                                    args << repath
                                     if system(*args)
                                         @repository.created_with_scm = true
                                     else
