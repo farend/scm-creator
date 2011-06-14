@@ -63,7 +63,8 @@ module ScmProjectPatch
 
                     elsif @scm == 'Git'
                         gitconf = ScmConfig['git']
-                        path = Redmine::Platform.mswin? ? "#{gitconf['path']}\\#{self.identifier}.git" : "#{gitconf['path']}/#{self.identifier}.git"
+                        ext = gitconf['git_ext'] ? '.git' : ''
+                        path = Redmine::Platform.mswin? ? "#{gitconf['path']}\\#{self.identifier}#{ext}" : "#{gitconf['path']}/#{self.identifier}#{ext}"
                         if File.directory?(path)
                             RAILS_DEFAULT_LOGGER.warn "Automatically using reporitory: #{path}"
                         else
@@ -79,6 +80,11 @@ module ScmProjectPatch
                             args << path
                             if system(*args)
                                 @repository.created_with_scm = true
+                                if gitconf['update_server_info']
+                                    Dir.chdir(path) do
+                                        system(gitconf['git'], 'update-server-info')
+                                    end
+                                end
                             else
                                 RAILS_DEFAULT_LOGGER.error "Repository creation failed"
                             end

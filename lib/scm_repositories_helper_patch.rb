@@ -60,8 +60,9 @@ module ScmRepositoriesHelperPatch
                 gittags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = gitconf['path'].dup
+                    ext = gitconf['git_ext'] ? '.git' : ''
                     path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
-                    gittags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}/#{@project.identifier}.git';")
+                    gittags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}/#{@project.identifier}#{ext}';")
                 end
 
             elsif @project.repository && @project.repository.created_with_scm &&

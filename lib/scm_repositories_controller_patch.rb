@@ -109,6 +109,11 @@ module ScmRepositoriesControllerPatch
                                     args << repath
                                     if system(*args)
                                         @repository.created_with_scm = true
+                                        if gitconf['update_server_info']
+                                            Dir.chdir(repath) do
+                                                system(gitconf['git'], 'update-server-info')
+                                            end
+                                        end
                                     else
                                         RAILS_DEFAULT_LOGGER.error "Repository creation failed"
                                     end
