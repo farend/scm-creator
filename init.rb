@@ -24,5 +24,5 @@ Redmine::Plugin.register :redmine_scm_plugin do
     author_url 'http://www.andriylesyuk.com/'
     description 'Allows creating Subversion/Git repositories using Redmine.'
     url 'http://projects.andriylesyuk.com/projects/redmine-svn'
-    version '0.1.1'
+    version '0.2.0'
 end

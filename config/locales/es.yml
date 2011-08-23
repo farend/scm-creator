@@ -1,0 +1,17 @@
+es:
+  button_create_new_repository: Crear nuevo repositorio
+
+  label_repository_format: repositorio
+
+  field_scm: SCM
+
+  text_cannot_be_changed_later: No puede ser cambiado más tarde.
+  text_cannot_be_used_redmine_auth: La autenticación basada en Redmine no puede usarse con este nombre de repositorio.
+
+  activerecord:
+    errors:
+      messages:
+        should_be_of_format_local: debe tener el formato "{{format}}"
+        already_exists: ya existe
+        scm_not_supported: Este SCM no está soportado
+        repository_exists_for_identifier: Ya existe un repositorio con este identificador de proyecto
