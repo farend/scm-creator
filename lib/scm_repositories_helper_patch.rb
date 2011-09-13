@@ -9,6 +9,7 @@ module ScmRepositoriesHelperPatch
             unloadable
             alias_method_chain :subversion_field_tags, :add
             alias_method_chain :git_field_tags, :add
+            alias_method_chain :mercurial_field_tags, :add
         end
     end
 
@@ -82,6 +83,39 @@ module ScmRepositoriesHelperPatch
             end
 
             return gittags
+        end
+
+        def mercurial_field_tags_with_add(form, repository)
+            hgtags = mercurial_field_tags_without_add(form, repository)
+            hgconf = ScmConfig['mercurial']
+
+            if !@project.repository && hgconf && hgconf['path'].present?
+                add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
+                hgtags['</p>'] = ' ' + add + '</p>'
+                hgtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
+                unless request.post?
+                    path = hgconf['path'].dup
+                    path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
+                    hgtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}/#{@project.identifier}';")
+                end
+
+            elsif @project.repository && @project.repository.created_with_scm &&
+                hgconf && hgconf['path'].present? && hgconf['url'].present?
+                path = hgconf['path'].dup
+                path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
+                matches = Regexp.new("^#{Regexp.escape(path)}/([^/]+)/?$").match(@project.repository.url)
+                if matches
+                    url = ''
+                    if hgconf['url'] =~ %r{^(?:https?|ssh)://}
+                        url = "#{hgconf['url']}/#{matches[1]}"
+                    else
+                        url = "#{Setting.protocol}://#{Setting.host_name}/#{hgconf['url']}/#{matches[1]}"
+                    end
+                    hgtags['</p>'] = '<br />' + url + '</p>'
+                end
+            end
+
+            return hgtags
         end
 
     end

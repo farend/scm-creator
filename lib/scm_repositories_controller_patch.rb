@@ -126,7 +126,37 @@ module ScmRepositoriesControllerPatch
                             end
 
                         elsif params[:repository_scm] == 'Mercurial'
-                            # TODO
+                            hgconf = ScmConfig['mercurial']
+                            path = hgconf['path'].dup
+                            path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
+                            matches = Regexp.new("^#{Regexp.escape(path)}/([^/]+)/?$").match(params[:repository]['url'])
+                            if matches
+                                repath = Redmine::Platform.mswin? ? "#{hgconf['path']}\\#{matches[1]}" : "#{hgconf['path']}/#{matches[1]}"
+                                if File.directory?(repath)
+                                    @repository.errors.add(:url, :already_exists)
+                                else
+                                    RAILS_DEFAULT_LOGGER.info "Creating Mercurial reporitory: #{repath}"
+                                    args = [ hgconf['hg'], 'init' ]
+                                    if hgconf['options']
+                                        if hgconf['options'].is_a?(Array)
+                                            args += hgconf['options']
+                                        else
+                                            args << hgconf['options']
+                                        end
+                                    end
+                                    args << repath
+                                    if system(*args)
+                                        @repository.created_with_scm = true
+                                    else
+                                        RAILS_DEFAULT_LOGGER.error "Repository creation failed"
+                                    end
+                                end
+                                if matches[1] != @project.identifier
+                                    flash[:warning] = l(:text_cannot_be_used_redmine_auth)
+                                end
+                            else
+                                @repository.errors.add(:url, :should_be_of_format_local, :format => "#{path}/<#{l(:label_repository_format)}>/")
+                            end
 
                         else
                             @repository.errors.add_to_base(:scm_not_supported)

@@ -90,6 +90,31 @@ module ScmProjectPatch
                             end
                         end
                         @repository.url = path
+
+                    elsif @scm == 'Mercurial'
+                        hgconf = ScmConfig['mercurial']
+                        path = Redmine::Platform.mswin? ? "#{hgconf['path']}\\#{self.identifier}" : "#{hgconf['path']}/#{self.identifier}"
+                        if File.directory?(path)
+                            RAILS_DEFAULT_LOGGER.warn "Automatically using reporitory: #{path}"
+                        else
+                            RAILS_DEFAULT_LOGGER.info "Automatically creating Mercurial reporitory: #{path}"
+                            args = [ hgconf['hg'], 'init' ]
+                            if hgconf['options']
+                                if hgconf['options'].is_a?(Array)
+                                    args += hgconf['options']
+                                else
+                                    args << hgconf['options']
+                                end
+                            end
+                            args << path
+                            if system(*args)
+                                @repository.created_with_scm = true
+                            else
+                                RAILS_DEFAULT_LOGGER.error "Repository creation failed"
+                            end
+                        end
+                        @repository.url = path
+
                     end
 
                     @repository.root_url = @repository.url
