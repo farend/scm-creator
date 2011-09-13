@@ -12,5 +12,8 @@ production:
     url: http://git.myhost.com
     update_server_info: true
     git_ext: true
+  mercurial:
+    path: /var/lib/mercurial
+    hg: /usr/bin/hg
 
 development:

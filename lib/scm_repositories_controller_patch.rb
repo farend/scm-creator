@@ -125,6 +125,9 @@ module ScmRepositoriesControllerPatch
                                 @repository.errors.add(:url, :should_be_of_format_local, :format => "#{path}/<#{l(:label_repository_format)}>/")
                             end
 
+                        elsif params[:repository_scm] == 'Mercurial'
+                            # TODO
+
                         else
                             @repository.errors.add_to_base(:scm_not_supported)
                         end
