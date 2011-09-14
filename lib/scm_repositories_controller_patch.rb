@@ -27,12 +27,23 @@ module ScmRepositoriesControllerPatch
         # Original function
         #def edit
         #    @repository = @project.repository
-        #    if !@repository
+        #    if !@repository && !params[:repository_scm].blank?
         #        @repository = Repository.factory(params[:repository_scm])
         #        @repository.project = @project if @repository
         #    end
         #    if request.post? && @repository
-        #        @repository.attributes = params[:repository]
+        #        p1 = params[:repository]
+        #        p       = {}
+        #        p_extra = {}
+        #        p1.each do |k, v|
+        #            if k =~ /^extra_/
+        #                p_extra[k] = v
+        #            else
+        #                p[k] = v
+        #            end
+        #        end
+        #        @repository.attributes = p
+        #        @repository.merge_extra_info(p_extra)
         #        @repository.save
         #    end
         #    render(:update) do |page|
@@ -46,20 +57,31 @@ module ScmRepositoriesControllerPatch
 
         def edit_with_add
             @repository = @project.repository
-            if !@repository
+            if !@repository && !params[:repository_scm].blank?
                 @repository = Repository.factory(params[:repository_scm])
                 @repository.project = @project if @repository
             end
 
             if request.post? && @repository
+                attributes = params[:repository]
+                attrs = {}
+                extra = {}
+                attributes.each do |name, value|
+                    if name =~ %r{^extra_}
+                        extra[name] = value
+                    else
+                        attrs[name] = value
+                    end
+                end
+
                 if params[:operation].present? && params[:operation] == 'add'
-                    if params[:repository]
+                    if attrs
 
                         if params[:repository_scm] == 'Subversion'
                             svnconf = ScmConfig['svn']
                             path = svnconf['path'].dup
                             path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
-                            matches = Regexp.new("^file://#{Regexp.escape(path)}/([^/]+)/?$").match(params[:repository]['url'])
+                            matches = Regexp.new("^file://#{Regexp.escape(path)}/([^/]+)/?$").match(attrs['url'])
                             if matches
                                 repath = Redmine::Platform.mswin? ? "#{svnconf['path']}\\#{matches[1]}" : "#{svnconf['path']}/#{matches[1]}"
                                 if File.directory?(repath)
@@ -91,7 +113,7 @@ module ScmRepositoriesControllerPatch
                             gitconf = ScmConfig['git']
                             path = gitconf['path'].dup
                             path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
-                            matches = Regexp.new("^#{Regexp.escape(path)}/([^/]+)/?$").match(params[:repository]['url'])
+                            matches = Regexp.new("^#{Regexp.escape(path)}/([^/]+)/?$").match(attrs['url'])
                             if matches
                                 repath = Redmine::Platform.mswin? ? "#{gitconf['path']}\\#{matches[1]}" : "#{gitconf['path']}/#{matches[1]}"
                                 if File.directory?(repath)
@@ -129,7 +151,7 @@ module ScmRepositoriesControllerPatch
                             hgconf = ScmConfig['mercurial']
                             path = hgconf['path'].dup
                             path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
-                            matches = Regexp.new("^#{Regexp.escape(path)}/([^/]+)/?$").match(params[:repository]['url'])
+                            matches = Regexp.new("^#{Regexp.escape(path)}/([^/]+)/?$").match(attrs['url'])
                             if matches
                                 repath = Redmine::Platform.mswin? ? "#{hgconf['path']}\\#{matches[1]}" : "#{hgconf['path']}/#{matches[1]}"
                                 if File.directory?(repath)
@@ -165,8 +187,9 @@ module ScmRepositoriesControllerPatch
                     end
                 end
 
-                @repository.attributes = params[:repository]
+                @repository.attributes = attrs
                 if @repository.errors.empty?
+                    @repository.merge_extra_info(extra) if @repository.respond_to?(:merge_extra_info)
                     @repository.root_url = @repository.url
                     @repository.save
                 end

@@ -6,8 +6,18 @@
 <%= error_messages_for 'repository' %>
 
 <div class="box tabular">
-<p><%= label_tag('repository_scm', l(:label_scm)) %><%= scm_select_tag(@repository) %></p>
-<%= repository_field_tags(f, @repository) if @repository %>
+<p>
+<%= label_tag('repository_scm', l(:label_scm)) %><%= scm_select_tag(@repository) %>
+<% if @repository && @repository.class.respond_to?(:scm_available) && !@repository.class.scm_available %>
+  <br />
+  <em><%= content_tag 'span', l(:text_scm_command_not_available), :class => 'error' %></em>
+<% end %>
+</p>
+<% button_disabled = @repository.class.respond_to?(:scm_available) ? true : @repository.nil? %>
+<% if @repository %>
+<% button_disabled = !@repository.class.scm_available if @repository.class.respond_to?(:scm_available) %>
+<%= repository_field_tags(f, @repository) %>
+<% end %>
 </div>
 
 <div class="contextual">
@@ -20,5 +30,5 @@
 <% end %>
 </div>
 
-<%= submit_tag((@repository.nil? || @repository.new_record?) ? l(:button_create) : l(:button_save), :disabled => @repository.nil?) %>
+<%= submit_tag((@repository.nil? || @repository.new_record?) ? l(:button_create) : l(:button_save), :disabled => button_disabled) %>
 <% end %>
