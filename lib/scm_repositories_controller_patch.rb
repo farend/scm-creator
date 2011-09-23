@@ -98,6 +98,14 @@ module ScmRepositoriesControllerPatch
                                     end
                                     if system(*args)
                                         @repository.created_with_scm = true
+                                        if svnconf['hooks'] && File.directory?(svnconf['hooks'])
+                                            args = [ '/bin/cp', '-aR' ]
+                                            args += Dir.glob("#{svnconf['hooks']}/*")
+                                            args << "#{path}/hooks/"
+                                            unless system(*args)
+                                                RAILS_DEFAULT_LOGGER.warn "Hooks copy failed"
+                                            end
+                                        end
                                     else
                                         RAILS_DEFAULT_LOGGER.error "Repository creation failed"
                                     end
@@ -136,6 +144,14 @@ module ScmRepositoriesControllerPatch
                                                 system(gitconf['git'], 'update-server-info')
                                             end
                                         end
+                                        if gitconf['hooks'] && File.directory?(gitconf['hooks'])
+                                            args = [ '/bin/cp', '-aR' ]
+                                            args += Dir.glob("#{gitconf['hooks']}/*")
+                                            args << "#{path}/hooks/"
+                                            unless system(*args)
+                                                RAILS_DEFAULT_LOGGER.warn "Hooks copy failed"
+                                            end
+                                        end
                                     else
                                         RAILS_DEFAULT_LOGGER.error "Repository creation failed"
                                     end
@@ -169,6 +185,14 @@ module ScmRepositoriesControllerPatch
                                     args << repath
                                     if system(*args)
                                         @repository.created_with_scm = true
+                                        if hgconf['hgrc'] && File.exists?(hgconf['hgrc'])
+                                            args = [ '/bin/cp' ]
+                                            args << hgconf['hgrc']
+                                            args << "#{path}/.hg/hgrc"
+                                            unless system(*args)
+                                                RAILS_DEFAULT_LOGGER.warn "File hgrc copy failed"
+                                            end
+                                        end
                                     else
                                         RAILS_DEFAULT_LOGGER.error "Repository creation failed"
                                     end

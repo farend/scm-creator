@@ -4,6 +4,7 @@ production:
   svn:
     path: /var/lib/svn
     svnadmin: /usr/bin/svnadmin
+    hooks: /usr/share/subversion/hook-scripts
     url: svn
   git:
     path: /var/lib/git
@@ -12,8 +13,10 @@ production:
     url: http://git.myhost.com
     update_server_info: true
     git_ext: true
+    hooks: /usr/share/git/hooks
   mercurial:
     path: /var/lib/mercurial
     hg: /usr/bin/hg
+    hgrc: /etc/mercurial/hgrc
 
 development:
