@@ -8,7 +8,7 @@ RAILS_DEFAULT_LOGGER.info 'Starting SCM Creator Plugin for Redmine'
 
 ActiveRecord::Base.observers << :repository_observer
 
-# FIXME: DRY
+# FIXME: DRY DRY DRY
 
 Dispatcher.to_prepare :redmine_scm_plugin do
     unless Project.included_modules.include?(ScmProjectPatch)

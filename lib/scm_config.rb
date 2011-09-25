@@ -10,6 +10,8 @@ class ScmConfig
         @@configs[config]
     end
 
+    # TODO: method_missing (e.g. ScmConfig.svn) ?
+
 protected
 
     def initialize
