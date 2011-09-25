@@ -5,3 +5,6 @@ Thanks to:
  o Jean-Sébastien Bour for French translation and patch
  o Txinto Vaz for Spanish translation
  o Fabricio Caseiro for Brazillian Portuguese translation
+ o Takashi Okamoto for SCM hooks patch
+ o John Blackwood and Etienne Savard for Mercurial assistance
+ o Roland Firmont for patch supporting Redmine 1.2.x
