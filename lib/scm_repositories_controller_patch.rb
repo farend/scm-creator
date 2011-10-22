@@ -101,7 +101,7 @@ module ScmRepositoriesControllerPatch
                                         if svnconf['hooks'] && File.directory?(svnconf['hooks'])
                                             args = [ '/bin/cp', '-aR' ]
                                             args += Dir.glob("#{svnconf['hooks']}/*")
-                                            args << "#{path}/hooks/"
+                                            args << "#{repath}/hooks/"
                                             unless system(*args)
                                                 RAILS_DEFAULT_LOGGER.warn "Hooks copy failed"
                                             end
@@ -147,7 +147,7 @@ module ScmRepositoriesControllerPatch
                                         if gitconf['hooks'] && File.directory?(gitconf['hooks'])
                                             args = [ '/bin/cp', '-aR' ]
                                             args += Dir.glob("#{gitconf['hooks']}/*")
-                                            args << "#{path}/hooks/"
+                                            args << "#{repath}/hooks/"
                                             unless system(*args)
                                                 RAILS_DEFAULT_LOGGER.warn "Hooks copy failed"
                                             end
@@ -188,7 +188,7 @@ module ScmRepositoriesControllerPatch
                                         if hgconf['hgrc'] && File.exists?(hgconf['hgrc'])
                                             args = [ '/bin/cp' ]
                                             args << hgconf['hgrc']
-                                            args << "#{path}/.hg/hgrc"
+                                            args << "#{repath}/.hg/hgrc"
                                             unless system(*args)
                                                 RAILS_DEFAULT_LOGGER.warn "File hgrc copy failed"
                                             end
