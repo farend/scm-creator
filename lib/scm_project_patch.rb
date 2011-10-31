@@ -54,7 +54,7 @@ module ScmProjectPatch
                             end
                             if system(*args)
                                 @repository.created_with_scm = true
-                                if svnconf['hooks'] && File.directory?(svnconf['hooks'])
+                                if svnconf['hooks'] && File.directory?(svnconf['hooks']) # FIXME: obsolete
                                     args = [ '/bin/cp', '-aR' ]
                                     args += Dir.glob("#{svnconf['hooks']}/*")
                                     args << "#{path}/hooks/"

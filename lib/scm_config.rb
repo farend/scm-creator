@@ -10,12 +10,10 @@ class ScmConfig
         @@configs[config]
     end
 
-    # TODO: method_missing (e.g. ScmConfig.svn) ?
-
 protected
 
     def initialize
-        file = "#{RAILS_ROOT}/config/scm.yml"
+        file = "#{RAILS_ROOT}/config/scm.yml" # FIXME: support scm.yml in plugin's dir
         if File.file?(file)
             config = YAML::load_file(file)
             if config.is_a?(Hash) && config.has_key?(Rails.env)
