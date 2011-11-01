@@ -37,112 +37,31 @@ module ScmProjectPatch
                 if @repository
                     @repository.project = self
 
-                    if @scm == 'Subversion'
-                        svnconf = ScmConfig['svn']
-                        path = Redmine::Platform.mswin? ? "#{svnconf['path']}\\#{self.identifier}" : "#{svnconf['path']}/#{self.identifier}"
+                    begin
+                        interface = Object.const_get("#{@scm}Creator")
+                        config = ScmConfig[interface.scm_name]
+                        path = interface.default_path(self.identifier, config)
+
                         if File.directory?(path)
                             RAILS_DEFAULT_LOGGER.warn "Automatically using reporitory: #{path}"
                         else
-                            RAILS_DEFAULT_LOGGER.info "Automatically creating SVN reporitory: #{path}"
-                            args = [ svnconf['svnadmin'], 'create', path ]
-                            if svnconf['options']
-                                if svnconf['options'].is_a?(Array)
-                                    args += svnconf['options']
-                                else
-                                    args << svnconf['options']
-                                end
-                            end
-                            if system(*args)
+                            RAILS_DEFAULT_LOGGER.info "Automatically creating reporitory: #{path}"
+                            if interface.create_repository(path, config)
                                 @repository.created_with_scm = true
-                                if svnconf['hooks'] && File.directory?(svnconf['hooks']) # FIXME: obsolete
-                                    args = [ '/bin/cp', '-aR' ]
-                                    args += Dir.glob("#{svnconf['hooks']}/*")
-                                    args << "#{path}/hooks/"
-                                    unless system(*args)
-                                        RAILS_DEFAULT_LOGGER.warn "Hooks copy failed"
-                                    end
+                                unless interface.copy_hooks(path, config)
+                                    RAILS_DEFAULT_LOGGER.warn "Hooks copy failed"
                                 end
                             else
                                 RAILS_DEFAULT_LOGGER.error "Repository creation failed"
                             end
                         end
-                        path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
-                        @repository.url = "file://#{path}"
 
-                    elsif @scm == 'Git'
-                        gitconf = ScmConfig['git']
-                        ext = gitconf['git_ext'] ? '.git' : ''
-                        path = Redmine::Platform.mswin? ? "#{gitconf['path']}\\#{self.identifier}#{ext}" : "#{gitconf['path']}/#{self.identifier}#{ext}"
-                        if File.directory?(path)
-                            RAILS_DEFAULT_LOGGER.warn "Automatically using reporitory: #{path}"
-                        else
-                            RAILS_DEFAULT_LOGGER.info "Automatically creating Git reporitory: #{path}"
-                            args = [ gitconf['git'], 'init' ]
-                            if gitconf['options']
-                                if gitconf['options'].is_a?(Array)
-                                    args += gitconf['options']
-                                else
-                                    args << gitconf['options']
-                                end
-                            end
-                            args << path
-                            if system(*args)
-                                @repository.created_with_scm = true
-                                if gitconf['update_server_info']
-                                    Dir.chdir(path) do
-                                        system(gitconf['git'], 'update-server-info')
-                                    end
-                                end
-                                if gitconf['hooks'] && File.directory?(gitconf['hooks'])
-                                    args = [ '/bin/cp', '-aR' ]
-                                    args += Dir.glob("#{gitconf['hooks']}/*")
-                                    args << "#{path}/hooks/"
-                                    unless system(*args)
-                                        RAILS_DEFAULT_LOGGER.warn "Hooks copy failed"
-                                    end
-                                end
-                            else
-                                RAILS_DEFAULT_LOGGER.error "Repository creation failed"
-                            end
-                        end
-                        @repository.url = path
+                        @repository.root_url = @repository.url = interface.urlify(path)
+                        @repository.save
 
-                    elsif @scm == 'Mercurial'
-                        hgconf = ScmConfig['mercurial']
-                        path = Redmine::Platform.mswin? ? "#{hgconf['path']}\\#{self.identifier}" : "#{hgconf['path']}/#{self.identifier}"
-                        if File.directory?(path)
-                            RAILS_DEFAULT_LOGGER.warn "Automatically using reporitory: #{path}"
-                        else
-                            RAILS_DEFAULT_LOGGER.info "Automatically creating Mercurial reporitory: #{path}"
-                            args = [ hgconf['hg'], 'init' ]
-                            if hgconf['options']
-                                if hgconf['options'].is_a?(Array)
-                                    args += hgconf['options']
-                                else
-                                    args << hgconf['options']
-                                end
-                            end
-                            args << path
-                            if system(*args)
-                                @repository.created_with_scm = true
-                                if hgconf['hgrc'] && File.exists?(hgconf['hgrc'])
-                                    args = [ '/bin/cp' ]
-                                    args << hgconf['hgrc']
-                                    args << "#{path}/.hg/hgrc"
-                                    unless system(*args)
-                                        RAILS_DEFAULT_LOGGER.warn "File hgrc copy failed"
-                                    end
-                                end
-                            else
-                                RAILS_DEFAULT_LOGGER.error "Repository creation failed"
-                            end
-                        end
-                        @repository.url = path
-
+                    rescue NameError
+                        RAILS_DEFAULT_LOGGER.error "Can't find interface for #{@scm}."
                     end
-
-                    @repository.root_url = @repository.url
-                    @repository.save
                 end
             end
         end
@@ -161,7 +80,7 @@ module ScmProjectPatch
                     if File.directory?(path) || File.directory?("#{path}.git")
                         errors.add_to_base(:repository_exists_for_identifier)
                     end
-                end
+                end # FIXME: Mercurial??!
             end
         end
 

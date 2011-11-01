@@ -18,7 +18,7 @@ module ScmRepositoriesHelperPatch
 
     module InstanceMethods
 
-        def subversion_field_tags_with_add(form, repository)
+        def subversion_field_tags_with_add(form, repository) # FIXME: ?
             svntags = subversion_field_tags_without_add(form, repository)
             svnconf = ScmConfig['svn']
 

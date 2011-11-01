@@ -11,14 +11,14 @@ class MercurialCreator < SCMCreator
 
         def copy_hooks(path, options)
             if options['hgrc']
-                RAILS_DEFAULT_LOGGER.warn "Option 'hgrc' is obsolete - use 'post_create' instead." # TODO: add issue
+                RAILS_DEFAULT_LOGGER.warn "Option 'hgrc' is obsolete - use 'post_create' instead. See: http://projects.andriylesyuk.com/issues/1886."
                 if File.exists?(options['hgrc'])
                     args = [ '/bin/cp' ]
                     args << options['hgrc']
                     args << "#{path}/.hg/hgrc"
                     system(*args)
                 else
-                    # TODO
+                    RAILS_DEFAULT_LOGGER.error "File #{options['hgrc']} does not exist."
                     false
                 end
             else

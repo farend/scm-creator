@@ -1,6 +1,11 @@
 require 'redmine'
 require 'dispatcher'
 
+require_dependency 'creator/scm_creator'
+require_dependency 'creator/subversion_creator'
+require_dependency 'creator/mercurial_creator'
+require_dependency 'creator/git_creator'
+
 require_dependency 'scm_config'
 require_dependency 'scm_hook'
 

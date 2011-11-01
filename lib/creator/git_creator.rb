@@ -2,12 +2,11 @@ class GitCreator < SCMCreator
 
     class << self
 
-        def default_path(identifier, options) # FIXME: use super
-            extension = options['git_ext'] ? '.git' : ''
-            if Redmine::Platform.mswin?
-                "#{options['path']}\\#{identifier}#{extension}"
+        def default_path(identifier, options)
+            if options['git_ext']
+                super + '.git'
             else
-                "#{options['path']}/#{identifier}#{extension}"
+                super
             end
         end
 
