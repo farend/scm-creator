@@ -12,7 +12,7 @@ module ScmProjectPatch
 
             validates_presence_of :scm, :if => Proc.new { |project| project.new_record? && ScmConfig['auto_create'] == 'force' }
 
-            validate :repository_exists
+            validate :repository_exists # FIXME: not sure if this should really be used
 
             after_create :create_scm
 
@@ -39,7 +39,7 @@ module ScmProjectPatch
 
                     begin
                         interface = Object.const_get("#{@scm}Creator")
-                        config = ScmConfig[interface.scm_name]
+                        config = ScmConfig[interface.scm_id]
                         path = interface.default_path(self.identifier, config)
 
                         if File.directory?(path)
@@ -68,19 +68,15 @@ module ScmProjectPatch
 
         def repository_exists
             if @scm.present? && self.identifier.present? && ScmConfig['auto_create']
-                if @scm == 'Subversion'
-                    svnconf = ScmConfig['svn']
-                    path = Redmine::Platform.mswin? ? "#{svnconf['path']}\\#{self.identifier}" : "#{svnconf['path']}/#{self.identifier}"
-                    if File.directory?(path)
+                begin
+                    interface = Object.const_get("#{@scm}Creator")
+                    config = ScmConfig[interface.scm_id]
+                    if interface.repository_exists?(self.identifier, config)
                         errors.add_to_base(:repository_exists_for_identifier)
                     end
-                elsif @scm == 'Git'
-                    gitconf = ScmConfig['git']
-                    path = Redmine::Platform.mswin? ? "#{gitconf['path']}\\#{self.identifier}" : "#{gitconf['path']}/#{self.identifier}"
-                    if File.directory?(path) || File.directory?("#{path}.git")
-                        errors.add_to_base(:repository_exists_for_identifier)
-                    end
-                end # FIXME: Mercurial??!
+                rescue NameError
+                    RAILS_DEFAULT_LOGGER.error "Can't find interface for #{@scm}."
+                end
             end
         end
 

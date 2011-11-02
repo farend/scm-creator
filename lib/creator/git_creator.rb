@@ -10,6 +10,15 @@ class GitCreator < SCMCreator
             end
         end
 
+        def repository_name_equal?(name, identifier)
+            name == identifier || name == "#{identifier}.git"
+        end
+
+        def repository_exists?(identifier, options)
+            path = default_path(identifier, options.reject{ |option, value| option == 'git_ext' })
+            File.directory?(path) || File.directory?("#{path}.git")
+        end
+
         def create_repository(path, options)
             args = [ options['git'], 'init' ]
             append_options(args, options)

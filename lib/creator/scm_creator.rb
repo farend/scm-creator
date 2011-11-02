@@ -2,7 +2,7 @@ class SCMCreator
 
     class << self
 
-        def scm_name
+        def scm_id
             if self.name =~ %r{^(.+)Creator$}
                 $1.downcase
             else
@@ -21,6 +21,25 @@ class SCMCreator
             else
                 "#{options['path']}/#{identifier}"
             end
+        end
+
+        def repository_name(path, options)
+            base = Redmine::Platform.mswin? ? options['path'].gsub!(%r{\\}, "/") : options['path']
+            matches = Regexp.new("^#{Regexp.escape(base)}/([^/]+)/?$").match(path)
+            matches ? matches[1] : nil
+        end
+
+        def repository_name_equal?(name, identifier)
+            name == identifier
+        end
+
+        def repository_format(options)
+            path = Redmine::Platform.mswin? ? options['path'].gsub!(%r{\\}, "/") : options['path']
+            "#{path}/<#{l(:label_repository_format)}>/"
+        end
+
+        def repository_exists?(identifier, options) # FIXME: obsolete?
+            File.directory?(default_path(identifier, options))
         end
 
         def create_repository(path, options)

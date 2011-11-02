@@ -77,137 +77,37 @@ module ScmRepositoriesControllerPatch
                 if params[:operation].present? && params[:operation] == 'add'
                     if attrs
 
-                        if params[:repository_scm] == 'Subversion'
-                            svnconf = ScmConfig['svn']
-                            path = svnconf['path'].dup
-                            path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
-                            matches = Regexp.new("^file://#{Regexp.escape(path)}/([^/]+)/?$").match(attrs['url'])
-                            if matches
-                                repath = Redmine::Platform.mswin? ? "#{svnconf['path']}\\#{matches[1]}" : "#{svnconf['path']}/#{matches[1]}"
-                                if File.directory?(repath)
+                        begin
+                            interface = Object.const_get("#{params[:repository_scm]}Creator")
+                            config = ScmConfig[interface.scm_id]
+
+                            name = interface.repository_name(attrs['url'], config)
+                            if name
+                                path = interface.default_path(name, config) # FIXME: adds another .git!
+                                if File.directory?(path)
                                     @repository.errors.add(:url, :already_exists)
                                 else
-                                    RAILS_DEFAULT_LOGGER.info "Creating SVN reporitory: #{repath}"
-                                    args = [ svnconf['svnadmin'], 'create', repath ]
-                                    if svnconf['options']
-                                        if svnconf['options'].is_a?(Array)
-                                            args += svnconf['options']
-                                        else
-                                            args << svnconf['options']
-                                        end
-                                    end
-                                    if system(*args)
+                                    RAILS_DEFAULT_LOGGER.info "Creating reporitory: #{path}"
+                                    if interface.create_repository(path, config)
                                         @repository.created_with_scm = true
-                                        if svnconf['hooks'] && File.directory?(svnconf['hooks'])
-                                            args = [ '/bin/cp', '-aR' ]
-                                            args += Dir.glob("#{svnconf['hooks']}/*")
-                                            args << "#{repath}/hooks/"
-                                            unless system(*args)
-                                                RAILS_DEFAULT_LOGGER.warn "Hooks copy failed"
-                                            end
+                                        unless interface.copy_hooks(path, config)
+                                            RAILS_DEFAULT_LOGGER.warn "Hooks copy failed"
                                         end
                                     else
                                         RAILS_DEFAULT_LOGGER.error "Repository creation failed"
                                     end
                                 end
-                                if matches[1] != @project.identifier
+                                if !interface.repository_name_equal?(name, @project.identifier)
                                     flash[:warning] = l(:text_cannot_be_used_redmine_auth)
                                 end
                             else
-                                @repository.errors.add(:url, :should_be_of_format_local, :format => "file://#{path}/<#{l(:label_repository_format)}>/")
+                                @repository.errors.add(:url, :should_be_of_format_local, :format => interface.repository_format(config))
                             end
 
-                        elsif params[:repository_scm] == 'Git'
-                            gitconf = ScmConfig['git']
-                            path = gitconf['path'].dup
-                            path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
-                            matches = Regexp.new("^#{Regexp.escape(path)}/([^/]+)/?$").match(attrs['url'])
-                            if matches
-                                repath = Redmine::Platform.mswin? ? "#{gitconf['path']}\\#{matches[1]}" : "#{gitconf['path']}/#{matches[1]}"
-                                if File.directory?(repath)
-                                    @repository.errors.add(:url, :already_exists)
-                                else
-                                    RAILS_DEFAULT_LOGGER.info "Creating Git reporitory: #{repath}"
-                                    args = [ gitconf['git'], 'init' ]
-                                    if gitconf['options']
-                                        if gitconf['options'].is_a?(Array)
-                                            args += gitconf['options']
-                                        else
-                                            args << gitconf['options']
-                                        end
-                                    end
-                                    args << repath
-                                    if system(*args)
-                                        @repository.created_with_scm = true
-                                        if gitconf['update_server_info']
-                                            Dir.chdir(repath) do
-                                                system(gitconf['git'], 'update-server-info')
-                                            end
-                                        end
-                                        if gitconf['hooks'] && File.directory?(gitconf['hooks'])
-                                            args = [ '/bin/cp', '-aR' ]
-                                            args += Dir.glob("#{gitconf['hooks']}/*")
-                                            args << "#{repath}/hooks/"
-                                            unless system(*args)
-                                                RAILS_DEFAULT_LOGGER.warn "Hooks copy failed"
-                                            end
-                                        end
-                                    else
-                                        RAILS_DEFAULT_LOGGER.error "Repository creation failed"
-                                    end
-                                end
-                                if matches[1] != @project.identifier && matches[1] != "#{@project.identifier}.git"
-                                    flash[:warning] = l(:text_cannot_be_used_redmine_auth)
-                                end
-                            else
-                                @repository.errors.add(:url, :should_be_of_format_local, :format => "#{path}/<#{l(:label_repository_format)}>/")
-                            end
-
-                        elsif params[:repository_scm] == 'Mercurial'
-                            hgconf = ScmConfig['mercurial']
-                            path = hgconf['path'].dup
-                            path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
-                            matches = Regexp.new("^#{Regexp.escape(path)}/([^/]+)/?$").match(attrs['url'])
-                            if matches
-                                repath = Redmine::Platform.mswin? ? "#{hgconf['path']}\\#{matches[1]}" : "#{hgconf['path']}/#{matches[1]}"
-                                if File.directory?(repath)
-                                    @repository.errors.add(:url, :already_exists)
-                                else
-                                    RAILS_DEFAULT_LOGGER.info "Creating Mercurial reporitory: #{repath}"
-                                    args = [ hgconf['hg'], 'init' ]
-                                    if hgconf['options']
-                                        if hgconf['options'].is_a?(Array)
-                                            args += hgconf['options']
-                                        else
-                                            args << hgconf['options']
-                                        end
-                                    end
-                                    args << repath
-                                    if system(*args)
-                                        @repository.created_with_scm = true
-                                        if hgconf['hgrc'] && File.exists?(hgconf['hgrc'])
-                                            args = [ '/bin/cp' ]
-                                            args << hgconf['hgrc']
-                                            args << "#{repath}/.hg/hgrc"
-                                            unless system(*args)
-                                                RAILS_DEFAULT_LOGGER.warn "File hgrc copy failed"
-                                            end
-                                        end
-                                    else
-                                        RAILS_DEFAULT_LOGGER.error "Repository creation failed"
-                                    end
-                                end
-                                if matches[1] != @project.identifier
-                                    flash[:warning] = l(:text_cannot_be_used_redmine_auth)
-                                end
-                            else
-                                @repository.errors.add(:url, :should_be_of_format_local, :format => "#{path}/<#{l(:label_repository_format)}>/")
-                            end
-
-                        else
+                        rescue NameError
+                            RAILS_DEFAULT_LOGGER.error "Can't find interface for #{params[:repository_scm]}."
                             @repository.errors.add_to_base(:scm_not_supported)
                         end
-
                     end
                 end
 

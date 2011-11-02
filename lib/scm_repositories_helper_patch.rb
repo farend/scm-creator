@@ -51,7 +51,7 @@ module ScmRepositoriesHelperPatch
             return svntags
         end
 
-        def git_field_tags_with_add(form, repository)
+        def git_field_tags_with_add(form, repository) # FIXME: fix button placement
             gittags = git_field_tags_without_add(form, repository)
             gitconf = ScmConfig['git']
 
@@ -85,7 +85,7 @@ module ScmRepositoriesHelperPatch
             return gittags
         end
 
-        def mercurial_field_tags_with_add(form, repository)
+        def mercurial_field_tags_with_add(form, repository) # FIXME: fix button placement
             hgtags = mercurial_field_tags_without_add(form, repository)
             hgconf = ScmConfig['mercurial']
 
