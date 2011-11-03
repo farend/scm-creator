@@ -63,7 +63,11 @@ module ScmRepositoriesHelperPatch
                 hgconf && hgconf['path'].present? && hgconf['url'].present?
                 name = MercurialCreator.repository_name(@project.repository.url)
                 if name
-                    hgtags['</p>'] = '<br />' + MercurialCreator.url(name) + '</p>' # FIXME: replace in 1.2.x
+                    if hgtags.include?(l(:text_mercurial_repository_note))
+                        hgtags[l(:text_mercurial_repository_note)] = MercurialCreator.url(name)
+                    else
+                        hgtags['</p>'] = '<br />' + MercurialCreator.url(name) + '</p>'
+                    end
                 end
             end
 
@@ -91,7 +95,11 @@ module ScmRepositoriesHelperPatch
                 gitconf && gitconf['path'].present? && gitconf['url'].present?
                 name = GitCreator.repository_name(@project.repository.url)
                 if name
-                    gittags['</p>'] = '<br />' + GitCreator.url(name) + '</p>' # FIXME: replace in 1.2.x
+                    if gittags.include?(l(:text_git_repository_note))
+                        gittags[l(:text_git_repository_note)] = GitCreator.url(name)
+                    else
+                        gittags['</p>'] = '<br />' + GitCreator.url(name) + '</p>'
+                    end
                 end
             end
 

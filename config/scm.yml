@@ -1,8 +1,10 @@
 production:
   auto_create: false
   deny_delete: true
+  pre_create: /usr/local/bin/pre-create.sh
   post_create: /usr/local/bin/post-create.sh
   pre_delete: /usr/local/bin/pre-delete.sh
+  post_delete: /usr/local/bin/post-delete.sh
   svn:
     path: /var/lib/svn
     svnadmin: /usr/bin/svnadmin
@@ -17,5 +19,8 @@ production:
   mercurial:
     path: /var/lib/mercurial
     hg: /usr/bin/hg
+  bazaar:
+    path: /var/li/bazaar
+    bzr: /usr/bin/bzr
 
 development:

@@ -87,7 +87,15 @@ module ScmRepositoriesControllerPatch
                                     @repository.errors.add(:url, :already_exists)
                                 else
                                     RAILS_DEFAULT_LOGGER.info "Creating reporitory: #{path}"
+                                    if ScmConfig['pre_create'] && File.executable?(ScmConfig['pre_create'])
+                                        interface.execute(ScmConfig['pre_create'], path, @project)
+                                    end
+                                    # TODO: hook
                                     if interface.create_repository(path)
+                                        # TODO: hook
+                                        if ScmConfig['post_create'] && File.executable?(ScmConfig['post_create'])
+                                            interface.execute(ScmConfig['post_create'], path, @project)
+                                        end
                                         @repository.created_with_scm = true
                                         unless interface.copy_hooks(path)
                                             RAILS_DEFAULT_LOGGER.warn "Hooks copy failed"
