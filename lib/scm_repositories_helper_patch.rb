@@ -8,8 +8,8 @@ module ScmRepositoriesHelperPatch
         base.class_eval do
             unloadable
             alias_method_chain :subversion_field_tags, :add
-            alias_method_chain :git_field_tags, :add
-            alias_method_chain :mercurial_field_tags, :add
+            alias_method_chain :mercurial_field_tags,  :add
+            alias_method_chain :git_field_tags,        :add
         end
     end
 
@@ -18,7 +18,7 @@ module ScmRepositoriesHelperPatch
 
     module InstanceMethods
 
-        def subversion_field_tags_with_add(form, repository) # FIXME: ?
+        def subversion_field_tags_with_add(form, repository)
             svntags = subversion_field_tags_without_add(form, repository)
             svnconf = ScmConfig['svn']
 
@@ -27,95 +27,75 @@ module ScmRepositoriesHelperPatch
                 svntags['<br />'] = ' ' + add + '<br />'
                 svntags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
-                    path = svnconf['path'].dup
-                    path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
-                    svntags << javascript_tag("$('repository_url').value = 'file://#{escape_javascript(path)}/#{@project.identifier}';")
+                    path = SubversionCreator.command_line_path(SubversionCreator.default_path(@project.identifier))
+                    svntags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
                 end
 
             elsif @project.repository && @project.repository.created_with_scm &&
                 svnconf && svnconf['path'].present? && svnconf['url'].present?
-                path = svnconf['path'].dup
-                path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
-                matches = Regexp.new("^file://#{Regexp.escape(path)}/([^/]+)/?$").match(@project.repository.url)
-                if matches
-                    url = ''
-                    if svnconf['url'] =~ %r{^(?:file|https?|svn(?:\+[a-z]+)?)://}
-                        url = "#{svnconf['url']}/#{matches[1]}"
-                    else
-                        url = "#{Setting.protocol}://#{Setting.host_name}/#{svnconf['url']}/#{matches[1]}"
-                    end
-                    svntags['(file:///, http://, https://, svn://, svn+[tunnelscheme]://)'] = url
+                name = SubversionCreator.repository_name(@project.repository.url)
+                if name
+                    svntags['(file:///, http://, https://, svn://, svn+[tunnelscheme]://)'] = SubversionCreator.url(name)
                 end
             end
 
             return svntags
         end
 
-        def git_field_tags_with_add(form, repository) # FIXME: fix button placement
-            gittags = git_field_tags_without_add(form, repository)
-            gitconf = ScmConfig['git']
-
-            if !@project.repository && gitconf && gitconf['path'].present?
-                add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
-                gittags['</p>'] = ' ' + add + '</p>'
-                gittags << hidden_field_tag(:operation, '', :id => 'repository_operation')
-                unless request.post?
-                    path = gitconf['path'].dup
-                    ext = gitconf['git_ext'] ? '.git' : ''
-                    path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
-                    gittags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}/#{@project.identifier}#{ext}';")
-                end
-
-            elsif @project.repository && @project.repository.created_with_scm &&
-                gitconf && gitconf['path'].present? && gitconf['url'].present?
-                path = gitconf['path'].dup
-                path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
-                matches = Regexp.new("^#{Regexp.escape(path)}/([^/]+)/?$").match(@project.repository.url)
-                if matches
-                    url = ''
-                    if gitconf['url'] =~ %r{^(?:https?|git|ssh)://}
-                        url = "#{gitconf['url']}/#{matches[1]}"
-                    else
-                        url = "#{Setting.protocol}://#{Setting.host_name}/#{gitconf['url']}/#{matches[1]}"
-                    end
-                    gittags['</p>'] = '<br />' + url + '</p>'
-                end
-            end
-
-            return gittags
-        end
-
-        def mercurial_field_tags_with_add(form, repository) # FIXME: fix button placement
+        def mercurial_field_tags_with_add(form, repository)
             hgtags = mercurial_field_tags_without_add(form, repository)
             hgconf = ScmConfig['mercurial']
 
             if !@project.repository && hgconf && hgconf['path'].present?
                 add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
-                hgtags['</p>'] = ' ' + add + '</p>'
+                if hgtags.include?('<br />')
+                    hgtags['<br />'] = ' ' + add + '<br />'
+                else
+                    hgtags['</p>'] = ' ' + add + '</p>'
+                end
                 hgtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
-                    path = hgconf['path'].dup
-                    path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
-                    hgtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}/#{@project.identifier}';")
+                    path = MercurialCreator.command_line_path(MercurialCreator.default_path(@project.identifier))
+                    hgtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
                 end
 
             elsif @project.repository && @project.repository.created_with_scm &&
                 hgconf && hgconf['path'].present? && hgconf['url'].present?
-                path = hgconf['path'].dup
-                path.gsub!(%r{\\}, "/") if Redmine::Platform.mswin?
-                matches = Regexp.new("^#{Regexp.escape(path)}/([^/]+)/?$").match(@project.repository.url)
-                if matches
-                    url = ''
-                    if hgconf['url'] =~ %r{^(?:https?|ssh)://}
-                        url = "#{hgconf['url']}/#{matches[1]}"
-                    else
-                        url = "#{Setting.protocol}://#{Setting.host_name}/#{hgconf['url']}/#{matches[1]}"
-                    end
-                    hgtags['</p>'] = '<br />' + url + '</p>'
+                name = MercurialCreator.repository_name(@project.repository.url)
+                if name
+                    hgtags['</p>'] = '<br />' + MercurialCreator.url(name) + '</p>' # FIXME: replace in 1.2.x
                 end
             end
 
             return hgtags
+        end
+
+        def git_field_tags_with_add(form, repository)
+            gittags = git_field_tags_without_add(form, repository)
+            gitconf = ScmConfig['git']
+
+            if !@project.repository && gitconf && gitconf['path'].present?
+                add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
+                if gittags.include?('<br />')
+                    gittags['<br />'] = ' ' + add + '<br />'
+                else
+                    gittags['</p>'] = ' ' + add + '</p>'
+                end
+                gittags << hidden_field_tag(:operation, '', :id => 'repository_operation')
+                unless request.post?
+                    path = GitCreator.command_line_path(GitCreator.default_path(@project.identifier))
+                    gittags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
+                end
+
+            elsif @project.repository && @project.repository.created_with_scm &&
+                gitconf && gitconf['path'].present? && gitconf['url'].present?
+                name = GitCreator.repository_name(@project.repository.url)
+                if name
+                    gittags['</p>'] = '<br />' + GitCreator.url(name) + '</p>' # FIXME: replace in 1.2.x
+                end
+            end
+
+            return gittags
         end
 
     end

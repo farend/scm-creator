@@ -79,18 +79,17 @@ module ScmRepositoriesControllerPatch
 
                         begin
                             interface = Object.const_get("#{params[:repository_scm]}Creator")
-                            config = ScmConfig[interface.scm_id]
 
-                            name = interface.repository_name(attrs['url'], config)
+                            name = interface.repository_name(attrs['url'])
                             if name
-                                path = interface.default_path(name, config) # FIXME: adds another .git!
+                                path = interface.path(name)
                                 if File.directory?(path)
                                     @repository.errors.add(:url, :already_exists)
                                 else
                                     RAILS_DEFAULT_LOGGER.info "Creating reporitory: #{path}"
-                                    if interface.create_repository(path, config)
+                                    if interface.create_repository(path)
                                         @repository.created_with_scm = true
-                                        unless interface.copy_hooks(path, config)
+                                        unless interface.copy_hooks(path)
                                             RAILS_DEFAULT_LOGGER.warn "Hooks copy failed"
                                         end
                                     else
@@ -101,7 +100,7 @@ module ScmRepositoriesControllerPatch
                                     flash[:warning] = l(:text_cannot_be_used_redmine_auth)
                                 end
                             else
-                                @repository.errors.add(:url, :should_be_of_format_local, :format => interface.repository_format(config))
+                                @repository.errors.add(:url, :should_be_of_format_local, :format => interface.repository_format)
                             end
 
                         rescue NameError

@@ -2,14 +2,18 @@ class MercurialCreator < SCMCreator
 
     class << self
 
-        def create_repository(path, options)
+        def url(name, regexp = %r{^(?:https?|ssh)://})
+            super
+        end
+
+        def create_repository(path)
             args = [ options['hg'], 'init' ]
-            append_options(args, options)
+            append_options(args)
             args << path
             system(*args)
         end
 
-        def copy_hooks(path, options)
+        def copy_hooks(path)
             if options['hgrc']
                 RAILS_DEFAULT_LOGGER.warn "Option 'hgrc' is obsolete - use 'post_create' instead. See: http://projects.andriylesyuk.com/issues/1886."
                 if File.exists?(options['hgrc'])

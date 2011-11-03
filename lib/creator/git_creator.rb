@@ -2,11 +2,15 @@ class GitCreator < SCMCreator
 
     class << self
 
-        def default_path(identifier, options)
+        def url(name, regexp = %r{^(?:https?|git|ssh)://})
+            super
+        end
+
+        def default_path(identifier)
             if options['git_ext']
-                super + '.git'
+                path(identifier) + '.git'
             else
-                super
+                path(identifier)
             end
         end
 
@@ -14,14 +18,14 @@ class GitCreator < SCMCreator
             name == identifier || name == "#{identifier}.git"
         end
 
-        def repository_exists?(identifier, options)
+        def repository_exists?(identifier)
             path = default_path(identifier, options.reject{ |option, value| option == 'git_ext' })
             File.directory?(path) || File.directory?("#{path}.git")
         end
 
-        def create_repository(path, options)
+        def create_repository(path)
             args = [ options['git'], 'init' ]
-            append_options(args, options)
+            append_options(args)
             args << path
             if system(*args)
                 if options['update_server_info']

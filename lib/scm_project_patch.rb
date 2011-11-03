@@ -39,16 +39,15 @@ module ScmProjectPatch
 
                     begin
                         interface = Object.const_get("#{@scm}Creator")
-                        config = ScmConfig[interface.scm_id]
-                        path = interface.default_path(self.identifier, config)
+                        path = interface.default_path(self.identifier)
 
                         if File.directory?(path)
                             RAILS_DEFAULT_LOGGER.warn "Automatically using reporitory: #{path}"
                         else
                             RAILS_DEFAULT_LOGGER.info "Automatically creating reporitory: #{path}"
-                            if interface.create_repository(path, config)
+                            if interface.create_repository(path)
                                 @repository.created_with_scm = true
-                                unless interface.copy_hooks(path, config)
+                                unless interface.copy_hooks(path)
                                     RAILS_DEFAULT_LOGGER.warn "Hooks copy failed"
                                 end
                             else
@@ -56,7 +55,7 @@ module ScmProjectPatch
                             end
                         end
 
-                        @repository.root_url = @repository.url = interface.urlify(path)
+                        @repository.root_url = @repository.url = interface.command_line_path(path)
                         @repository.save
 
                     rescue NameError
@@ -70,8 +69,7 @@ module ScmProjectPatch
             if @scm.present? && self.identifier.present? && ScmConfig['auto_create']
                 begin
                     interface = Object.const_get("#{@scm}Creator")
-                    config = ScmConfig[interface.scm_id]
-                    if interface.repository_exists?(self.identifier, config)
+                    if interface.repository_exists?(self.identifier)
                         errors.add_to_base(:repository_exists_for_identifier)
                     end
                 rescue NameError

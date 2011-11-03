@@ -13,7 +13,7 @@ class ScmHook  < Redmine::Hook::ViewListener
                 row << '<br />' + content_tag(:em, l(:text_cannot_be_changed_later)) if ScmConfig['auto_create'] == 'force'
                 content_tag(:p, row)
             else
-                if ScmConfig['svn'] # FIXME: should use *Creator?
+                if ScmConfig['svn']
                     hidden_field_tag('project[scm]', 'Subversion')
                 elsif ScmConfig['git']
                     hidden_field_tag('project[scm]', 'Git')
