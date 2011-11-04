@@ -13,7 +13,7 @@ class ScmConfig
 protected
 
     def initialize
-        file = "#{RAILS_ROOT}/config/scm.yml" # FIXME: support scm.yml in plugin's dir
+        file = "#{RAILS_ROOT}/config/scm.yml" # FIXME: support scm.yml in plugin's dir? if so rename to scm.yml.example
         if File.file?(file)
             config = YAML::load_file(file)
             if config.is_a?(Hash) && config.has_key?(Rails.env)

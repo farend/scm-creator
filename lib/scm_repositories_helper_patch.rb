@@ -10,6 +10,7 @@ module ScmRepositoriesHelperPatch
             alias_method_chain :subversion_field_tags, :add
             alias_method_chain :mercurial_field_tags,  :add
             alias_method_chain :git_field_tags,        :add
+            alias_method_chain :bazaar_field_tags,     :add
         end
     end
 
@@ -72,6 +73,30 @@ module ScmRepositoriesHelperPatch
             end
 
             return hgtags
+        end
+
+        def bazaar_field_tags_with_add(form, repository)
+            bzrtags = bazaar_field_tags_without_add(form, repository)
+            bzrconf = ScmConfig['bazaar']
+
+            if !@project.repository && bzrconf && bzrconf['path'].present?
+                add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
+                bzrtags['</p>'] = ' ' + add + '</p>'
+                bzrtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
+                unless request.post?
+                    path = BazaarCreator.command_line_path(BazaarCreator.default_path(@project.identifier))
+                    bzrtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
+                end
+
+            elsif @project.repository && @project.repository.created_with_scm &&
+                bzrconf && bzrconf['path'].present? && bzrconf['url'].present?
+                name = BazaarCreator.repository_name(@project.repository.url)
+                if name
+                    bzrtags['</p>'] = '<br />' + BazaarCreator.url(name) + '</p>'
+                end
+            end
+
+            return bzrtags
         end
 
         def git_field_tags_with_add(form, repository)

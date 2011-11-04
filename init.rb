@@ -5,6 +5,7 @@ require_dependency 'creator/scm_creator'
 require_dependency 'creator/subversion_creator'
 require_dependency 'creator/mercurial_creator'
 require_dependency 'creator/git_creator'
+require_dependency 'creator/bazaar_creator'
 
 require_dependency 'scm_config'
 require_dependency 'scm_hook'
@@ -29,7 +30,7 @@ Redmine::Plugin.register :redmine_scm_plugin do
     name 'SCM Creator'
     author 'Andriy Lesyuk'
     author_url 'http://www.andriylesyuk.com/'
-    description 'Allows creating Subversion, Git and Mercurial repositories using Redmine.'
+    description 'Allows creating Subversion, Git, Mercurial and Bazaar repositories using Redmine.'
     url 'http://projects.andriylesyuk.com/projects/redmine-svn'
-    version '0.2.0'
+    version '0.3.0'
 end

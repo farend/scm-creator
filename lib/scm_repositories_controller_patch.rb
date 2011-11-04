@@ -90,9 +90,7 @@ module ScmRepositoriesControllerPatch
                                     if ScmConfig['pre_create'] && File.executable?(ScmConfig['pre_create'])
                                         interface.execute(ScmConfig['pre_create'], path, @project)
                                     end
-                                    # TODO: hook
                                     if interface.create_repository(path)
-                                        # TODO: hook
                                         if ScmConfig['post_create'] && File.executable?(ScmConfig['post_create'])
                                             interface.execute(ScmConfig['post_create'], path, @project)
                                         end
@@ -122,7 +120,7 @@ module ScmRepositoriesControllerPatch
                 if @repository.errors.empty?
                     @repository.merge_extra_info(extra) if @repository.respond_to?(:merge_extra_info)
                     @repository.root_url = @repository.url
-                    @repository.save
+                    @repository.save # FIXME: maybe move all above below save?
                 end
             end
 
