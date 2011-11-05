@@ -4,20 +4,27 @@ class RepositoryObserver < ActiveRecord::Observer
         if repository.created_with_scm
             project = repository.project
 
-            if ScmConfig['pre_delete'] && File.executable?(ScmConfig['pre_delete']) # FIXME: test
-                interface.execute(ScmConfig['pre_delete'], path, project)
+            begin
+                interface = Object.const_get("#{repository.type}Creator")
+
+                name = interface.repository_name(repository.url)
+                if name
+                    path = interface.path(name)
+
+                    if ScmConfig['pre_delete'] && File.executable?(ScmConfig['pre_delete'])
+                        interface.execute(ScmConfig['pre_delete'], path, project)
+                    end
+
+                    FileUtils.remove_entry_secure(path, true)
+
+                    if ScmConfig['post_delete'] && File.executable?(ScmConfig['post_delete'])
+                        interface.execute(ScmConfig['post_delete'], path, project)
+                    end
+
+                end
+            rescue NameError
             end
 
-            case repository.type # FIXME: should not it be converted for Windows? + Use *Creator?
-            when 'Subversion'
-                FileUtils.remove_entry_secure(repository.url.gsub(%r{^file:\/\/}, ''), true) if repository.url =~ %r{^file:\/\/}
-            when 'Git', 'Mercurial'
-                FileUtils.remove_entry_secure(repository.url, true) if repository.url =~ %r{^\.*\/}
-            end
-
-            if ScmConfig['post_delete'] && File.executable?(ScmConfig['post_delete']) # FIXME: test
-                interface.execute(ScmConfig['post_delete'], path, project)
-            end
         end
     end
 
