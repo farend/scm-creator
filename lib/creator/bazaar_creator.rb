@@ -16,6 +16,10 @@ class BazaarCreator < SCMCreator
             system(*args)
         end
 
+        def init_repository(repository)
+            repository.log_encoding = 'UTF-8'
+        end
+
     end
 
 end

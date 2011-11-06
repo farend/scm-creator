@@ -73,8 +73,9 @@ module ScmRepositoriesControllerPatch
                         attrs[name] = value
                     end
                 end
+                @repository.attributes = attrs
 
-                if params[:operation].present? && params[:operation] == 'add'
+                if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
                     if attrs
 
                         begin
@@ -116,11 +117,10 @@ module ScmRepositoriesControllerPatch
                     end
                 end
 
-                @repository.attributes = attrs
                 if @repository.errors.empty?
                     @repository.merge_extra_info(extra) if @repository.respond_to?(:merge_extra_info)
                     @repository.root_url = @repository.url
-                    @repository.save # FIXME: maybe move all above below save?
+                    @repository.save
                 end
             end
 
