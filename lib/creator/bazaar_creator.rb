@@ -7,6 +7,7 @@ class BazaarCreator < SCMCreator
         end
 
         def copy_hooks(path)
+            true
         end
 
         def create_repository(path)
