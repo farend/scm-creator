@@ -93,11 +93,13 @@ class SCMCreator
 
         # executes custom scripts
         def execute(script, path, project)
-            project.custom_field_values.each do |custom_value|
-                name = custom_value.custom_field.name.gsub(%r{[^a-z0-9]+}i, '_').upcase
-                ENV["SCM_CUSTOM_FIELD_#{name}"] = custom_value.value unless name.empty?
+            if File.executable?(script)
+                project.custom_field_values.each do |custom_value|
+                    name = custom_value.custom_field.name.gsub(%r{[^a-z0-9]+}i, '_').upcase
+                    ENV["SCM_CUSTOM_FIELD_#{name}"] = custom_value.value unless name.empty?
+                end
+                system(script, path, scm_id, project.identifier)
             end
-            system(script, path, scm_id, project.identifier)
         end
 
         # initializes required properties of repository (used for Bazaar which requires log_encoding)

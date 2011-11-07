@@ -11,15 +11,11 @@ class RepositoryObserver < ActiveRecord::Observer
                 if name
                     path = interface.path(name)
 
-                    if ScmConfig['pre_delete'] && File.executable?(ScmConfig['pre_delete'])
-                        interface.execute(ScmConfig['pre_delete'], path, project)
-                    end
+                    interface.execute(ScmConfig['pre_delete'], path, project) if ScmConfig['pre_delete']
 
                     FileUtils.remove_entry_secure(path, true)
 
-                    if ScmConfig['post_delete'] && File.executable?(ScmConfig['post_delete'])
-                        interface.execute(ScmConfig['post_delete'], path, project)
-                    end
+                    interface.execute(ScmConfig['post_delete'], path, project) if ScmConfig['post_delete']
 
                 end
             rescue NameError
