@@ -2,6 +2,10 @@ class GitCreator < SCMCreator
 
     class << self
 
+        def enabled?
+            options && options['path'] && options['git'] && File.executable?(options['git'])
+        end
+
         def url(name, regexp = %r{^(?:https?|git|ssh)://})
             super
         end

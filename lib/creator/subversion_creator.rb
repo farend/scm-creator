@@ -6,6 +6,10 @@ class SubversionCreator < SCMCreator
             'svn'
         end
 
+        def enabled?
+            options && options['path'] && options['svnadmin'] && File.executable?(options['svnadmin'])
+        end
+
         def command_line_path(path)
             'file://' + (Redmine::Platform.mswin? ? path.gsub(%r{\\}, "/") : path)
         end

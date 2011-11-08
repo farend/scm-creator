@@ -2,6 +2,10 @@ class BazaarCreator < SCMCreator
 
     class << self
 
+        def enabled?
+            options && options['path'] && options['bzr'] && File.executable?(options['bzr'])
+        end
+
         def url(name, regexp = %r{^(?:sftp|bzr(?:\+[a-z]+)?)://})
             super
         end
@@ -18,7 +22,9 @@ class BazaarCreator < SCMCreator
         end
 
         def init_repository(repository)
-            repository.log_encoding = 'UTF-8'
+            if repository.respond_to?(:log_encoding=)
+                repository.log_encoding = 'UTF-8'
+            end
         end
 
     end

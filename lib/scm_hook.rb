@@ -2,8 +2,8 @@ class ScmHook  < Redmine::Hook::ViewListener
 
     def view_projects_form(context = {})
         if context[:project].new_record? && ScmConfig['auto_create']
-            count = %w(svn git mercurial bazaar).inject(0) do |sum, scm|
-                sum += 1 if ScmConfig[scm]
+            count = [ SubversionCreator, GitCreator, MercurialCreator, BazaarCreator ].inject(0) do |sum, scm|
+                sum += 1 if scm.enabled?
                 sum
             end
             if (count > 1) || (ScmConfig['auto_create'] != 'force')
@@ -13,13 +13,13 @@ class ScmHook  < Redmine::Hook::ViewListener
                 row << '<br />' + content_tag(:em, l(:text_cannot_be_changed_later)) if ScmConfig['auto_create'] == 'force'
                 content_tag(:p, row)
             else
-                if ScmConfig['svn']
+                if SubversionCreator.enabled?
                     hidden_field_tag('project[scm]', 'Subversion')
-                elsif ScmConfig['git']
+                elsif GitCreator.enabled?
                     hidden_field_tag('project[scm]', 'Git')
-                elsif ScmConfig['mercurial']
+                elsif MercurialCreator.enabled?
                     hidden_field_tag('project[scm]', 'Mercurial')
-                elsif ScmConfig['bazaar']
+                elsif BazaarCreator.enabled?
                     hidden_field_tag('project[scm]', 'Bazaar')
                 end
             end
@@ -52,10 +52,10 @@ private
     def project_scm_options_for_select(selected = nil)
         options = []
         options << [ '' ]           if ScmConfig['auto_create'] != 'force'
-        options << [ 'Subversion' ] if ScmConfig['svn']
-        options << [ 'Mercurial' ]  if ScmConfig['mercurial']
-        options << [ 'Bazaar' ]     if ScmConfig['bazaar']
-        options << [ 'Git' ]        if ScmConfig['git']
+        options << [ 'Subversion' ] if SubversionCreator.enabled?
+        options << [ 'Mercurial' ]  if MercurialCreator.enabled?
+        options << [ 'Bazaar' ]     if BazaarCreator.enabled?
+        options << [ 'Git' ]        if GitCreator.enabled?
         options_for_select(options, selected)
     end
 

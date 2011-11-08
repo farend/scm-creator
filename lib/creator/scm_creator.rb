@@ -11,6 +11,11 @@ class SCMCreator
             end
         end
 
+        # returns true if SCM is enabled
+        def enabled?
+            false
+        end
+
         # returns configuration from scm.yml
         def options
             @options ||= ScmConfig[scm_id]

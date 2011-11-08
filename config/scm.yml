@@ -20,7 +20,7 @@ production:
     path: /var/lib/mercurial
     hg: /usr/bin/hg
   bazaar:
-    path: /var/li/bazaar
+    path: /var/lib/bazaar
     bzr: /usr/bin/bzr
 
 development:

@@ -21,9 +21,8 @@ module ScmRepositoriesHelperPatch
 
         def subversion_field_tags_with_add(form, repository)
             svntags = subversion_field_tags_without_add(form, repository)
-            svnconf = ScmConfig['svn']
 
-            if !@project.repository && svnconf && svnconf['path'].present?
+            if !@project.repository && SubversionCreator.enabled?
                 add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
                 svntags['<br />'] = ' ' + add + '<br />'
                 svntags << hidden_field_tag(:operation, '', :id => 'repository_operation')
@@ -33,7 +32,7 @@ module ScmRepositoriesHelperPatch
                 end
 
             elsif @project.repository && @project.repository.created_with_scm &&
-                svnconf && svnconf['path'].present? && svnconf['url'].present?
+                SubversionCreator.enabled? && SubversionCreator.options['url'].present?
                 name = SubversionCreator.repository_name(@project.repository.url)
                 if name
                     svntags['(file:///, http://, https://, svn://, svn+[tunnelscheme]://)'] = SubversionCreator.url(name)
@@ -45,9 +44,8 @@ module ScmRepositoriesHelperPatch
 
         def mercurial_field_tags_with_add(form, repository)
             hgtags = mercurial_field_tags_without_add(form, repository)
-            hgconf = ScmConfig['mercurial']
 
-            if !@project.repository && hgconf && hgconf['path'].present?
+            if !@project.repository && MercurialCreator.enabled?
                 add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
                 if hgtags.include?('<br />')
                     hgtags['<br />'] = ' ' + add + '<br />'
@@ -61,7 +59,7 @@ module ScmRepositoriesHelperPatch
                 end
 
             elsif @project.repository && @project.repository.created_with_scm &&
-                hgconf && hgconf['path'].present? && hgconf['url'].present?
+                MercurialCreator.enabled? && MercurialCreator.options['url'].present?
                 name = MercurialCreator.repository_name(@project.repository.url)
                 if name
                     if hgtags.include?(l(:text_mercurial_repository_note))
@@ -77,9 +75,8 @@ module ScmRepositoriesHelperPatch
 
         def bazaar_field_tags_with_add(form, repository)
             bzrtags = bazaar_field_tags_without_add(form, repository)
-            bzrconf = ScmConfig['bazaar']
 
-            if !@project.repository && bzrconf && bzrconf['path'].present?
+            if !@project.repository && BazaarCreator.enabled?
                 add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
                 bzrtags['</p>'] = ' ' + add + '</p>'
                 bzrtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
@@ -89,7 +86,7 @@ module ScmRepositoriesHelperPatch
                 end
 
             elsif @project.repository && @project.repository.created_with_scm &&
-                bzrconf && bzrconf['path'].present? && bzrconf['url'].present?
+                BazaarCreator.enabled? && BazaarCreator.options['url'].present?
                 name = BazaarCreator.repository_name(@project.repository.url)
                 if name
                     bzrtags['</p>'] = '<br />' + BazaarCreator.url(name) + '</p>'
@@ -101,9 +98,8 @@ module ScmRepositoriesHelperPatch
 
         def git_field_tags_with_add(form, repository)
             gittags = git_field_tags_without_add(form, repository)
-            gitconf = ScmConfig['git']
 
-            if !@project.repository && gitconf && gitconf['path'].present?
+            if !@project.repository && GitCreator.enabled?
                 add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
                 if gittags.include?('<br />')
                     gittags['<br />'] = ' ' + add + '<br />'
@@ -117,7 +113,7 @@ module ScmRepositoriesHelperPatch
                 end
 
             elsif @project.repository && @project.repository.created_with_scm &&
-                gitconf && gitconf['path'].present? && gitconf['url'].present?
+                GitCreator.enabled? && GitCreator.options['url'].present?
                 name = GitCreator.repository_name(@project.repository.url)
                 if name
                     if gittags.include?(l(:text_git_repository_note))

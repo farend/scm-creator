@@ -2,6 +2,10 @@ class MercurialCreator < SCMCreator
 
     class << self
 
+        def enabled?
+            options && options['path'] && options['hg'] && File.executable?(options['hg'])
+        end
+
         def url(name, regexp = %r{^(?:https?|ssh)://})
             super
         end
