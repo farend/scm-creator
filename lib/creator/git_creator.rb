@@ -2,6 +2,8 @@ class GitCreator < SCMCreator
 
     class << self
 
+        # FIXME: set url for not bare repo to +/.git?..
+
         def enabled?
             options && options['path'] && options['git'] && File.executable?(options['git'])
         end

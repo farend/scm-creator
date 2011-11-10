@@ -22,5 +22,7 @@ production:
   bazaar:
     path: /var/lib/bazaar
     bzr: /usr/bin/bzr
+    init: init-repository
+    log_encoding: UTF-8
 
 development:

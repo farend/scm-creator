@@ -83,6 +83,9 @@ module ScmRepositoriesHelperPatch
                 unless request.post?
                     path = BazaarCreator.command_line_path(BazaarCreator.default_path(@project.identifier))
                     bzrtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
+                    if BazaarCreator.options['log_encoding']
+                        bzrtags << javascript_tag("$('repository_log_encoding').value = '#{escape_javascript(BazaarCreator.options['log_encoding'])}';")
+                    end
                 end
 
             elsif @project.repository && @project.repository.created_with_scm &&
