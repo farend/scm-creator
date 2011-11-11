@@ -10,11 +10,19 @@ class SubversionCreator < SCMCreator
             options && options['path'] && options['svnadmin'] && File.executable?(options['svnadmin'])
         end
 
-        def command_line_path(path)
+        def access_url(path)
+            if options['append']
+                access_root_url(path) + '/' + options['append']
+            else
+                access_root_url(path)
+            end
+        end
+
+        def access_root_url(path)
             'file://' + (Redmine::Platform.mswin? ? path.gsub(%r{\\}, "/") : path)
         end
 
-        def url(name, regexp = %r{^(?:file|https?|svn(?:\+[a-z]+)?)://})
+        def external_url(name, regexp = %r{^(?:file|https?|svn(?:\+[a-z]+)?)://})
             super
         end
 

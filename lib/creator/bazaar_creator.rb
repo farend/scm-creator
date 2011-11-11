@@ -6,7 +6,7 @@ class BazaarCreator < SCMCreator
             options && options['path'] && options['bzr'] && File.executable?(options['bzr'])
         end
 
-        def url(name, regexp = %r{^(?:sftp|bzr(?:\+[a-z]+)?)://})
+        def external_url(name, regexp = %r{^(?:sftp|bzr(?:\+[a-z]+)?)://})
             super
         end
 

@@ -21,8 +21,21 @@ class SCMCreator
             @options ||= ScmConfig[scm_id]
         end
 
+        # returns local path used to access repository locally (with optional /.git/ etc)
+        def access_url(path)
+            if options['append']
+                if Redmine::Platform.mswin?
+                    "#{access_root_url(path)}\\#{options['append']}"
+                else
+                    "#{access_root_url(path)}/#{options['append']}"
+                end
+            else
+                access_root_url(path)
+            end
+        end
+
         # returns local path used to access repository locally
-        def command_line_path(path)
+        def access_root_url(path)
             path
         end
 
@@ -37,7 +50,7 @@ class SCMCreator
         end
 
         # returns url which can used to access the repository externally
-        def url(name, regexp = %r{^https?://})
+        def external_url(name, regexp = %r{^https?://})
             if options['url'] =~ regexp
                 url = "#{options['url']}/#{name}"
             else

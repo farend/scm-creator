@@ -6,7 +6,7 @@ class MercurialCreator < SCMCreator
             options && options['path'] && options['hg'] && File.executable?(options['hg'])
         end
 
-        def url(name, regexp = %r{^(?:https?|ssh)://})
+        def external_url(name, regexp = %r{^(?:https?|ssh)://})
             super
         end
 

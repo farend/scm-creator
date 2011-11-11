@@ -19,7 +19,7 @@ module ScmRepositoriesControllerPatch
 
         def delete_scm
             if @repository.created_with_scm && ScmConfig['deny_delete']
-                RAILS_DEFAULT_LOGGER.info "Deletion denied: #{@repository.url}"
+                RAILS_DEFAULT_LOGGER.info "Deletion denied: #{@repository.root_url}"
                 render_403
             end
         end
@@ -99,6 +99,10 @@ module ScmRepositoriesControllerPatch
                                         RAILS_DEFAULT_LOGGER.error "Repository creation failed"
                                     end
                                 end
+
+                                @repository.root_url = interface.access_root_url(path)
+                                @repository.url = interface.access_url(path)
+
                                 if !interface.repository_name_equal?(name, @project.identifier)
                                     flash[:warning] = l(:text_cannot_be_used_redmine_auth)
                                 end
@@ -115,7 +119,6 @@ module ScmRepositoriesControllerPatch
 
                 if @repository.errors.empty?
                     @repository.merge_extra_info(extra) if @repository.respond_to?(:merge_extra_info)
-                    @repository.root_url = @repository.url
                     @repository.save
                 end
             end

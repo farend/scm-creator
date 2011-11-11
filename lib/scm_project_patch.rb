@@ -58,7 +58,8 @@ module ScmProjectPatch
                         end
 
                         interface.init_repository(@repository) if @repository.new_record?
-                        @repository.root_url = @repository.url = interface.command_line_path(path)
+                        @repository.root_url = interface.access_root_url(path)
+                        @repository.url = interface.access_url(path)
                         @repository.save
 
                     rescue NameError

@@ -31,15 +31,16 @@ class ScmHook  < Redmine::Hook::ViewListener
             begin
                 interface = Object.const_get("#{context[:project].repository.type}Creator")
 
-                name = interface.repository_name(context[:project].repository.url)
+                name = interface.repository_name(context[:project].repository.root_url)
                 if name && interface.repository_name_equal?(name, context[:old_identifier])
                     old_path = interface.path(name)
                     if File.directory?(old_path)
                         new_path = interface.default_path(context[:new_identifier])
                         File.rename(old_path, new_path)
 
-                        url = interface.command_line_path(new_path)
-                        context[:project].repository.update_attributes(:root_url => url, :url => url)
+                        url = interface.access_url(new_path)
+                        root_url = interface.access_root_url(new_path)
+                        context[:project].repository.update_attributes(:root_url => root_url, :url => url)
                     end
                 end
             rescue NameError

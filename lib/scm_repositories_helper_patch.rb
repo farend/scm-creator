@@ -27,15 +27,15 @@ module ScmRepositoriesHelperPatch
                 svntags['<br />'] = ' ' + add + '<br />'
                 svntags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
-                    path = SubversionCreator.command_line_path(SubversionCreator.default_path(@project.identifier))
+                    path = SubversionCreator.access_root_url(SubversionCreator.default_path(@project.identifier))
                     svntags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
                 end
 
             elsif @project.repository && @project.repository.created_with_scm &&
                 SubversionCreator.enabled? && SubversionCreator.options['url'].present?
-                name = SubversionCreator.repository_name(@project.repository.url)
+                name = SubversionCreator.repository_name(@project.repository.root_url)
                 if name
-                    svntags['(file:///, http://, https://, svn://, svn+[tunnelscheme]://)'] = SubversionCreator.url(name)
+                    svntags['(file:///, http://, https://, svn://, svn+[tunnelscheme]://)'] = SubversionCreator.external_url(name)
                 end
             end
 
@@ -54,18 +54,18 @@ module ScmRepositoriesHelperPatch
                 end
                 hgtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
-                    path = MercurialCreator.command_line_path(MercurialCreator.default_path(@project.identifier))
+                    path = MercurialCreator.access_root_url(MercurialCreator.default_path(@project.identifier))
                     hgtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
                 end
 
             elsif @project.repository && @project.repository.created_with_scm &&
                 MercurialCreator.enabled? && MercurialCreator.options['url'].present?
-                name = MercurialCreator.repository_name(@project.repository.url)
+                name = MercurialCreator.repository_name(@project.repository.root_url)
                 if name
                     if hgtags.include?(l(:text_mercurial_repository_note))
-                        hgtags[l(:text_mercurial_repository_note)] = MercurialCreator.url(name)
+                        hgtags[l(:text_mercurial_repository_note)] = MercurialCreator.external_url(name)
                     else
-                        hgtags['</p>'] = '<br />' + MercurialCreator.url(name) + '</p>'
+                        hgtags['</p>'] = '<br />' + MercurialCreator.external_url(name) + '</p>'
                     end
                 end
             end
@@ -81,7 +81,7 @@ module ScmRepositoriesHelperPatch
                 bzrtags['</p>'] = ' ' + add + '</p>'
                 bzrtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
-                    path = BazaarCreator.command_line_path(BazaarCreator.default_path(@project.identifier))
+                    path = BazaarCreator.access_root_url(BazaarCreator.default_path(@project.identifier))
                     bzrtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
                     if BazaarCreator.options['log_encoding']
                         bzrtags << javascript_tag("$('repository_log_encoding').value = '#{escape_javascript(BazaarCreator.options['log_encoding'])}';")
@@ -90,9 +90,9 @@ module ScmRepositoriesHelperPatch
 
             elsif @project.repository && @project.repository.created_with_scm &&
                 BazaarCreator.enabled? && BazaarCreator.options['url'].present?
-                name = BazaarCreator.repository_name(@project.repository.url)
+                name = BazaarCreator.repository_name(@project.repository.root_url)
                 if name
-                    bzrtags['</p>'] = '<br />' + BazaarCreator.url(name) + '</p>'
+                    bzrtags['</p>'] = '<br />' + BazaarCreator.external_url(name) + '</p>'
                 end
             end
 
@@ -111,18 +111,18 @@ module ScmRepositoriesHelperPatch
                 end
                 gittags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
-                    path = GitCreator.command_line_path(GitCreator.default_path(@project.identifier))
+                    path = GitCreator.access_root_url(GitCreator.default_path(@project.identifier))
                     gittags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
                 end
 
             elsif @project.repository && @project.repository.created_with_scm &&
                 GitCreator.enabled? && GitCreator.options['url'].present?
-                name = GitCreator.repository_name(@project.repository.url)
+                name = GitCreator.repository_name(@project.repository.root_url)
                 if name
                     if gittags.include?(l(:text_git_repository_note))
-                        gittags[l(:text_git_repository_note)] = GitCreator.url(name)
+                        gittags[l(:text_git_repository_note)] = GitCreator.external_url(name)
                     else
-                        gittags['</p>'] = '<br />' + GitCreator.url(name) + '</p>'
+                        gittags['</p>'] = '<br />' + GitCreator.external_url(name) + '</p>'
                     end
                 end
             end

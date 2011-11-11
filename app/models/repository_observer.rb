@@ -7,7 +7,7 @@ class RepositoryObserver < ActiveRecord::Observer
             begin
                 interface = Object.const_get("#{repository.type}Creator")
 
-                name = interface.repository_name(repository.url)
+                name = interface.repository_name(repository.root_url)
                 if name
                     path = interface.path(name)
 
