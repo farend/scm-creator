@@ -16,7 +16,7 @@ production:
     url: http://git.myhost.com
     update_server_info: true
     git_ext: true
-    append: .git
+    append: trunk
   mercurial:
     path: /var/lib/mercurial
     hg: /usr/bin/hg
