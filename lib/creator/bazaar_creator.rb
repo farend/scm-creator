@@ -3,7 +3,23 @@ class BazaarCreator < SCMCreator
     class << self
 
         def enabled?
-            options && options['path'] && options['bzr'] && File.executable?(options['bzr'])
+            if options
+                if options['path']
+                    if options['bzr']
+                        if File.executable?(options['bzr'])
+                            return true
+                        else
+                            RAILS_DEFAULT_LOGGER.warn "'#{options['bzr']}' cannot be found/executed - ignoring '#{scm_id}"
+                        end
+                    else
+                        RAILS_DEFAULT_LOGGER.warn "missing path to the 'bzr' tool for '#{scm_id}'"
+                    end
+                else
+                    RAILS_DEFAULT_LOGGER.warn "missing path for '#{scm_id}'"
+                end
+            end
+
+            false
         end
 
         def external_url(name, regexp = %r{^(?:sftp|bzr(?:\+[a-z]+)?)://})

@@ -3,7 +3,23 @@ class MercurialCreator < SCMCreator
     class << self
 
         def enabled?
-            options && options['path'] && options['hg'] && File.executable?(options['hg'])
+            if options
+                if options['path']
+                    if options['hg']
+                        if File.executable?(options['hg'])
+                            return true
+                        else
+                            RAILS_DEFAULT_LOGGER.warn "'#{options['hg']}' cannot be found/executed - ignoring '#{scm_id}"
+                        end
+                    else
+                        RAILS_DEFAULT_LOGGER.warn "missing path to the 'hg' tool for '#{scm_id}'"
+                    end
+                else
+                    RAILS_DEFAULT_LOGGER.warn "missing path for '#{scm_id}'"
+                end
+            end
+
+            false
         end
 
         def external_url(name, regexp = %r{^(?:https?|ssh)://})

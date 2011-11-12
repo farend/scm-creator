@@ -28,8 +28,12 @@ class ScmHook  < Redmine::Hook::ViewListener
 
     def controller_project_aliases_rename_after(context = {})
         if context[:project].repository && context[:project].repository.created_with_scm
+
+            type = context[:project].repository.type
+            type.gsub!(%r{^Repository::}, '')
+
             begin
-                interface = Object.const_get("#{context[:project].repository.type}Creator")
+                interface = Object.const_get("#{type}Creator")
 
                 name = interface.repository_name(context[:project].repository.root_url)
                 if name && interface.repository_name_equal?(name, context[:old_identifier])

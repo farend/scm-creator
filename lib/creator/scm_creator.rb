@@ -117,6 +117,8 @@ class SCMCreator
                     ENV["SCM_CUSTOM_FIELD_#{name}"] = custom_value.value unless name.empty?
                 end
                 system(script, path, scm_id, project.identifier)
+            else
+                RAILS_DEFAULT_LOGGER.warn "cannot find/execute: #{script}"
             end
         end
 

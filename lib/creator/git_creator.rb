@@ -2,10 +2,24 @@ class GitCreator < SCMCreator
 
     class << self
 
-        # FIXME: set url for not bare repo to +/.git?..
-
         def enabled?
-            options && options['path'] && options['git'] && File.executable?(options['git'])
+            if options
+                if options['path']
+                    if options['git']
+                        if File.executable?(options['git'])
+                            return true
+                        else
+                            RAILS_DEFAULT_LOGGER.warn "'#{options['git']}' cannot be found/executed - ignoring '#{scm_id}"
+                        end
+                    else
+                        RAILS_DEFAULT_LOGGER.warn "missing path to the 'git' tool for '#{scm_id}'"
+                    end
+                else
+                    RAILS_DEFAULT_LOGGER.warn "missing path for '#{scm_id}'"
+                end
+            end
+
+            false
         end
 
         def external_url(name, regexp = %r{^(?:https?|git|ssh)://})

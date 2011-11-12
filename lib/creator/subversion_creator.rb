@@ -7,7 +7,23 @@ class SubversionCreator < SCMCreator
         end
 
         def enabled?
-            options && options['path'] && options['svnadmin'] && File.executable?(options['svnadmin'])
+            if options
+                if options['path']
+                    if options['svnadmin']
+                        if File.executable?(options['svnadmin'])
+                            return true
+                        else
+                            RAILS_DEFAULT_LOGGER.warn "'#{options['svnadmin']}' cannot be found/executed - ignoring '#{scm_id}"
+                        end
+                    else
+                        RAILS_DEFAULT_LOGGER.warn "missing path to the 'svnadmin' tool for '#{scm_id}'"
+                    end
+                else
+                    RAILS_DEFAULT_LOGGER.warn "missing path for '#{scm_id}'"
+                end
+            end
+
+            false
         end
 
         def access_url(path)
