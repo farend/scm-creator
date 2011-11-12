@@ -64,6 +64,8 @@ module ScmRepositoriesHelperPatch
                 if name
                     if hgtags.include?(l(:text_mercurial_repository_note))
                         hgtags[l(:text_mercurial_repository_note)] = MercurialCreator.external_url(name)
+                    elsif hgtags.include?(l(:text_mercurial_repo_example))
+                        hgtags[l(:text_mercurial_repo_example)] = MercurialCreator.external_url(name)
                     else
                         hgtags['</p>'] = '<br />' + MercurialCreator.external_url(name) + '</p>'
                     end
@@ -121,6 +123,8 @@ module ScmRepositoriesHelperPatch
                 if name
                     if gittags.include?(l(:text_git_repository_note))
                         gittags[l(:text_git_repository_note)] = GitCreator.external_url(name)
+                    elsif gittags.include?(l(:text_git_repo_example))
+                        gittags[l(:text_git_repo_example)] = GitCreator.external_url(name)
                     else
                         gittags['</p>'] = '<br />' + GitCreator.external_url(name) + '</p>'
                     end

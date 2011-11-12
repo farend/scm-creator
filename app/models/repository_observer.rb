@@ -4,8 +4,11 @@ class RepositoryObserver < ActiveRecord::Observer
         if repository.created_with_scm
             project = repository.project
 
+            type = repository.type
+            type.gsub!(%r{^Repository::}, '')
+
             begin
-                interface = Object.const_get("#{repository.type}Creator")
+                interface = Object.const_get("#{type}Creator")
 
                 name = interface.repository_name(repository.root_url)
                 if name
