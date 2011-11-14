@@ -10,3 +10,7 @@ Thanks to:
  o Takashi Okamoto for SCM hooks patch
  o John Blackwood and Etienne Savard for Mercurial assistance
  o Roland Firmont for patch supporting Redmine 1.2.x
+ o Blaž Podržaj, Mike Hagedon and Clément Démoulins for fixing hooks copy issue
+ o Mario Luzeiro for Bazaar assistance
+ o Blaž Podržaj for idea of custom scripts
+ o Jonas Götze for help extending the custom scripts idea
