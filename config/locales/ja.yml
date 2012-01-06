@@ -1,0 +1,17 @@
+ja:
+  button_create_new_repository: リポジトリの作成
+
+  label_repository_format: リポジトリ
+
+  field_scm: SCM
+
+  text_cannot_be_changed_later: 後で変更できません
+  text_cannot_be_used_redmine_auth: このリポジトリ名ではRedmineの認証が利用できません
+
+  activerecord:
+    errors:
+      messages:
+        should_be_of_format_local: フォーマットは"{{format}}"です
+        already_exists: 既に存在しています
+        scm_not_supported: このSCMはサポートされていません
+        repository_exists_for_identifier: このプロジェクトIDのリポジトリは既に存在しています
