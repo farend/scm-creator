@@ -11,7 +11,7 @@ pt-BR:
   activerecord:
     errors:
       messages:
-        should_be_of_format_local: precisa estar no formato "{{format}}"
+        should_be_of_format_local: precisa estar no formato "%{format}"
         already_exists: já existe
         scm_not_supported: Esse SCM não é suportado.
         repository_exists_for_identifier: Já existe um repositório para esse identificador de projeto

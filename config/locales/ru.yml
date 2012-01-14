@@ -11,7 +11,7 @@ ru:
   activerecord:
     errors:
       messages:
-        should_be_of_format_local: должен соответствовать формату "{{format}}"
+        should_be_of_format_local: должен соответствовать формату "%{format}"
         already_exists: уже существует
         scm_not_supported: Этот тип хранилища не поддерживается
         repository_exists_for_identifier: Хранилище уже существует для этого идентификатора проекта

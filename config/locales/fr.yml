@@ -11,6 +11,6 @@ fr:
   activerecord:
     errors:
       messages:
-        should_be_of_format_local: doit respecter le format "{{format}}"
+        should_be_of_format_local: doit respecter le format "%{format}"
         already_exists: existe déjà
         scm_not_supported: La création automatique n'est pas disponible pour ce SCM

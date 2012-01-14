@@ -11,7 +11,7 @@ ja:
   activerecord:
     errors:
       messages:
-        should_be_of_format_local: フォーマットは"{{format}}"です
+        should_be_of_format_local: フォーマットは"%{format}"です
         already_exists: 既に存在しています
         scm_not_supported: このSCMはサポートされていません
         repository_exists_for_identifier: このプロジェクトIDのリポジトリは既に存在しています
