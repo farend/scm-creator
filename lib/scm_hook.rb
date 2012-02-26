@@ -27,19 +27,24 @@ class ScmHook  < Redmine::Hook::ViewListener
     end
 
     def controller_project_aliases_rename_after(context = {})
+        Rails.logger.info " >>> controller_project_aliases_rename_after" # FIXME
         if context[:project].repository && context[:project].repository.created_with_scm
 
             type = context[:project].repository.type
             type.gsub!(%r{^Repository::}, '')
 
+            Rails.logger.info " >>> #{type}" # FIXME
             begin
                 interface = Object.const_get("#{type}Creator")
 
                 name = interface.repository_name(context[:project].repository.root_url)
+                Rails.logger.info " >>> #{name} <=> #{context[:old_identifier]}" # FIXME
                 if name && interface.repository_name_equal?(name, context[:old_identifier])
                     old_path = interface.path(name)
+                    Rails.logger.info " >>> #{old_path}" # FIXME
                     if File.directory?(old_path)
                         new_path = interface.default_path(context[:new_identifier])
+                        Rails.logger.info " >>> #{old_path} => #{new_path}" # FIXME
                         File.rename(old_path, new_path)
 
                         url = interface.access_url(new_path)
@@ -48,6 +53,7 @@ class ScmHook  < Redmine::Hook::ViewListener
                     end
                 end
             rescue NameError
+                Rails.logger.info " >>> NameError" # FIXME
             end
         end
     end
