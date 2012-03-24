@@ -35,7 +35,7 @@ module ScmRepositoriesHelperPatch
                 SubversionCreator.enabled? && SubversionCreator.options['url'].present?
                 name = SubversionCreator.repository_name(@project.repository.root_url)
                 if name
-                    svntags['(file:///, http://, https://, svn://, svn+[tunnelscheme]://)'] = SubversionCreator.external_url(name)
+                    svntags['(file:///, http://, https://, svn://, svn+[tunnelscheme]://)'] = SubversionCreator.external_url(name) # FIXME: remains same after rename
                 end
             end
 
