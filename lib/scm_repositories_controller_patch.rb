@@ -49,7 +49,7 @@ module ScmRepositoriesControllerPatch
                     @repository.project = @project
 
                     if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
-                        scm_create_repository(repository, params[:repository_scm], params[:repository]['url'])
+                        scm_create_repository(@repository, params[:repository_scm], params[:repository]['url'])
                     end
 
                     if request.post? && @repository.save
