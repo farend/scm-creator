@@ -28,6 +28,9 @@ module ScmRepositoriesHelperPatch
                 svntags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = SubversionCreator.access_root_url(SubversionCreator.default_path(@project.identifier))
+                    if SubversionCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
+                        path << '.' + @project.repositories.size.to_s
+                    end
                     svntags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
                 end
 
@@ -55,6 +58,9 @@ module ScmRepositoriesHelperPatch
                 hgtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = MercurialCreator.access_root_url(MercurialCreator.default_path(@project.identifier))
+                    if MercurialCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
+                        path << '.' + @project.repositories.size.to_s
+                    end
                     hgtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
                 end
 
@@ -84,6 +90,9 @@ module ScmRepositoriesHelperPatch
                 bzrtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = BazaarCreator.access_root_url(BazaarCreator.default_path(@project.identifier))
+                    if BazaarCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
+                        path << '.' + @project.repositories.size.to_s
+                    end
                     bzrtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
                     if BazaarCreator.options['log_encoding']
                         bzrtags << javascript_tag("$('repository_log_encoding').value = '#{escape_javascript(BazaarCreator.options['log_encoding'])}';")
@@ -114,6 +123,9 @@ module ScmRepositoriesHelperPatch
                 gittags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = GitCreator.access_root_url(GitCreator.default_path(@project.identifier))
+                    if GitCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
+                        path << '.' + @project.repositories.size.to_s
+                    end
                     gittags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
                 end
 
