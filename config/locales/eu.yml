@@ -1,0 +1,17 @@
+eu:
+  button_create_new_repository: Biltegi berria sortu
+
+  label_repository_format: biltegia
+
+  field_scm: SCM
+
+  text_cannot_be_changed_later: Ezin da geroago aldatu.
+  text_cannot_be_used_redmine_auth: Redmineko autentifikazioa ezin da biltegi izen honekin erabili.
+
+  activerecord:
+    errors:
+      messages:
+        should_be_of_format_local: "%{format} formatua izan beharko luke"
+        already_exists: dagoeneko existitzen da
+        scm_not_supported: SCM honekin ez dabil
+        repository_exists_for_identifier: Proiektu identifikadore honekin dagoeneko beste biltegi bat dago
