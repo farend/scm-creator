@@ -9,7 +9,7 @@ module ScmRepositoriesControllerPatch
             unloadable
             before_filter :delete_scm, :only => :destroy
 
-            if Redmine::VERSION::MAJOR > 1 || Redmine::VERSION::MINOR >= 4
+            if Redmine::VERSION::MAJOR > 1 || Redmine::VERSION::MINOR >= 4 # FIXME
                 alias_method :create, :create_with_add
             else
                 alias_method :edit, :edit_with_add
@@ -30,7 +30,7 @@ module ScmRepositoriesControllerPatch
         end
 
         # Redmine >= 1.4.x
-        if Redmine::VERSION::MAJOR > 1 || Redmine::VERSION::MINOR >= 4
+        if Redmine::VERSION::MAJOR > 1 || Redmine::VERSION::MINOR >= 4 # FIXME
 
             # Original function
             #def create
