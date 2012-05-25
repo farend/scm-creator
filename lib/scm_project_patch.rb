@@ -42,18 +42,18 @@ module ScmProjectPatch
                         path = interface.default_path(self.identifier)
 
                         if File.directory?(path)
-                            RAILS_DEFAULT_LOGGER.warn "Automatically using reporitory: #{path}"
+                            Rails.logger.warn "Automatically using reporitory: #{path}"
                         else
-                            RAILS_DEFAULT_LOGGER.info "Automatically creating reporitory: #{path}"
+                            Rails.logger.info "Automatically creating reporitory: #{path}"
                             interface.execute(ScmConfig['pre_create'], path, self) if ScmConfig['pre_create']
                             if interface.create_repository(path)
                                 interface.execute(ScmConfig['post_create'], path, self) if ScmConfig['post_create']
                                 @repository.created_with_scm = true
                                 unless interface.copy_hooks(path)
-                                    RAILS_DEFAULT_LOGGER.warn "Hooks copy failed"
+                                    Rails.logger.warn "Hooks copy failed"
                                 end
                             else
-                                RAILS_DEFAULT_LOGGER.error "Repository creation failed"
+                                Rails.logger.error "Repository creation failed"
                             end
                         end
 
@@ -63,7 +63,7 @@ module ScmProjectPatch
                         @repository.save
 
                     rescue NameError
-                        RAILS_DEFAULT_LOGGER.error "Can't find interface for #{@scm}."
+                        Rails.logger.error "Can't find interface for #{@scm}."
                     end
                 end
             end
@@ -77,7 +77,7 @@ module ScmProjectPatch
                         errors.add_to_base(:repository_exists_for_identifier)
                     end
                 rescue NameError
-                    RAILS_DEFAULT_LOGGER.error "Can't find interface for #{@scm}."
+                    Rails.logger.error "Can't find interface for #{@scm}."
                 end
             end
         end

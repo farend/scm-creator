@@ -24,7 +24,7 @@ module ScmRepositoriesControllerPatch
 
         def delete_scm
             if @repository.created_with_scm && ScmConfig['deny_delete']
-                RAILS_DEFAULT_LOGGER.info "Deletion denied: #{@repository.root_url}"
+                Rails.logger.info "Deletion denied: #{@repository.root_url}"
                 render_403
             end
         end
@@ -146,16 +146,16 @@ module ScmRepositoriesControllerPatch
                 if File.directory?(path)
                     repository.errors.add(:url, :already_exists)
                 else
-                    RAILS_DEFAULT_LOGGER.info "Creating reporitory: #{path}"
+                    Rails.logger.info "Creating reporitory: #{path}"
                     interface.execute(ScmConfig['pre_create'], path, @project) if ScmConfig['pre_create']
                     if interface.create_repository(path)
                         interface.execute(ScmConfig['post_create'], path, @project) if ScmConfig['post_create']
                         repository.created_with_scm = true
                         unless interface.copy_hooks(path)
-                            RAILS_DEFAULT_LOGGER.warn "Hooks copy failed"
+                            Rails.logger.warn "Hooks copy failed"
                         end
                     else
-                        RAILS_DEFAULT_LOGGER.error "Repository creation failed"
+                        Rails.logger.error "Repository creation failed"
                     end
                 end
 
@@ -170,7 +170,7 @@ module ScmRepositoriesControllerPatch
             end
 
         rescue NameError
-            RAILS_DEFAULT_LOGGER.error "Can't find interface for #{scm}."
+            Rails.logger.error "Can't find interface for #{scm}."
             repository.errors.add_to_base(:scm_not_supported)
         end
 

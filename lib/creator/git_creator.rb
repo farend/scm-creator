@@ -9,13 +9,13 @@ class GitCreator < SCMCreator
                         if File.executable?(options['git'])
                             return true
                         else
-                            RAILS_DEFAULT_LOGGER.warn "'#{options['git']}' cannot be found/executed - ignoring '#{scm_id}"
+                            Rails.logger.warn "'#{options['git']}' cannot be found/executed - ignoring '#{scm_id}"
                         end
                     else
-                        RAILS_DEFAULT_LOGGER.warn "missing path to the 'git' tool for '#{scm_id}'"
+                        Rails.logger.warn "missing path to the 'git' tool for '#{scm_id}'"
                     end
                 else
-                    RAILS_DEFAULT_LOGGER.warn "missing path for '#{scm_id}'"
+                    Rails.logger.warn "missing path for '#{scm_id}'"
                 end
             end
 

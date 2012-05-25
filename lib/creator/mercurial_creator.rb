@@ -9,13 +9,13 @@ class MercurialCreator < SCMCreator
                         if File.executable?(options['hg'])
                             return true
                         else
-                            RAILS_DEFAULT_LOGGER.warn "'#{options['hg']}' cannot be found/executed - ignoring '#{scm_id}"
+                            Rails.logger.warn "'#{options['hg']}' cannot be found/executed - ignoring '#{scm_id}"
                         end
                     else
-                        RAILS_DEFAULT_LOGGER.warn "missing path to the 'hg' tool for '#{scm_id}'"
+                        Rails.logger.warn "missing path to the 'hg' tool for '#{scm_id}'"
                     end
                 else
-                    RAILS_DEFAULT_LOGGER.warn "missing path for '#{scm_id}'"
+                    Rails.logger.warn "missing path for '#{scm_id}'"
                 end
             end
 
@@ -35,14 +35,14 @@ class MercurialCreator < SCMCreator
 
         def copy_hooks(path)
             if options['hgrc']
-                RAILS_DEFAULT_LOGGER.warn "Option 'hgrc' is obsolete - use 'post_create' instead. See: http://projects.andriylesyuk.com/issues/1886."
+                Rails.logger.warn "Option 'hgrc' is obsolete - use 'post_create' instead. See: http://projects.andriylesyuk.com/issues/1886."
                 if File.exists?(options['hgrc'])
                     args = [ '/bin/cp' ]
                     args << options['hgrc']
                     args << "#{path}/.hg/hgrc"
                     system(*args)
                 else
-                    RAILS_DEFAULT_LOGGER.error "File #{options['hgrc']} does not exist."
+                    Rails.logger.error "File #{options['hgrc']} does not exist."
                     false
                 end
             else

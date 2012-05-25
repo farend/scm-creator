@@ -9,13 +9,13 @@ class BazaarCreator < SCMCreator
                         if File.executable?(options['bzr'])
                             return true
                         else
-                            RAILS_DEFAULT_LOGGER.warn "'#{options['bzr']}' cannot be found/executed - ignoring '#{scm_id}"
+                            Rails.logger.warn "'#{options['bzr']}' cannot be found/executed - ignoring '#{scm_id}"
                         end
                     else
-                        RAILS_DEFAULT_LOGGER.warn "missing path to the 'bzr' tool for '#{scm_id}'"
+                        Rails.logger.warn "missing path to the 'bzr' tool for '#{scm_id}'"
                     end
                 else
-                    RAILS_DEFAULT_LOGGER.warn "missing path for '#{scm_id}'"
+                    Rails.logger.warn "missing path for '#{scm_id}'"
                 end
             end
 

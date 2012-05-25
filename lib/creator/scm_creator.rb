@@ -94,14 +94,14 @@ class SCMCreator
         # copies hooks (obsolete)
         def copy_hooks(path)
             if options['hooks']
-                RAILS_DEFAULT_LOGGER.warn "Option 'hooks' is obsolete - use 'post_create' instead. See: http://projects.andriylesyuk.com/issues/1886."
+                Rails.logger.warn "Option 'hooks' is obsolete - use 'post_create' instead. See: http://projects.andriylesyuk.com/issues/1886."
                 if File.directory?(options['hooks'])
                     args = [ '/bin/cp', '-aR' ]
                     args += Dir.glob("#{options['hooks']}/*")
                     args << "#{path}/hooks/"
                     system(*args)
                 else
-                    RAILS_DEFAULT_LOGGER.error "Hooks directory #{options['hooks']} does not exist."
+                    Rails.logger.error "Hooks directory #{options['hooks']} does not exist."
                     false
                 end
             else
@@ -118,7 +118,7 @@ class SCMCreator
                 end
                 system(script, path, scm_id, project.identifier)
             else
-                RAILS_DEFAULT_LOGGER.warn "cannot find/execute: #{script}"
+                Rails.logger.warn "cannot find/execute: #{script}"
             end
         end
 

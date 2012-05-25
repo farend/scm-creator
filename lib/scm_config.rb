@@ -19,10 +19,10 @@ protected
             if config.is_a?(Hash) && config.has_key?(Rails.env)
                 @@configs = config[Rails.env]
             else
-                RAILS_DEFAULT_LOGGER.warn "Invalid configuration file or missing configuration for #{Rails.env}: #{RAILS_ROOT}/config/scm.yml"
+                Rails.logger.warn "Invalid configuration file or missing configuration for #{Rails.env}: #{RAILS_ROOT}/config/scm.yml"
             end
         else
-            RAILS_DEFAULT_LOGGER.warn "Can't find configuration file: #{RAILS_ROOT}/config/scm.yml"
+            Rails.logger.warn "Can't find configuration file: #{RAILS_ROOT}/config/scm.yml"
         end
     end
 
