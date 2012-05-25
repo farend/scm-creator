@@ -6,13 +6,10 @@ begin
     def dispatch(plugin, &block)
         Dispatcher.to_prepare(plugin, &block)
     end
-
 rescue LoadError # Rails 3
-
     def dispatch(plugin, &block)
         Rails.configuration.to_prepare(&block)
     end
-
 end
 
 require_dependency 'creator/scm_creator'

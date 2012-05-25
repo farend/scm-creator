@@ -13,16 +13,16 @@ class ScmConfig
 protected
 
     def initialize
-        file = "#{RAILS_ROOT}/config/scm.yml"
+        file = "#{Rails.root}/config/scm.yml"
         if File.file?(file)
             config = YAML::load_file(file)
             if config.is_a?(Hash) && config.has_key?(Rails.env)
                 @@configs = config[Rails.env]
             else
-                Rails.logger.warn "Invalid configuration file or missing configuration for #{Rails.env}: #{RAILS_ROOT}/config/scm.yml"
+                Rails.logger.warn "Invalid configuration file or missing configuration for #{Rails.env}: #{Rails.root}/config/scm.yml"
             end
         else
-            Rails.logger.warn "Can't find configuration file: #{RAILS_ROOT}/config/scm.yml"
+            Rails.logger.warn "Can't find configuration file: #{Rails.root}/config/scm.yml"
         end
     end
 
