@@ -171,7 +171,7 @@ module ScmRepositoriesControllerPatch
 
         rescue NameError
             Rails.logger.error "Can't find interface for #{scm}."
-            repository.errors.add_to_base(:scm_not_supported)
+            repository.errors.add(:base, :scm_not_supported)
         end
 
     end

@@ -74,7 +74,7 @@ module ScmProjectPatch
                 begin
                     interface = Object.const_get("#{@scm}Creator")
                     if interface.repository_exists?(self.identifier)
-                        errors.add_to_base(:repository_exists_for_identifier)
+                        errors.add(:base, :repository_exists_for_identifier)
                     end
                 rescue NameError
                     Rails.logger.error "Can't find interface for #{@scm}."
