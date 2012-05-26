@@ -1,17 +1,5 @@
 require 'redmine'
 
-begin
-    require 'dispatcher'
-
-    def dispatch(plugin, &block)
-        Dispatcher.to_prepare(plugin, &block)
-    end
-rescue LoadError # Rails 3
-    def dispatch(plugin, &block)
-        Rails.configuration.to_prepare(&block)
-    end
-end
-
 require_dependency 'creator/scm_creator'
 require_dependency 'creator/subversion_creator'
 require_dependency 'creator/mercurial_creator'
@@ -23,9 +11,9 @@ require_dependency 'scm_hook'
 
 Rails.logger.info 'Starting SCM Creator Plugin for Redmine'
 
-ActiveRecord::Base.observers << :repository_observer
+Rails.configuration.active_record.observers << :repository_observer
 
-dispatch :redmine_scm_plugin do
+Rails.configuration.to_prepare do
     unless Project.included_modules.include?(ScmProjectPatch)
         Project.send(:include, ScmProjectPatch)
     end
