@@ -143,7 +143,7 @@ module ScmRepositoriesControllerPatch
             name = interface.repository_name(url)
             if name
                 path = interface.path(name)
-                if File.directory?(path)
+                if File.directory?(path) # FIXME: for some reason it does not work
                     repository.errors.add(:url, :already_exists)
                 else
                     Rails.logger.info "Creating reporitory: #{path}"
