@@ -10,7 +10,7 @@ module ScmProjectPatch
 
             safe_attributes 'scm' unless Redmine::VERSION::MAJOR == 1 && Redmine::VERSION::MINOR == 0 # Redmine 1.0.x
 
-            validates_presence_of :scm, :if => Proc.new { |project| project.new_record? && ScmConfig['auto_create'] == 'force' }
+            validates_presence_of :scm, :if => Proc.new { |project| project.new_record? && project.module_enabled?(:repository) && ScmConfig['auto_create'] == 'force' }
 
             validate :repository_exists # FIXME: not sure if this should really be used
 
@@ -32,7 +32,7 @@ module ScmProjectPatch
     module InstanceMethods
 
         def create_scm
-            if @scm.present? && ScmConfig['auto_create']
+            if @scm.present? && self.module_enabled?(:repository) && ScmConfig['auto_create']
                 @repository = Repository.factory(@scm)
                 if @repository
                     @repository.project = self
@@ -70,7 +70,7 @@ module ScmProjectPatch
         end
 
         def repository_exists
-            if @scm.present? && self.identifier.present? && ScmConfig['auto_create']
+            if @scm.present? && self.identifier.present? && self.module_enabled?(:repository) && ScmConfig['auto_create']
                 begin
                     interface = Object.const_get("#{@scm}Creator")
                     if interface.repository_exists?(self.identifier)
