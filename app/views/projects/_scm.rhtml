@@ -1,0 +1,42 @@
+<% if project.new_record? && ScmConfig['auto_create'] %>
+  <% count = [ SubversionCreator, GitCreator, MercurialCreator, BazaarCreator ].inject(0) do |sum, scm|
+               sum += 1 if scm.enabled?
+               sum
+             end %>
+  <% if (count > 1) || (ScmConfig['auto_create'] != 'force') %>
+    <% options = []
+       options << [ '' ]           if ScmConfig['auto_create'] != 'force'
+       options << [ 'Subversion' ] if SubversionCreator.enabled?
+       options << [ 'Mercurial' ]  if MercurialCreator.enabled?
+       options << [ 'Bazaar' ]     if BazaarCreator.enabled?
+       options << [ 'Git' ]        if GitCreator.enabled? %>
+    <p id="project_scm">
+      <label for="project_scm"><%= l(:field_scm) %> <% if ScmConfig['auto_create'] == 'force' %><span class="required">*</span><% end %></label>
+      <%= select_tag('project[scm]', options_for_select(options, (request.params[:project] ? request.params[:project][:scm] : nil))) %><br />
+      <% if ScmConfig['auto_create'] == 'force' %>
+        <em><%= l(:text_cannot_be_changed_later) %></em>
+      <% end %>
+    </p>
+    <script type="text/javascript">
+      //<![CDATA[
+      Event.observe(window, 'load', function() {
+        var f = function() {
+          setVisible('project_scm', ($('project_enabled_module_names_repository').checked == true));
+        };
+        Event.observe('project_enabled_module_names_repository', 'change', f);
+        f();
+      });
+      //]]>
+    </script>
+  <% else %>
+    <% if SubversionCreator.enabled? %>
+      <%= hidden_field_tag('project[scm]', 'Subversion') %>
+    <% elsif GitCreator.enabled? %>
+      <%= hidden_field_tag('project[scm]', 'Git') %>
+    <% elsif MercurialCreator.enabled? %>
+      <%= hidden_field_tag('project[scm]', 'Mercurial') %>
+    <% elsif BazaarCreator.enabled? %>
+      <%= hidden_field_tag('project[scm]', 'Bazaar') %>
+    <% end %>
+  <% end %>
+<% end %>

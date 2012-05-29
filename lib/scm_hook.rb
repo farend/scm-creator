@@ -1,31 +1,5 @@
 class ScmHook  < Redmine::Hook::ViewListener
 
-    def view_projects_form(context = {})
-        if context[:project].new_record? && ScmConfig['auto_create']
-            count = [ SubversionCreator, GitCreator, MercurialCreator, BazaarCreator ].inject(0) do |sum, scm|
-                sum += 1 if scm.enabled?
-                sum
-            end
-            if (count > 1) || (ScmConfig['auto_create'] != 'force')
-                row = ''
-                row << label_tag('project[scm]', l(:field_scm) + (ScmConfig['auto_create'] == 'force' ? ' ' + content_tag(:span, '*', :class => 'required') : ''))
-                row << select_tag('project[scm]', project_scm_options_for_select(context[:request].params[:project] ? context[:request].params[:project][:scm] : nil))
-                row << '<br />' + content_tag(:em, l(:text_cannot_be_changed_later)) if ScmConfig['auto_create'] == 'force'
-                content_tag(:p, row)
-            else
-                if SubversionCreator.enabled?
-                    hidden_field_tag('project[scm]', 'Subversion')
-                elsif GitCreator.enabled?
-                    hidden_field_tag('project[scm]', 'Git')
-                elsif MercurialCreator.enabled?
-                    hidden_field_tag('project[scm]', 'Mercurial')
-                elsif BazaarCreator.enabled?
-                    hidden_field_tag('project[scm]', 'Bazaar')
-                end
-            end
-        end
-    end
-
     def controller_project_aliases_rename_after(context = {})
         if context[:project].repository && context[:project].repository.created_with_scm
 
@@ -51,6 +25,8 @@ class ScmHook  < Redmine::Hook::ViewListener
             end
         end
     end
+
+    render_on :view_projects_form, :partial => 'projects/scm'
 
 private
 
