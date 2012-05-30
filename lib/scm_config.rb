@@ -10,6 +10,13 @@ class ScmConfig
         @@configs[config]
     end
 
+    def self.configured?
+        if @@instance.nil?
+            @@instance = new
+        end
+        @@configs.any?
+    end
+
 protected
 
     def initialize

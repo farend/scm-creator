@@ -5,7 +5,7 @@
 
 <%= error_messages_for 'repository' %>
 
-<% unless File.file?("#{Rails.root}/config/scm.yml") %>
+<% unless ScmConfig.configured? %>
   <div class="warning"><%= l(:text_scm_creator_not_configured_warning) %></div>
 <% end %>
 

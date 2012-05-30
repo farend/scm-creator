@@ -9,7 +9,7 @@ module ScmRepositoriesControllerPatch
             unloadable
             before_filter :delete_scm, :only => :destroy
 
-            if Redmine::VERSION::MAJOR > 1 || Redmine::VERSION::MINOR >= 4 # FIXME
+            if method_defined?(:repositories)
                 alias_method :create, :create_with_add
             else
                 alias_method :edit, :edit_with_add
@@ -30,7 +30,7 @@ module ScmRepositoriesControllerPatch
         end
 
         # Redmine >= 1.4.x
-        if Redmine::VERSION::MAJOR > 1 || Redmine::VERSION::MINOR >= 4 # FIXME
+        if method_defined?(:repositories)
 
             # Original function
             #def create
@@ -43,7 +43,7 @@ module ScmRepositoriesControllerPatch
             #    end
             #end
 
-            def create_with_add
+            def create_with_add # FIXME: check path and executable
                 @repository = Repository.factory(params[:repository_scm], params[:repository])
                 if @repository
                     @repository.project = @project
@@ -96,7 +96,7 @@ module ScmRepositoriesControllerPatch
             #    end
             #end
 
-            def edit_with_add
+            def edit_with_add # FIXME: check path and executable
                 @repository = @project.repository
                 if !@repository && !params[:repository_scm].blank?
                     @repository = Repository.factory(params[:repository_scm])
