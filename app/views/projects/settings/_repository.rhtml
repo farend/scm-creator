@@ -1,9 +1,13 @@
-<% remote_form_for :repository, @repository, 
+<% remote_form_for :repository, @repository,
                    :url => { :controller => 'repositories', :action => 'edit', :id => @project },
                    :builder => TabularFormBuilder,
                    :lang => current_language do |f| %>
 
 <%= error_messages_for 'repository' %>
+
+<% unless File.file?("#{Rails.root}/config/scm.yml") %>
+  <div class="warning"><%= l(:text_scm_creator_not_configured_warning) %></div>
+<% end %>
 
 <div class="box tabular">
 <p>
@@ -11,25 +15,32 @@
 <% if @repository && @repository.class.respond_to?(:scm_available) && !@repository.class.scm_available &&
       ::I18n.t(:text_scm_command_not_available, :default => '') != '' %>
   <br />
-  <em><%= content_tag 'span', l(:text_scm_command_not_available), :class => 'error' %></em>
+  <em class="info error"><%= content_tag 'span', l(:text_scm_command_not_available) %></em>
 <% end %>
 </p>
 <% button_disabled = @repository.class.respond_to?(:scm_available) ? true : @repository.nil? %>
 <% if @repository %>
-<% button_disabled = !@repository.class.scm_available if @repository.class.respond_to?(:scm_available) %>
-<%= repository_field_tags(f, @repository) %>
+<%   button_disabled = ! @repository.class.scm_available if @repository.class.respond_to?(:scm_available) %>
+<%=    repository_field_tags(f, @repository)%>
 <% end %>
 </div>
 
 <div class="contextual">
 <% if @repository && !@repository.new_record? %>
-<%= link_to(l(:label_user_plural), {:controller => 'repositories', :action => 'committers', :id => @project}, :class => 'icon icon-user') %>
+<%= link_to(l(:label_user_plural),
+                {
+                :controller => 'repositories',
+                :action     => 'committers',
+                :id         => @project
+                },
+             :class => 'icon icon-user') %>
 <%= link_to(l(:button_delete), {:controller => 'repositories', :action => 'destroy', :id => @project},
             :confirm => l(:text_are_you_sure),
-            :method => :post,
-            :class => 'icon icon-del') unless @repository.created_with_scm && ScmConfig['deny_delete'] %>
+            :method  => :post,
+            :class   => 'icon icon-del') unless @repository.created_with_scm && ScmConfig['deny_delete'] %>
 <% end %>
 </div>
 
-<%= submit_tag((@repository.nil? || @repository.new_record?) ? l(:button_create) : l(:button_save), :disabled => button_disabled) %>
+<%= submit_tag((@repository.nil? || @repository.new_record?) ? l(:button_create) : l(:button_save),
+               :disabled => button_disabled) %>
 <% end %>

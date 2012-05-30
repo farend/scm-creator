@@ -7,6 +7,7 @@ en:
 
   text_cannot_be_changed_later: Cannot be changed later.
   text_cannot_be_used_redmine_auth: Redmine based authentication can not be used with this repository name.
+  text_scm_creator_not_configured_warning: SCM Creator installed but not configured.
 
   activerecord:
     errors:

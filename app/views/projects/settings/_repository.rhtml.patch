@@ -1,11 +1,37 @@
---- /usr/share/redmine/app/views/projects/settings/_repository.rhtml	2011-03-07 21:44:37.000000000 +0200
-+++ _repository.rhtml	2011-05-29 22:17:01.000000000 +0300
-@@ -16,7 +16,7 @@
+--- /usr/share/redmine/app/views/projects/settings/_repository.html.erb	2012-04-14 11:21:01.000000000 +0300
++++ _repository.rhtml	2012-05-30 12:39:30.000000000 +0300
+@@ -5,17 +5,22 @@
+ 
+ <%= error_messages_for 'repository' %>
+ 
++<% unless File.file?("#{Rails.root}/config/scm.yml") %>
++  <div class="warning"><%= l(:text_scm_creator_not_configured_warning) %></div>
++<% end %>
++
+ <div class="box tabular">
+ <p>
+ <%= label_tag('repository_scm', l(:label_scm)) %><%= scm_select_tag(@repository) %>
+-<% if @repository && ! @repository.class.scm_available %>
++<% if @repository && @repository.class.respond_to?(:scm_available) && !@repository.class.scm_available &&
++      ::I18n.t(:text_scm_command_not_available, :default => '') != '' %>
+   <br />
+   <em class="info error"><%= content_tag 'span', l(:text_scm_command_not_available) %></em>
+ <% end %>
+ </p>
+-<% button_disabled = true %>
++<% button_disabled = @repository.class.respond_to?(:scm_available) ? true : @repository.nil? %>
+ <% if @repository %>
+-<%   button_disabled = ! @repository.class.scm_available %>
++<%   button_disabled = ! @repository.class.scm_available if @repository.class.respond_to?(:scm_available) %>
+ <%=    repository_field_tags(f, @repository)%>
+ <% end %>
+ </div>
+@@ -32,7 +37,7 @@
  <%= link_to(l(:button_delete), {:controller => 'repositories', :action => 'destroy', :id => @project},
              :confirm => l(:text_are_you_sure),
-             :method => :post,
--            :class => 'icon icon-del') %>
-+            :class => 'icon icon-del') unless @repository.created_with_scm && ScmConfig['deny_delete'] %>
+             :method  => :post,
+-            :class   => 'icon icon-del') %>
++            :class   => 'icon icon-del') unless @repository.created_with_scm && ScmConfig['deny_delete'] %>
  <% end %>
  </div>
  
