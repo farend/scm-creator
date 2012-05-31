@@ -65,7 +65,7 @@ class SCMCreator
 
         # extracts repository name from path
         def repository_name(path)
-            base = Redmine::Platform.mswin? ? options['path'].gsub!(%r{\\}, "/") : options['path']
+            base = Redmine::Platform.mswin? ? options['path'].gsub(%r{\\}, "/") : options['path']
             matches = Regexp.new("^#{Regexp.escape(base)}/([^/]+)/?$").match(path)
             matches ? matches[1] : nil
         end
@@ -77,7 +77,7 @@ class SCMCreator
 
         # returns format of repository path which is displayed in the form as a default value
         def repository_format
-            path = Redmine::Platform.mswin? ? options['path'].gsub!(%r{\\}, "/") : options['path']
+            path = Redmine::Platform.mswin? ? options['path'].gsub(%r{\\}, "/") : options['path']
             "#{path}/<#{l(:label_repository_format)}>/"
         end
 

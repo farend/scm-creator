@@ -4,20 +4,22 @@ class ScmConfig
     @@configs = {}
 
     def self.[](config)
-        if @@instance.nil?
-            @@instance = new
-        end
+        instantiate
         @@configs[config]
     end
 
     def self.configured?
-        if @@instance.nil?
-            @@instance = new
-        end
+        instantiate
         @@configs.any?
     end
 
 protected
+
+    def self.instantiate
+        if @@instance.nil?
+            @@instance = new
+        end
+    end
 
     def initialize
         file = "#{Rails.root}/config/scm.yml"

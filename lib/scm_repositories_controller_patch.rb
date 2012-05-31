@@ -43,7 +43,7 @@ module ScmRepositoriesControllerPatch
             #    end
             #end
 
-            def create_with_add # FIXME: check path and executable
+            def create_with_add
                 @repository = Repository.factory(params[:repository_scm], params[:repository])
                 if @repository
                     @repository.project = @project
@@ -96,7 +96,7 @@ module ScmRepositoriesControllerPatch
             #    end
             #end
 
-            def edit_with_add # FIXME: check path and executable
+            def edit_with_add
                 @repository = @project.repository
                 if !@repository && !params[:repository_scm].blank?
                     @repository = Repository.factory(params[:repository_scm])

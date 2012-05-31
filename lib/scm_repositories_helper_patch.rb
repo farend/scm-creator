@@ -36,8 +36,10 @@ module ScmRepositoriesHelperPatch
 
             elsif !repository.new_record? && repository.created_with_scm &&
                 SubversionCreator.enabled? && SubversionCreator.options['url'].present?
+                Rails.logger.info "#2017: subversion_field_tags_with_add for existing repository" # FIXME
                 name = SubversionCreator.repository_name(repository.root_url)
                 if name
+                    Rails.logger.info "#2017: name is #{name}" # FIXME
                     svntags['(file:///, http://, https://, svn://, svn+[tunnelscheme]://)'] = SubversionCreator.external_url(name)
                 end
             end

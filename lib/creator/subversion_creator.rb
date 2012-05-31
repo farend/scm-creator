@@ -43,13 +43,13 @@ class SubversionCreator < SCMCreator
         end
 
         def repository_name(path)
-            base = Redmine::Platform.mswin? ? '/' + options['path'].gsub!(%r{\\}, "/") : options['path']
+            base = Redmine::Platform.mswin? ? '/' + options['path'].gsub(%r{\\}, "/") : options['path']
             matches = Regexp.new("^file://#{Regexp.escape(base)}/([^/]+)/?$").match(path)
             matches ? matches[1] : nil
         end
 
         def repository_format
-            path = Redmine::Platform.mswin? ? '/' + options['path'].gsub!(%r{\\}, "/") : options['path']
+            path = Redmine::Platform.mswin? ? '/' + options['path'].gsub(%r{\\}, "/") : options['path']
             "file://#{path}/<#{l(:label_repository_format)}>/"
         end
 
