@@ -17,6 +17,7 @@ module ScmRepositoriesHelperPatch
     module ClassMethods
     end
 
+    # TODO: introduce limits e.g. max_repos_per_project
     module InstanceMethods
 
         def subversion_field_tags_with_add(form, repository)

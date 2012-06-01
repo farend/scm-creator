@@ -1,0 +1,12 @@
+<h2><%= l(:label_confirmation) %></h2>
+<div class="warning">
+  <p><%= l(:text_scm_repository_created_by_scm) %></p>
+  <p><%= l(:text_scm_repository_destroy_confirmation) %></p>
+  <p>
+    <% form_tag({ :controller => 'repositories', :action => 'destroy', :id => @project }, :method => :post) do %>
+      <%= hidden_field_tag('confirm', 1) %>
+      <label><%= check_box_tag('confirm_with_scm', 1) %> <%= l(:general_text_Yes) %></label>
+      <%= submit_tag(l(:button_delete)) %>
+    <% end %>
+  </p>
+</div>

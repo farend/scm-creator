@@ -9,7 +9,7 @@ module ScmRepositoriesControllerPatch
             unloadable
             before_filter :delete_scm, :only => :destroy
 
-            #alias_method_chain :destroy, :confirmation
+            alias_method_chain :destroy, :confirmation
 
             if method_defined?(:repositories)
                 alias_method :create, :create_with_add
@@ -139,9 +139,15 @@ module ScmRepositoriesControllerPatch
 
         end
 
-        #def destroy_with_confirmation # TODO
-            #destroy_without_confirmation
-        #end
+        def destroy_with_confirmation
+            if params[:confirm]
+                unless params[:confirm_with_scm]
+                    @repository.created_with_scm = false
+                end
+
+                destroy_without_confirmation
+            end
+        end
 
     private
 

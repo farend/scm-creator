@@ -1,6 +1,6 @@
 class RepositoryObserver < ActiveRecord::Observer
 
-    def before_destroy(repository)
+    def before_destroy(repository) # FIXME: does not get executed
         Rails.logger.info "#2017: before_destroy" # FIXME
         if repository.created_with_scm
             project = repository.project
