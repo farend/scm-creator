@@ -9,6 +9,8 @@ module ScmRepositoriesControllerPatch
             unloadable
             before_filter :delete_scm, :only => :destroy
 
+            #alias_method_chain :destroy, :confirmation
+
             if method_defined?(:repositories)
                 alias_method :create, :create_with_add
             else
@@ -136,6 +138,12 @@ module ScmRepositoriesControllerPatch
             end
 
         end
+
+        #def destroy_with_confirmation # TODO
+            #destroy_without_confirmation
+        #end
+
+    private
 
         def scm_create_repository(repository, scm, url)
             interface = Object.const_get("#{scm}Creator")

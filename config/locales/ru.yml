@@ -8,6 +8,7 @@ ru:
   text_cannot_be_changed_later: Позже невозможно будет поменять.
   text_cannot_be_used_redmine_auth: Вы не сможете использовать аутентификацию Redmine для этого хранилища.
   text_scm_creator_not_configured_warning: SCM Creator инсталлирован но не настроен.
+  text_scm_repository_destroy_confirmation: Вы настаиваете на удалении данного хранилища с файловой системы?
 
   activerecord:
     errors:
