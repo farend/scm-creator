@@ -144,11 +144,15 @@ module ScmRepositoriesControllerPatch
         end
 
         def destroy_with_confirmation
-            if params[:confirm]
-                unless params[:confirm_with_scm]
-                    @repository.created_with_scm = false
-                end
+            if @repository.created_with_scm
+                if params[:confirm]
+                    unless params[:confirm_with_scm]
+                        @repository.created_with_scm = false
+                    end
 
+                    destroy_without_confirmation
+                end
+            else
                 destroy_without_confirmation
             end
         end

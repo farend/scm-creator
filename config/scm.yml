@@ -1,11 +1,12 @@
 production:
-  auto_create: false
   deny_delete: true
+  auto_create: false
+  force_repository: true
   pre_create: /usr/local/bin/pre-create.sh
   post_create: /usr/local/bin/post-create.sh
   pre_delete: /usr/local/bin/pre-delete.sh
   post_delete: /usr/local/bin/post-delete.sh
-  max_repos: 3
+  max_repos: 0
   svn:
     path: /var/lib/svn
     svnadmin: /usr/bin/svnadmin
