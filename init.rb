@@ -11,6 +11,7 @@ require_dependency 'scm_hook'
 
 Rails.logger.info 'Starting SCM Creator Plugin for Redmine'
 
+# ActiveRecord::Base.observers << :repository_observer # FIXME
 Rails.configuration.active_record.observers << :repository_observer
 
 Rails.configuration.to_prepare do

@@ -12,7 +12,7 @@ module ScmProjectPatch
 
             validates_presence_of :scm, :if => Proc.new { |project| project.new_record? && project.module_enabled?(:repository) && ScmConfig['auto_create'] == 'force' }
 
-            validate :repository_exists # FIXME: not sure if this should really be used
+            validate :repository_exists
 
             after_create :create_scm
 

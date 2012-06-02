@@ -17,11 +17,15 @@ module ScmRepositoriesHelperPatch
     module ClassMethods
     end
 
-    # TODO: introduce limits e.g. max_repos_per_project
     module InstanceMethods
 
         def subversion_field_tags_with_add(form, repository)
             svntags = subversion_field_tags_without_add(form, repository)
+
+            if @project.respond_to?(:repositories) &&
+                ScmConfig['max_repos'] && ScmConfig['max_repos'].to_i > 0 && @project.repositories.size >= ScmConfig['max_repos'].to_i
+                return svntags
+            end
 
             if repository.new_record? && SubversionCreator.enabled?
                 add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
@@ -48,6 +52,11 @@ module ScmRepositoriesHelperPatch
 
         def mercurial_field_tags_with_add(form, repository)
             hgtags = mercurial_field_tags_without_add(form, repository)
+
+            if @project.respond_to?(:repositories) &&
+                ScmConfig['max_repos'] && ScmConfig['max_repos'].to_i > 0 && @project.repositories.size >= ScmConfig['max_repos'].to_i
+                return hgtags
+            end
 
             if repository.new_record? && MercurialCreator.enabled?
                 add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
@@ -85,6 +94,11 @@ module ScmRepositoriesHelperPatch
         def bazaar_field_tags_with_add(form, repository)
             bzrtags = bazaar_field_tags_without_add(form, repository)
 
+            if @project.respond_to?(:repositories) &&
+                ScmConfig['max_repos'] && ScmConfig['max_repos'].to_i > 0 && @project.repositories.size >= ScmConfig['max_repos'].to_i
+                return bzrtags
+            end
+
             if repository.new_record? && BazaarCreator.enabled?
                 add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
                 bzrtags['</p>'] = ' ' + add + '</p>'
@@ -113,6 +127,11 @@ module ScmRepositoriesHelperPatch
 
         def git_field_tags_with_add(form, repository)
             gittags = git_field_tags_without_add(form, repository)
+
+            if @project.respond_to?(:repositories) &&
+                ScmConfig['max_repos'] && ScmConfig['max_repos'].to_i > 0 && @project.repositories.size >= ScmConfig['max_repos'].to_i
+                return gittags
+            end
 
             if repository.new_record? && GitCreator.enabled?
                 add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")

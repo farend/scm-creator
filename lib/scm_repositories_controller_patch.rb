@@ -51,7 +51,11 @@ module ScmRepositoriesControllerPatch
                     @repository.project = @project
 
                     if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
-                        scm_create_repository(@repository, params[:repository_scm], params[:repository]['url'])
+                        if !ScmConfig['max_repos'] || ScmConfig['max_repos'].to_i == 0 || @project.repositories.size < ScmConfig['max_repos'].to_i
+                            scm_create_repository(@repository, params[:repository_scm], params[:repository]['url'])
+                        else
+                            @repository.errors.add(:base, :scm_repositories_maximum_count_exceeded, :max => ScmConfig['max_repos'].to_i)
+                        end
                     end
 
                     if request.post? && @repository.save
@@ -157,7 +161,7 @@ module ScmRepositoriesControllerPatch
             name = interface.repository_name(url)
             if name
                 path = interface.path(name)
-                if File.directory?(path) # FIXME: for some reason it does not work
+                if File.directory?(path) # FIXME: for some reason it does not work under 2.0
                     repository.errors.add(:url, :already_exists)
                 else
                     Rails.logger.info "Creating reporitory: #{path}"
@@ -181,6 +185,12 @@ module ScmRepositoriesControllerPatch
                 end
             else
                 repository.errors.add(:url, :should_be_of_format_local, :format => interface.repository_format)
+            end
+
+            # Otherwise input field will be disabled
+            if repository.errors.any?
+                repository.root_url = nil
+                repository.url = nil
             end
 
         rescue NameError

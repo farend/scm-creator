@@ -14,12 +14,12 @@ class RepositoryObserver < ActiveRecord::Observer
 
                 name = interface.repository_name(repository.root_url)
                 if name
-                    Rails.logger.info "#2017: name" # FIXME
                     path = interface.path(name)
 
                     interface.execute(ScmConfig['pre_delete'], path, project) if ScmConfig['pre_delete']
 
-                    FileUtils.remove_entry_secure(path, true)
+                    Rails.logger.info "#2017: #{path}" # FIXME
+                    FileUtils.remove_entry_secure(path, true) # FIXME: make a note http://www.ruby-doc.org/stdlib-1.9.3/libdoc/fileutils/rdoc/FileUtils.html#method-c-remove_entry_secure
 
                     interface.execute(ScmConfig['post_delete'], path, project) if ScmConfig['post_delete']
 
