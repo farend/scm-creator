@@ -7,6 +7,7 @@ production:
   pre_delete: /usr/local/bin/pre-delete.sh
   post_delete: /usr/local/bin/post-delete.sh
   max_repos: 0
+  only_creator: false
   svn:
     path: /var/lib/svn
     svnadmin: /usr/bin/svnadmin

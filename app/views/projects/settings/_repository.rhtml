@@ -41,6 +41,8 @@
 <% end %>
 </div>
 
+<% unless ScmConfig['only_creator'] %>
 <%= submit_tag((@repository.nil? || @repository.new_record?) ? l(:button_create) : l(:button_save),
                :disabled => button_disabled) %>
+<% end %>
 <% end %>

@@ -11,7 +11,7 @@ module ScmRepositoriesControllerPatch
 
             alias_method_chain :destroy, :confirmation
 
-            if method_defined?(:repositories)
+            if Project.method_defined?(:repositories)
                 alias_method :create, :create_with_add
             else
                 alias_method :edit, :edit_with_add
@@ -32,7 +32,7 @@ module ScmRepositoriesControllerPatch
         end
 
         # Redmine >= 1.4.x
-        if method_defined?(:repositories)
+        if Project.method_defined?(:repositories)
 
             # Original function
             #def create
