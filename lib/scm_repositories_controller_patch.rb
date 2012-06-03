@@ -58,7 +58,7 @@ module ScmRepositoriesControllerPatch
                         end
                     end
 
-                    if request.post? && @repository.save
+                    if request.post? && @repository.errors.empty? && @repository.save
                         redirect_to(settings_project_path(@project, :tab => 'repositories'))
                     else
                         render(:action => 'new')
@@ -165,7 +165,7 @@ module ScmRepositoriesControllerPatch
             name = interface.repository_name(url)
             if name
                 path = interface.path(name)
-                if File.directory?(path) # FIXME: for some reason it does not work under 2.0
+                if File.directory?(path)
                     repository.errors.add(:url, :already_exists)
                 else
                     Rails.logger.info "Creating reporitory: #{path}"
