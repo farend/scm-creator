@@ -8,6 +8,8 @@ production:
   post_delete: /usr/local/bin/post-delete.sh
   max_repos: 0
   only_creator: false
+  allow_add_local: false
+  allow_pickup: false
   svn:
     path: /var/lib/svn
     svnadmin: /usr/bin/svnadmin

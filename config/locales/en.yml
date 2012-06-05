@@ -19,3 +19,4 @@ en:
         scm_not_supported: This SCM is not supported
         repository_exists_for_identifier: Repository already exists for this project identifier
         scm_repositories_maximum_count_exceeded: Maximum count (%{max}) of repositories exceeded
+        scm_local_repositories_denied: Adding local repositories was denied by the administrator

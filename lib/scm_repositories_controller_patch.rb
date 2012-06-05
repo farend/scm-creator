@@ -58,6 +58,11 @@ module ScmRepositoriesControllerPatch
                         end
                     end
 
+                    if !ScmConfig['allow_add_local'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm &&
+                        params[:repository]['url'] =~ %r{^(file://|([a-z]:)?\.*[\\/])}i
+                        @repository.errors.add(:base, :scm_local_repositories_denied)
+                    end
+
                     if request.post? && @repository.errors.empty? && @repository.save
                         redirect_to(settings_project_path(@project, :tab => 'repositories'))
                     else
@@ -124,6 +129,11 @@ module ScmRepositoriesControllerPatch
 
                     if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
                         scm_create_repository(@repository, params[:repository_scm], attrs['url']) if attrs
+                    end
+
+                    if !ScmConfig['allow_add_local'] && @repository.errors.empty? && !@repository.created_with_scm &&
+                        attrs['url'] =~ %r{^(file://|([a-z]:)?\.*[\\/])}i
+                        @repository.errors.add(:base, :scm_local_repositories_denied)
                     end
 
                     if @repository.errors.empty?

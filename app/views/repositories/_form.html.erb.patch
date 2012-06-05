@@ -1,0 +1,11 @@
+--- /usr/share/redmine/app/views/repositories/_form.html.erb	2012-05-13 22:10:22.000000000 +0300
++++ _form.html.erb	2012-06-05 18:55:26.000000000 +0300
+@@ -19,6 +19,8 @@
+ </div>
+ 
+ <p>
++  <% unless ScmConfig['only_creator'] %>
+   <%= submit_tag(@repository.new_record? ? l(:button_create) : l(:button_save), :disabled => button_disabled) %>
++  <% end %>
+ 	<%= link_to l(:button_cancel), settings_project_path(@project, :tab => 'repositories') %>
+ </p>

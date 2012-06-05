@@ -19,3 +19,4 @@ uk:
         scm_not_supported: Цей тип репозиторію не підтримується
         repository_exists_for_identifier: Репозиторій вже існує для цього ідентифікатора проекту
         scm_repositories_maximum_count_exceeded: Перевищена максимальна кількість репозиторіїв (%{max})
+        scm_local_repositories_denied: Додавання локальних репозиторіїв було заборонене адміністратором

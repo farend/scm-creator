@@ -42,7 +42,12 @@ module ScmProjectPatch
                         path = interface.default_path(self.identifier)
 
                         if File.directory?(path)
-                            Rails.logger.warn "Automatically using reporitory: #{path}"
+                            if ScmConfig['allow_pickup']
+                                Rails.logger.warn "Automatically using reporitory: #{path}"
+                            else
+                                Rails.logger.warn "Repository already exists: #{path}"
+                                return
+                            end
                         else
                             Rails.logger.info "Automatically creating reporitory: #{path}"
                             interface.execute(ScmConfig['pre_create'], path, self) if ScmConfig['pre_create']

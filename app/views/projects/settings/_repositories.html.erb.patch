@@ -1,6 +1,14 @@
---- /usr/share/redmine/app/views/projects/settings/_repositories.html.erb	2012-04-20 13:01:52.000000000 +0300
-+++ _repositories.rhtml	2012-05-23 20:40:16.592523925 +0300
-@@ -25,7 +25,7 @@
+--- /usr/share/redmine/app/views/projects/settings/_repositories.html.erb	2012-05-13 22:10:22.000000000 +0300
++++ _repositories.html.erb	2012-06-02 21:12:13.000000000 +0300
+@@ -1,4 +1,7 @@
+ <% if @project.repositories.any? %>
++<% unless ScmConfig.configured? %>
++  <div class="warning"><%= l(:text_scm_creator_not_configured_warning) %></div>
++<% end %>
+ <table class="list">
+   <thead>
+     <tr>
+@@ -25,7 +28,7 @@
          <%= link_to(l(:button_delete), repository_path(repository),
              :confirm => l(:text_are_you_sure),
              :method  => :delete,
@@ -9,3 +17,12 @@
        <% end %>
        </td>
      </tr>
+@@ -36,6 +39,8 @@
+ <p class="nodata"><%= l(:label_no_data) %></p>
+ <% end %>
+ 
++<% unless ScmConfig['only_creator'] && ScmConfig['max_repos'] && ScmConfig['max_repos'].to_i > 0 && @project.repositories.size >= ScmConfig['max_repos'].to_i %>
+ <% if User.current.allowed_to?(:manage_repository, @project) %>
+   <p><%= link_to l(:label_repository_new), new_project_repository_path(@project), :class => 'icon icon-add' %></p>
+ <% end %>
++<% end %>
