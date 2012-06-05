@@ -45,7 +45,7 @@ module ScmRepositoriesControllerPatch
             #    end
             #end
 
-            def create_with_add
+            def create_with_add # FIXME: alias_method_chain if no params[:operation] and not scm.enabled?
                 @repository = Repository.factory(params[:repository_scm], params[:repository])
                 if @repository
                     @repository.project = @project
@@ -58,7 +58,9 @@ module ScmRepositoriesControllerPatch
                         end
                     end
 
-                    if !ScmConfig['allow_add_local'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm &&
+                    if ScmConfig['only_creator'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm
+                        @repository.errors.add(:base, :scm_only_creator)
+                    elsif !ScmConfig['allow_add_local'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm &&
                         params[:repository]['url'] =~ %r{^(file://|([a-z]:)?\.*[\\/])}i
                         @repository.errors.add(:base, :scm_local_repositories_denied)
                     end
@@ -107,7 +109,7 @@ module ScmRepositoriesControllerPatch
             #    end
             #end
 
-            def edit_with_add
+            def edit_with_add # FIXME: alias_method_chain if no params[:operation] and not scm.enabled?
                 @repository = @project.repository
                 if !@repository && !params[:repository_scm].blank?
                     @repository = Repository.factory(params[:repository_scm])
@@ -131,7 +133,9 @@ module ScmRepositoriesControllerPatch
                         scm_create_repository(@repository, params[:repository_scm], attrs['url']) if attrs
                     end
 
-                    if !ScmConfig['allow_add_local'] && @repository.errors.empty? && !@repository.created_with_scm &&
+                    if ScmConfig['only_creator'] && @repository.errors.empty? && !@repository.created_with_scm
+                        @repository.errors.add(:base, :scm_only_creator)
+                    elsif !ScmConfig['allow_add_local'] && @repository.errors.empty? && !@repository.created_with_scm &&
                         attrs['url'] =~ %r{^(file://|([a-z]:)?\.*[\\/])}i
                         @repository.errors.add(:base, :scm_local_repositories_denied)
                     end
