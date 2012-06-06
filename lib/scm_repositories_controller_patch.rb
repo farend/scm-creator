@@ -12,9 +12,9 @@ module ScmRepositoriesControllerPatch
             alias_method_chain :destroy, :confirmation
 
             if Project.method_defined?(:repositories)
-                alias_method :create, :create_with_add
+                alias_method_chain :create, :add
             else
-                alias_method :edit, :edit_with_add
+                alias_method_chain :edit, :add
             end
         end
     end
@@ -45,33 +45,45 @@ module ScmRepositoriesControllerPatch
             #    end
             #end
 
-            def create_with_add # FIXME: alias_method_chain if no params[:operation] and not scm.enabled?
-                @repository = Repository.factory(params[:repository_scm], params[:repository])
-                if @repository
-                    @repository.project = @project
+            def create_with_add
+                begin
+                    interface = Object.const_get("#{params[:repository_scm]}Creator")
+                rescue NameError
+                end
 
-                    if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
-                        if !ScmConfig['max_repos'] || ScmConfig['max_repos'].to_i == 0 || @project.repositories.size < ScmConfig['max_repos'].to_i
-                            scm_create_repository(@repository, params[:repository_scm], params[:repository]['url'])
-                        else
-                            @repository.errors.add(:base, :scm_repositories_maximum_count_exceeded, :max => ScmConfig['max_repos'].to_i)
+                if interface && interface.is_a?(SCMCreator) && interface.enabled? && (params[:operation].present? && params[:operation] == 'add') ||
+                    ScmConfig['only_creator'] || !ScmConfig['allow_add_local']
+
+                    @repository = Repository.factory(params[:repository_scm], params[:repository])
+                    if @repository
+                        @repository.project = @project
+
+                        if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
+                            if !ScmConfig['max_repos'] || ScmConfig['max_repos'].to_i == 0 || @project.repositories.size < ScmConfig['max_repos'].to_i
+                                scm_create_repository(@repository, interface, params[:repository]['url'])
+                            else
+                                @repository.errors.add(:base, :scm_repositories_maximum_count_exceeded, :max => ScmConfig['max_repos'].to_i)
+                            end
                         end
-                    end
 
-                    if ScmConfig['only_creator'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm
-                        @repository.errors.add(:base, :scm_only_creator)
-                    elsif !ScmConfig['allow_add_local'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm &&
-                        params[:repository]['url'] =~ %r{^(file://|([a-z]:)?\.*[\\/])}i
-                        @repository.errors.add(:base, :scm_local_repositories_denied)
-                    end
+                        if ScmConfig['only_creator'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm
+                            @repository.errors.add(:base, :scm_only_creator)
+                        elsif !ScmConfig['allow_add_local'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm &&
+                            params[:repository]['url'] =~ %r{^(file://|([a-z]:)?\.*[\\/])}i
+                            @repository.errors.add(:base, :scm_local_repositories_denied)
+                        end
 
-                    if request.post? && @repository.errors.empty? && @repository.save
-                        redirect_to(settings_project_path(@project, :tab => 'repositories'))
+                        if request.post? && @repository.errors.empty? && @repository.save
+                            redirect_to(settings_project_path(@project, :tab => 'repositories'))
+                        else
+                            render(:action => 'new')
+                        end
                     else
                         render(:action => 'new')
                     end
+
                 else
-                    render(:action => 'new')
+                    create_without_add
                 end
             end
 
@@ -109,49 +121,61 @@ module ScmRepositoriesControllerPatch
             #    end
             #end
 
-            def edit_with_add # FIXME: alias_method_chain if no params[:operation] and not scm.enabled?
-                @repository = @project.repository
-                if !@repository && !params[:repository_scm].blank?
-                    @repository = Repository.factory(params[:repository_scm])
-                    @repository.project = @project if @repository
+            def edit_with_add
+                begin
+                    interface = Object.const_get("#{params[:repository_scm]}Creator")
+                rescue NameError
                 end
 
-                if request.post? && @repository
-                    attributes = params[:repository]
-                    attrs = {}
-                    extra = {}
-                    attributes.each do |name, value|
-                        if name =~ %r{^extra_}
-                            extra[name] = value
-                        else
-                            attrs[name] = value
+                if interface && interface.is_a?(SCMCreator) && interface.enabled? && (params[:operation].present? && params[:operation] == 'add') ||
+                    ScmConfig['only_creator'] || !ScmConfig['allow_add_local']
+
+                    @repository = @project.repository
+                    if !@repository && !params[:repository_scm].blank?
+                        @repository = Repository.factory(params[:repository_scm])
+                        @repository.project = @project if @repository
+                    end
+
+                    if request.post? && @repository
+                        attributes = params[:repository]
+                        attrs = {}
+                        extra = {}
+                        attributes.each do |name, value|
+                            if name =~ %r{^extra_}
+                                extra[name] = value
+                            else
+                                attrs[name] = value
+                            end
+                        end
+                        @repository.attributes = attrs
+
+                        if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
+                            scm_create_repository(@repository, interface, attrs['url']) if attrs
+                        end
+
+                        if ScmConfig['only_creator'] && @repository.errors.empty? && !@repository.created_with_scm
+                            @repository.errors.add(:base, :scm_only_creator)
+                        elsif !ScmConfig['allow_add_local'] && @repository.errors.empty? && !@repository.created_with_scm &&
+                            attrs['url'] =~ %r{^(file://|([a-z]:)?\.*[\\/])}i
+                            @repository.errors.add(:base, :scm_local_repositories_denied)
+                        end
+
+                        if @repository.errors.empty?
+                            @repository.merge_extra_info(extra) if @repository.respond_to?(:merge_extra_info)
+                            @repository.save
                         end
                     end
-                    @repository.attributes = attrs
 
-                    if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
-                        scm_create_repository(@repository, params[:repository_scm], attrs['url']) if attrs
+                    render(:update) do |page|
+                        page.replace_html("tab-content-repository", :partial => 'projects/settings/repository')
+                        if @repository && !@project.repository
+                            @project.reload
+                            page.replace_html("main-menu", render_main_menu(@project))
+                        end
                     end
 
-                    if ScmConfig['only_creator'] && @repository.errors.empty? && !@repository.created_with_scm
-                        @repository.errors.add(:base, :scm_only_creator)
-                    elsif !ScmConfig['allow_add_local'] && @repository.errors.empty? && !@repository.created_with_scm &&
-                        attrs['url'] =~ %r{^(file://|([a-z]:)?\.*[\\/])}i
-                        @repository.errors.add(:base, :scm_local_repositories_denied)
-                    end
-
-                    if @repository.errors.empty?
-                        @repository.merge_extra_info(extra) if @repository.respond_to?(:merge_extra_info)
-                        @repository.save
-                    end
-                end
-
-                render(:update) do |page|
-                    page.replace_html("tab-content-repository", :partial => 'projects/settings/repository')
-                    if @repository && !@project.repository
-                        @project.reload
-                        page.replace_html("main-menu", render_main_menu(@project))
-                    end
+                else
+                    edit_without_add
                 end
             end
 
@@ -173,9 +197,7 @@ module ScmRepositoriesControllerPatch
 
     private
 
-        def scm_create_repository(repository, scm, url)
-            interface = Object.const_get("#{scm}Creator")
-
+        def scm_create_repository(repository, interface, url)
             name = interface.repository_name(url)
             if name
                 path = interface.path(name)
@@ -210,10 +232,6 @@ module ScmRepositoriesControllerPatch
                 repository.root_url = nil
                 repository.url = nil
             end
-
-        rescue NameError
-            Rails.logger.error "Can't find interface for #{scm}."
-            repository.errors.add(:base, :scm_not_supported)
         end
 
     end
