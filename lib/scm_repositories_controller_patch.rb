@@ -36,12 +36,16 @@ module ScmRepositoriesControllerPatch
 
             # Original function
             #def create
-            #    @repository = Repository.factory(params[:repository_scm], params[:repository])
+            #    attrs = pickup_extra_info
+            #    @repository = Repository.factory(params[:repository_scm], attrs[:attrs])
+            #    if attrs[:attrs_extra].keys.any?
+            #        @repository.merge_extra_info(attrs[:attrs_extra])
+            #    end
             #    @repository.project = @project
             #    if request.post? && @repository.save
-            #        redirect_to(settings_project_path(@project, :tab => 'repositories'))
+            #        redirect_to settings_project_path(@project, :tab => 'repositories')
             #    else
-            #        render(:action => 'new')
+            #        render :action => 'new'
             #    end
             #end
 
@@ -51,10 +55,21 @@ module ScmRepositoriesControllerPatch
                 rescue NameError
                 end
 
-                if interface && interface.is_a?(SCMCreator) && interface.enabled? && (params[:operation].present? && params[:operation] == 'add') ||
-                    ScmConfig['only_creator'] || !ScmConfig['allow_add_local']
+                if (interface && interface.is_a?(SCMCreator) && interface.enabled? &&
+                  ((params[:operation].present? && params[:operation] == 'add') || ScmConfig['only_creator'])) ||
+                   !ScmConfig['allow_add_local']
 
-                    @repository = Repository.factory(params[:repository_scm], params[:repository])
+                    # Fix for 2.0
+                    if respond_to?(:pickup_extra_info)
+                        attrs = pickup_extra_info
+                        @repository = Repository.factory(params[:repository_scm], attrs[:attrs])
+                        if attrs[:attrs_extra].keys.any?
+                            @repository.merge_extra_info(attrs[:attrs_extra])
+                        end
+                    else
+                        @repositor = Repository.factory(params[:repository_scm], params[:repository])
+                    end
+
                     if @repository
                         @repository.project = @project
 
@@ -127,8 +142,9 @@ module ScmRepositoriesControllerPatch
                 rescue NameError
                 end
 
-                if interface && interface.is_a?(SCMCreator) && interface.enabled? && (params[:operation].present? && params[:operation] == 'add') ||
-                    ScmConfig['only_creator'] || !ScmConfig['allow_add_local']
+                if (interface && interface.is_a?(SCMCreator) && interface.enabled? &&
+                  ((params[:operation].present? && params[:operation] == 'add') || ScmConfig['only_creator'])) ||
+                   !ScmConfig['allow_add_local']
 
                     @repository = @project.repository
                     if !@repository && !params[:repository_scm].blank?

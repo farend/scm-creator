@@ -15,7 +15,6 @@ Rails.logger.info 'Starting SCM Creator Plugin for Redmine'
 
 ActiveRecord::Base.observers << :repository_observer
 
-# FIXME: ActionDispatch::Callbacks.to_prepare do
 Rails.configuration.to_prepare do
     unless Project.included_modules.include?(ScmProjectPatch)
         Project.send(:include, ScmProjectPatch)
