@@ -11,7 +11,7 @@ require_dependency 'scm_hook'
 
 Rails.logger.info 'Starting SCM Creator Plugin for Redmine'
 
-# FIXME: only_creator and CVS?
+# TODO: enable Create for unsupported SCMs
 
 ActiveRecord::Base.observers << :repository_observer
 

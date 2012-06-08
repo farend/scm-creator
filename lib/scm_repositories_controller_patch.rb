@@ -67,7 +67,7 @@ module ScmRepositoriesControllerPatch
                             @repository.merge_extra_info(attrs[:attrs_extra])
                         end
                     else
-                        @repositor = Repository.factory(params[:repository_scm], params[:repository])
+                        @repository = Repository.factory(params[:repository_scm], params[:repository])
                     end
 
                     if @repository

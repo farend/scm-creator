@@ -38,6 +38,7 @@ module ScmRepositoriesHelperPatch
                     end
                     svntags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
                 end
+                svntags << javascript_tag("$('repository_save').disable();") if ScmConfig['only_creator']
 
             elsif !repository.new_record? && repository.created_with_scm &&
                 SubversionCreator.enabled? && SubversionCreator.options['url'].present?
@@ -73,6 +74,7 @@ module ScmRepositoriesHelperPatch
                     end
                     hgtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
                 end
+                hgtags << javascript_tag("$('repository_save').disable();") if ScmConfig['only_creator']
 
             elsif !repository.new_record? && repository.created_with_scm &&
                 MercurialCreator.enabled? && MercurialCreator.options['url'].present?
@@ -113,6 +115,7 @@ module ScmRepositoriesHelperPatch
                         bzrtags << javascript_tag("$('repository_log_encoding').value = '#{escape_javascript(BazaarCreator.options['log_encoding'])}';")
                     end
                 end
+                bzrtags << javascript_tag("$('repository_save').disable();") if ScmConfig['only_creator']
 
             elsif !repository.new_record? && repository.created_with_scm &&
                 BazaarCreator.enabled? && BazaarCreator.options['url'].present?
@@ -148,6 +151,7 @@ module ScmRepositoriesHelperPatch
                     end
                     gittags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
                 end
+                gittags << javascript_tag("$('repository_save').disable();") if ScmConfig['only_creator']
 
             elsif !repository.new_record? && repository.created_with_scm &&
                 GitCreator.enabled? && GitCreator.options['url'].present?

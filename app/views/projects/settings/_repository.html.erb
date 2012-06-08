@@ -23,6 +23,7 @@
 <%   button_disabled = ! @repository.class.scm_available if @repository.class.respond_to?(:scm_available) %>
 <%=    repository_field_tags(f, @repository)%>
 <% end %>
+<% button_disabled = true if ScmConfig['only_creator'] %>
 </div>
 
 <div class="contextual">
@@ -41,8 +42,6 @@
 <% end %>
 </div>
 
-<% unless ScmConfig['only_creator'] %>
 <%= submit_tag((@repository.nil? || @repository.new_record?) ? l(:button_create) : l(:button_save),
-               :disabled => button_disabled) %>
-<% end %>
+               :id => 'repository_save', :disabled => button_disabled) %>
 <% end %>
