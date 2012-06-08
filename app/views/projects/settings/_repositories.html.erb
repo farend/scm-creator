@@ -39,8 +39,6 @@
 <p class="nodata"><%= l(:label_no_data) %></p>
 <% end %>
 
-<% unless ScmConfig['only_creator'] && ScmConfig['max_repos'] && ScmConfig['max_repos'].to_i > 0 && @project.repositories.size >= ScmConfig['max_repos'].to_i %><!-- FIXME -->
 <% if User.current.allowed_to?(:manage_repository, @project) %>
   <p><%= link_to l(:label_repository_new), new_project_repository_path(@project), :class => 'icon icon-add' %></p>
-<% end %>
 <% end %>

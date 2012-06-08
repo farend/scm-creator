@@ -4,8 +4,7 @@ class RepositoryObserver < ActiveRecord::Observer
         if repository.created_with_scm
             project = repository.project
 
-            type = repository.type
-            type.gsub!(%r{^Repository::}, '')
+            type = repository.class.name.demodulize
 
             begin
                 interface = Object.const_get("#{type}Creator")

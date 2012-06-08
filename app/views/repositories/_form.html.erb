@@ -16,7 +16,6 @@
 <%   button_disabled = ! @repository.class.scm_available %>
 <%=    repository_field_tags(f, @repository)%>
 <% end %>
-<% button_disabled = true if ScmConfig['only_creator'] %>
 </div>
 
 <p>

@@ -55,7 +55,7 @@ module ScmRepositoriesControllerPatch
                 rescue NameError
                 end
 
-                if (interface && interface.is_a?(SCMCreator) && interface.enabled? &&
+                if (interface && (interface < SCMCreator) && interface.enabled? &&
                   ((params[:operation].present? && params[:operation] == 'add') || ScmConfig['only_creator'])) ||
                    !ScmConfig['allow_add_local']
 
@@ -142,7 +142,7 @@ module ScmRepositoriesControllerPatch
                 rescue NameError
                 end
 
-                if (interface && interface.is_a?(SCMCreator) && interface.enabled? &&
+                if (interface && (interface < SCMCreator) && interface.enabled? &&
                   ((params[:operation].present? && params[:operation] == 'add') || ScmConfig['only_creator'])) ||
                    !ScmConfig['allow_add_local']
 
