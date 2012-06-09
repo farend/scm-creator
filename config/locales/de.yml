@@ -5,13 +5,13 @@ de:
 
   field_scm: SCM
 
-  text_cannot_be_changed_later: Kann später nicht mehr geändert werden.
-  text_cannot_be_used_redmine_auth: Die Authentifizierung über Redmine kann mit diesem Repository Namen nicht verwendet werden.
+  text_cannot_be_changed_later: Kann spÃ¤ter nicht mehr geÃ¤ndert werden.
+  text_cannot_be_used_redmine_auth: Die Authentifizierung Ã¼ber Redmine kann mit diesem Repository Namen nicht verwendet werden.
 
   activerecord:
     errors:
       messages:
         should_be_of_format_local: sollte dem Format "%{format}" entsprechen
         already_exists: existiert bereits
-        scm_not_supported: Dieses SCM wird nicht unterstützt.
-        repository_exists_for_identifier: Für diesen Projektnamen existiert bereits ein Repository.
+        scm_not_supported: Dieses SCM wird nicht unterstÃ¼tzt.
+        repository_exists_for_identifier: FÃ¼r diesen Projektnamen existiert bereits ein Repository.
