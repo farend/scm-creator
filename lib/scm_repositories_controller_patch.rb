@@ -74,7 +74,7 @@ module ScmRepositoriesControllerPatch
                         @repository.project = @project
 
                         if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
-                            if !ScmConfig['max_repos'] || ScmConfig['max_repos'].to_i == 0 || @project.repositories.size < ScmConfig['max_repos'].to_i
+                            if !ScmConfig['max_repos'] || ScmConfig['max_repos'].to_i == 0 || @project.repositories.select{ |r| r.created_with_scm }.size < ScmConfig['max_repos'].to_i
                                 scm_create_repository(@repository, interface, params[:repository]['url'])
                             else
                                 @repository.errors.add(:base, :scm_repositories_maximum_count_exceeded, :max => ScmConfig['max_repos'].to_i)
