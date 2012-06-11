@@ -23,7 +23,7 @@ module ScmRepositoriesHelperPatch
         def repository_field_tags_with_add(form, repository)
             reptags = repository_field_tags_without_add(form, repository)
 
-            button_disabled = !repository.class.scm_available
+            button_disabled = repository.class.respond_to?(:scm_available) ? !repository.class.scm_available : false
 
             if ScmConfig['only_creator']
                 begin
