@@ -25,7 +25,7 @@ Rails.configuration.to_prepare do
     end
 end
 
-Redmine::Plugin.register :redmine_scm_plugin do
+Redmine::Plugin.register :redmine_scm do
     name 'SCM Creator'
     author 'Andriy Lesyuk'
     author_url 'http://www.andriylesyuk.com/'
