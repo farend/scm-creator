@@ -1,5 +1,5 @@
---- /usr/share/redmine/app/views/projects/settings/_repository.html.erb	2012-04-14 11:21:01.000000000 +0300
-+++ _repository.rhtml	2012-05-30 14:12:33.000000000 +0300
+--- /usr/share/redmine/app/views/projects/settings/_repository.html.erb	2011-12-10 16:53:33.000000000 +0200
++++ _repository.html.erb	2011-12-12 01:04:08.876669850 +0200
 @@ -5,17 +5,22 @@
  
  <%= error_messages_for 'repository' %>
@@ -15,7 +15,8 @@
 +<% if @repository && @repository.class.respond_to?(:scm_available) && !@repository.class.scm_available &&
 +      ::I18n.t(:text_scm_command_not_available, :default => '') != '' %>
    <br />
-   <em class="info error"><%= content_tag 'span', l(:text_scm_command_not_available) %></em>
+-  <em><%= content_tag 'span', l(:text_scm_command_not_available), :class => 'error' %></em>
++  <em class="info error"><%= content_tag 'span', l(:text_scm_command_not_available) %></em>
  <% end %>
  </p>
 -<% button_disabled = true %>
@@ -26,7 +27,7 @@
  <%=    repository_field_tags(f, @repository)%>
  <% end %>
  </div>
-@@ -32,7 +37,7 @@
+@@ -32,10 +37,10 @@
  <%= link_to(l(:button_delete), {:controller => 'repositories', :action => 'destroy', :id => @project},
              :confirm => l(:text_are_you_sure),
              :method  => :post,
@@ -35,3 +36,7 @@
  <% end %>
  </div>
  
+ <%= submit_tag((@repository.nil? || @repository.new_record?) ? l(:button_create) : l(:button_save),
+-               :disabled => button_disabled) %>
++               :id => 'repository_save', :disabled => button_disabled) %>
+ <% end %>
