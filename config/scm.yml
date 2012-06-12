@@ -1,7 +1,7 @@
 production:
-  deny_delete: true
+  deny_delete: false
   auto_create: false
-  force_repository: true
+  force_repository: false
   pre_create: /usr/local/bin/pre-create.sh
   post_create: /usr/local/bin/post-create.sh
   pre_delete: /usr/local/bin/pre-delete.sh

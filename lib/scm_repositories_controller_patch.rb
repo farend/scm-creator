@@ -59,14 +59,19 @@ module ScmRepositoriesControllerPatch
                   ((params[:operation].present? && params[:operation] == 'add') || ScmConfig['only_creator'])) ||
                    !ScmConfig['allow_add_local']
 
+                    Rails.logger.info " >>> inside customized code" # FIXME
+
                     # Fix for 2.0
                     if respond_to?(:pickup_extra_info)
+                        Rails.logger.info " >>> :pickup_extra_info defined" # FIXME
                         attrs = pickup_extra_info
                         @repository = Repository.factory(params[:repository_scm], attrs[:attrs])
                         if attrs[:attrs_extra].keys.any?
+                            Rails.logger.info " >>> extra attributes available" # FIXME
                             @repository.merge_extra_info(attrs[:attrs_extra])
                         end
                     else
+                        Rails.logger.info " >>> :pickup_extra_info undefined" # FIXME
                         @repository = Repository.factory(params[:repository_scm], params[:repository])
                     end
 
@@ -91,9 +96,11 @@ module ScmRepositoriesControllerPatch
                         if request.post? && @repository.errors.empty? && @repository.save
                             redirect_to(settings_project_path(@project, :tab => 'repositories'))
                         else
+                            Rails.logger.info " >>> failed saving @repository" # FIXME
                             render(:action => 'new')
                         end
                     else
+                        Rails.logger.info " >>> @repository is nil" # FIXME
                         render(:action => 'new')
                     end
 
@@ -166,7 +173,7 @@ module ScmRepositoriesControllerPatch
                         @repository.attributes = attrs
 
                         if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
-                            scm_create_repository(@repository, interface, attrs['url']) if attrs
+                            scm_create_repository(@repository, interface, attrs['url']) if attrs # FIXME: does not return error if fails (e.g. no write permissions)
                         end
 
                         if ScmConfig['only_creator'] && @repository.errors.empty? && !@repository.created_with_scm
