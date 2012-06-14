@@ -21,3 +21,4 @@ ru:
         scm_repositories_maximum_count_exceeded: Превышено максимальное количество хранилищ (%{max})
         scm_local_repositories_denied: Добавление локальных хранилищ было запрещено администратором
         scm_only_creator: Используйте кнопку "Создать новое хранилище" для создания/добавления хранилища
+        scm_repository_creation_failed: Не удалось создать хранилище

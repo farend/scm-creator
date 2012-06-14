@@ -21,3 +21,4 @@ uk:
         scm_repositories_maximum_count_exceeded: Перевищена максимальна кількість репозиторіїв (%{max})
         scm_local_repositories_denied: Додавання локальних репозиторіїв було заборонене адміністратором
         scm_only_creator: Використовуйте кнопку "Створити новий репозиторій" для створення/додавання репозиторію
+        scm_repository_creation_failed: Не вдалося створити репозиторій

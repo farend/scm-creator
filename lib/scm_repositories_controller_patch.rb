@@ -59,18 +59,19 @@ module ScmRepositoriesControllerPatch
                   ((params[:operation].present? && params[:operation] == 'add') || ScmConfig['only_creator'])) ||
                    !ScmConfig['allow_add_local']
 
-                    # Fix for 2.0
-                    if respond_to?(:pickup_extra_info)
-                        attrs = pickup_extra_info
-                        @repository = Repository.factory(params[:repository_scm], attrs[:attrs])
-                        if attrs[:attrs_extra].keys.any?
-                            @repository.merge_extra_info(attrs[:attrs_extra])
+                    attributes = {}
+                    extra_attrs = {}
+                    params[:repository].each do |name, value|
+                        if name =~ %r{^extra_}
+                            extra_attrs[name] = value
+                        else
+                            attributes[name] = value
                         end
-                    else
-                        Rails.logger.info " ---"
-                        #@repository = Repository.factory(params[:repository_scm], params[:repository]) # FIXME: returns nil
-                        klass = "Repository::#{params[:repository_scm]}".constantize
-                        @repository = klass.new(params[:repository])
+                    end
+
+                    @repository = Repository.factory(params[:repository_scm], attributes)
+                    if extra_attrs.any?
+                        @repository.merge_extra_info(extra_attrs)
                     end
 
                     if @repository
@@ -78,7 +79,7 @@ module ScmRepositoriesControllerPatch
 
                         if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
                             if !ScmConfig['max_repos'] || ScmConfig['max_repos'].to_i == 0 || @project.repositories.select{ |r| r.created_with_scm }.size < ScmConfig['max_repos'].to_i
-                                scm_create_repository(@repository, interface, params[:repository]['url'])
+                                scm_create_repository(@repository, interface, attributes['url'])
                             else
                                 @repository.errors.add(:base, :scm_repositories_maximum_count_exceeded, :max => ScmConfig['max_repos'].to_i)
                             end
@@ -87,7 +88,7 @@ module ScmRepositoriesControllerPatch
                         if ScmConfig['only_creator'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm
                             @repository.errors.add(:base, :scm_only_creator)
                         elsif !ScmConfig['allow_add_local'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm &&
-                            params[:repository]['url'] =~ %r{^(file://|([a-z]:)?\.*[\\/])}i
+                            attributes['url'] =~ %r{^(file://|([a-z]:)?\.*[\\/])}i
                             @repository.errors.add(:base, :scm_local_repositories_denied)
                         end
 
@@ -232,6 +233,7 @@ module ScmRepositoriesControllerPatch
                             Rails.logger.warn "Hooks copy failed"
                         end
                     else
+                        repository.errors.add(:base, :scm_repository_creation_failed)
                         Rails.logger.error "Repository creation failed"
                     end
                 end
