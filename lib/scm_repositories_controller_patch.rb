@@ -170,7 +170,7 @@ module ScmRepositoriesControllerPatch
                         @repository.attributes = attrs
 
                         if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
-                            scm_create_repository(@repository, interface, attrs['url']) if attrs # FIXME: does not return error if fails (e.g. no write permissions)
+                            scm_create_repository(@repository, interface, attrs['url']) if attrs
                         end
 
                         if ScmConfig['only_creator'] && @repository.errors.empty? && !@repository.created_with_scm
