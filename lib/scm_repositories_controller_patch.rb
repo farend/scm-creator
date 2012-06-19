@@ -244,7 +244,7 @@ module ScmRepositoriesControllerPatch
                 repository.root_url = interface.access_root_url(path)
                 repository.url = interface.access_url(path)
 
-                if !interface.repository_name_equal?(name, @project.identifier)
+                if !interface.belongs_to_project?(name, @project.identifier)
                     flash[:warning] = l(:text_cannot_be_used_redmine_auth)
                 end
             else

@@ -70,9 +70,9 @@ class SCMCreator
             matches ? matches[1] : nil
         end
 
-        # compares repository names (was created for Git which can add .git extension)
-        def repository_name_equal?(name, identifier)
-            name == identifier
+        # compares repository names (was created for multiple repositories support)
+        def belongs_to_project?(name, identifier)
+            name =~ %r{^#{Regexp.escape(identifier)}(\..+)?$}
         end
 
         # returns format of repository path which is displayed in the form as a default value

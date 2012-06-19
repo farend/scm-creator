@@ -34,8 +34,10 @@ class GitCreator < SCMCreator
             end
         end
 
-        def repository_name_equal?(name, identifier)
-            name == identifier || name == "#{identifier}.git"
+        def repository_name(path)
+            base = Redmine::Platform.mswin? ? options['path'].gsub(%r{\\}, "/") : options['path']
+            matches = Regexp.new("^#{Regexp.escape(base)}/([^/]+?)(\.git)?/?$").match(path)
+            matches ? matches[1] : nil
         end
 
         def repository_exists?(identifier)
