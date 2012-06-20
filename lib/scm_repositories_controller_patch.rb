@@ -69,10 +69,7 @@ module ScmRepositoriesControllerPatch
                         end
                     end
 
-                    # FIXME: remove
-                    klass = "Repository::#{params[:repository_scm]}".constantize
-                    @repository = klass.new(attributes)
-                    #@repository = Repository.factory(params[:repository_scm], attributes)
+                    @repository = Repository.factory(params[:repository_scm], attributes)
                     if extra_attrs.any?
                         @repository.merge_extra_info(extra_attrs)
                     end
