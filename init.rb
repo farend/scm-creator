@@ -9,9 +9,11 @@ require_dependency 'creator/bazaar_creator'
 require_dependency 'scm_config'
 require_dependency 'scm_hook'
 
+require_dependency File.expand_path(File.join(File.dirname(__FILE__), 'app/models/repository_observer'))
+
 Rails.logger.info 'Starting SCM Creator Plugin for Redmine'
 
-ActiveRecord::Base.observers << :repository_observer
+ActiveRecord::Base.observers << RepositoryObserver
 
 Rails.configuration.to_prepare do
     unless Project.included_modules.include?(ScmProjectPatch)
