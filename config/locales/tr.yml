@@ -1,0 +1,24 @@
+tr:
+  button_create_new_repository: Yeni depo oluştur
+
+  label_repository_format: depo
+
+  field_scm: SCM
+
+  text_cannot_be_changed_later: Daha sonra değiştirilemez.
+  text_cannot_be_used_redmine_auth: Redmine tabanlı kimlik doğrulaması bu depo adı ile kullanılamaz.
+  text_scm_creator_not_configured_warning: SCM Creator kuruldu fakat yapılandırılmadı.
+  text_scm_repository_created_by_scm: Dosya sistemindeki depo özellikle Redmine için oluşturulmuştur. Deponun Redmine girdisini silerseniz depoyu kullanılamaz hale getirebilirsiniz.
+  text_scm_repository_destroy_confirmation: Yine de depoyu dosya sisteminden kaldırmak istiyor musunuz?
+
+  activerecord:
+    errors:
+      messages:
+        should_be_of_format_local: '"%{format}" biçiminde olmalı'
+        already_exists: zaten mevcut
+        scm_not_supported: Bu SCM desteklenmiyor
+        repository_exists_for_identifier: Bu proje tanımlayıcısı için depo zaten mevcut
+        scm_repositories_maximum_count_exceeded: Depoların Üst sınırı (%{max}) aşıldı
+        scm_local_repositories_denied: Yerel depo ekleme işlemi yönetici tarafından  reddedildi 
+        scm_only_creator: 'Bir depo oluşturmak/eklemek için "Yeni depo oluştur" düğmesini kullanın'
+        scm_repository_creation_failed: Depo oluşturulamadı

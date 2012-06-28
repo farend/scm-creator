@@ -7,6 +7,9 @@ fr:
 
   text_cannot_be_changed_later: Une fois choisi, le SCM ne pourra plus être modifié.
   text_cannot_be_used_redmine_auth: Ce chemin ne permettra pas d'exposer le dépôt en utilisant les droits d'accès configurés dans Redmine.
+  text_scm_creator_not_configured_warning: Le plugin SCM Creator est installé mais pas configuré.
+  text_scm_repository_created_by_scm: Le dépôt sur le système de fichiers a été créé par Redmine. Le supprimer du projet Redmine le rendra peut-être inutile.
+  text_scm_repository_destroy_confirmation: Voulez-vous également supprimer le dépôt du système de fichiers ?
 
   activerecord:
     errors:
@@ -14,3 +17,8 @@ fr:
         should_be_of_format_local: doit respecter le format "%{format}"
         already_exists: existe déjà
         scm_not_supported: La création automatique n'est pas disponible pour ce SCM
+        repository_exists_for_identifier: Un dépôt existe déjà pour cet identifiant de projet
+        scm_repositories_maximum_count_exceeded: Le nombre maximum de dépôts (%{max}) a été atteint
+        scm_local_repositories_denied: L'ajout de dépôts locaux a été interdit par l'administrateur
+        scm_only_creator: Utilisez le bouton "Créer le dépôt" pour créer/ajouter un dépôt.
+        scm_repository_creation_failed: La création du dépôt a échoué
