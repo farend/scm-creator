@@ -11,7 +11,8 @@ class RepositoryObserver < ActiveRecord::Observer
 
                 name = interface.repository_name(repository.root_url)
                 if name
-                    path = interface.path(name)
+                    path = interface.default_path(name) # FIXME: Removing should not depend on current settings.
+                                                        #        If the repo was created with different path and git_ext it should still delete.
 
                     interface.execute(ScmConfig['pre_delete'], path, project) if ScmConfig['pre_delete']
 
