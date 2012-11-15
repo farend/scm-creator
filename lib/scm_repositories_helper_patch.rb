@@ -37,9 +37,9 @@ module ScmRepositoriesHelperPatch
             end
 
             if request.xhr?
-                reptags << javascript_tag("$('repository_save')." + (button_disabled ? 'disable' : 'enable') + "();")
+                reptags << javascript_tag("$('repository_save')." + (button_disabled ? 'disable' : 'enable') + "();") # FIXME
             else
-                reptags << javascript_tag("Event.observe(window, 'load', function() { $('repository_save')." + (button_disabled ? 'disable' : 'enable') + "(); });")
+                reptags << javascript_tag("Event.observe(window, 'load', function() { $('repository_save')." + (button_disabled ? 'disable' : 'enable') + "(); });") # FIXME
             end
 
             return reptags
@@ -62,7 +62,7 @@ module ScmRepositoriesHelperPatch
                     if SubversionCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
                         path << '.' + @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                     end
-                    svntags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
+                    svntags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';") # FIXME
                 end
 
             elsif !repository.new_record? && repository.created_with_scm &&
@@ -97,7 +97,7 @@ module ScmRepositoriesHelperPatch
                     if MercurialCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
                         path << '.' + @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                     end
-                    hgtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
+                    hgtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';") # FIXME
                 end
 
             elsif !repository.new_record? && repository.created_with_scm &&
@@ -134,9 +134,9 @@ module ScmRepositoriesHelperPatch
                     if BazaarCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
                         path << '.' + @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                     end
-                    bzrtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
+                    bzrtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';") # FIXME
                     if BazaarCreator.options['log_encoding']
-                        bzrtags << javascript_tag("$('repository_log_encoding').value = '#{escape_javascript(BazaarCreator.options['log_encoding'])}';")
+                        bzrtags << javascript_tag("$('repository_log_encoding').value = '#{escape_javascript(BazaarCreator.options['log_encoding'])}';") # FIXME
                     end
                 end
 
@@ -172,7 +172,7 @@ module ScmRepositoriesHelperPatch
                     if GitCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
                         path << '.' + @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                     end
-                    gittags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
+                    gittags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';") # FIXME
                 end
 
             elsif !repository.new_record? && repository.created_with_scm &&

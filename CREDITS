@@ -26,3 +26,5 @@ Thanks to:
  o Fabien Crespel for French translation update
  o Ismail Sezen for Turkish translation
  o Jaebok Oh for Korean translation
+ o Martin Corino for patch fixing .git stripping code
+ o Manfred Kröhnert and Christian Rishøj for patch fixing creation with no .git extension

@@ -1,7 +1,7 @@
 <% if ScmConfig['force_repository'] %>
   <script type="text/javascript">
     //<![CDATA[
-    Event.observe(window, 'load', function() {
+    Event.observe(window, 'load', function() { // FIXME
       var r = $('project_enabled_module_names_repository');
       if (r) {
         r.checked = true;
@@ -33,7 +33,7 @@
     </p>
     <script type="text/javascript">
       //<![CDATA[
-      Event.observe(window, 'load', function() {
+      Event.observe(window, 'load', function() { // FIXME
         var f = function() {
           setVisible('project_scm', ($('project_enabled_module_names_repository').checked == true));
         };

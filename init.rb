@@ -32,6 +32,6 @@ Redmine::Plugin.register :redmine_scm do
     author 'Andriy Lesyuk'
     author_url 'http://www.andriylesyuk.com/'
     description 'Allows creating Subversion, Git, Mercurial and Bazaar repositories using Redmine.'
-    url 'http://projects.andriylesyuk.com/projects/redmine-svn'
-    version '0.4.1'
+    url 'http://projects.andriylesyuk.com/projects/scm-creator'
+    version '0.4.2'
 end
