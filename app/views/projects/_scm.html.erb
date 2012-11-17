@@ -1,15 +1,21 @@
+<% content_for :header_tags do %>
+  <!-- Rails 3.0 and below -->
+  <% if defined? observe_field %>
+    <%= javascript_include_tag('scm_utils_prototype', :plugin => 'redmine_scm') %>
+  <!-- Rails 3.1 and above -->
+  <% else %>
+    <%= javascript_include_tag('scm_utils_jquery', :plugin => 'redmine_scm') %>
+  <% end %>
+<% end %>
+
 <% if ScmConfig['force_repository'] %>
-  <script type="text/javascript">
-    //<![CDATA[
-    Event.observe(window, 'load', function() { // FIXME
-      var r = $('project_enabled_module_names_repository');
-      if (r) {
-        r.checked = true;
-        r.disable();
-      }
-    });
-    //]]>
-  </script>
+  <!-- Rails 3.0 and below -->
+  <% if defined? observe_field %>
+    <%= javascript_tag("Event.observe(window, 'load', force_repository_module);") %>
+  <!-- Rails 3.1 and above -->
+  <% else %>
+    <%= javascript_tag("$(document).ready(force_repository_module);") %>
+  <% end %>
 <% end %>
 
 <% if project.new_record? && ScmConfig['auto_create'] %>
@@ -33,13 +39,19 @@
     </p>
     <script type="text/javascript">
       //<![CDATA[
-      Event.observe(window, 'load', function() { // FIXME
-        var f = function() {
-          setVisible('project_scm', ($('project_enabled_module_names_repository').checked == true));
-        };
-        Event.observe('project_enabled_module_names_repository', 'change', f);
-        f();
-      });
+      // Rails 3.0 and below
+      <% if defined? observe_field %>
+        Event.observe(window, 'load', function() {
+          Event.observe('project_enabled_module_names_repository', 'change', toggle_project_scm_visibility);
+          toggle_project_scm_visibility();
+        });
+      // Rails 3.1 and above
+      <% else %>
+        $(document).ready(function() {
+          $(document).on('change', '#project_enabled_module_names_repository', toggle_project_scm_visibility);
+          toggle_project_scm_visibility();
+        });
+      <% end %>
       //]]>
     </script>
   <% else %>

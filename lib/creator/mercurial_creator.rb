@@ -35,16 +35,16 @@ class MercurialCreator < SCMCreator
 
         def copy_hooks(path)
             if options['hgrc']
-                Rails.logger.warn "Option 'hgrc' is obsolete - use 'post_create' instead. See: http://projects.andriylesyuk.com/issues/1886."
-                if File.exists?(options['hgrc'])
-                    args = [ '/bin/cp' ]
-                    args << options['hgrc']
-                    args << "#{path}/.hg/hgrc"
-                    system(*args)
-                else
-                    Rails.logger.error "File #{options['hgrc']} does not exist."
+                Rails.logger.error "Option 'hgrc' is obsolete - use 'post_create' instead. See: http://projects.andriylesyuk.com/issues/1886."
+                #if File.exists?(options['hgrc'])
+                #    args = [ '/bin/cp' ]
+                #    args << options['hgrc']
+                #    args << "#{path}/.hg/hgrc"
+                #    system(*args)
+                #else
+                #    Rails.logger.error "File #{options['hgrc']} does not exist."
                     false
-                end
+                #end
             else
                 true
             end

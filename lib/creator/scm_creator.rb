@@ -94,16 +94,16 @@ class SCMCreator
         # copies hooks (obsolete)
         def copy_hooks(path)
             if options['hooks']
-                Rails.logger.warn "Option 'hooks' is obsolete - use 'post_create' instead. See: http://projects.andriylesyuk.com/issues/1886."
-                if File.directory?(options['hooks'])
-                    args = [ '/bin/cp', '-aR' ]
-                    args += Dir.glob("#{options['hooks']}/*")
-                    args << "#{path}/hooks/"
-                    system(*args)
-                else
-                    Rails.logger.error "Hooks directory #{options['hooks']} does not exist."
+                Rails.logger.error "Option 'hooks' is obsolete - use 'post_create' instead. See: http://projects.andriylesyuk.com/issues/1886."
+                #if File.directory?(options['hooks'])
+                #    args = [ '/bin/cp', '-aR' ]
+                #    args += Dir.glob("#{options['hooks']}/*")
+                #    args << "#{path}/hooks/"
+                #    system(*args)
+                #else
+                #    Rails.logger.error "Hooks directory #{options['hooks']} does not exist."
                     false
-                end
+                #end
             else
                 true
             end
