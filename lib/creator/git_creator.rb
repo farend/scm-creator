@@ -34,6 +34,17 @@ class GitCreator < SCMCreator
             end
         end
 
+        def existing_path(identifier)
+            path = path(identifier)
+            if File.directory?("#{path}.git")
+                path + '.git'
+            elsif File.directory?(path)
+                path
+            else
+                false
+            end
+        end
+
         def repository_name(path)
             base = Redmine::Platform.mswin? ? options['path'].gsub(%r{\\}, "/") : options['path']
             matches = Regexp.new("^#{Regexp.escape(base)}/([^/]+?)(\\.git)?/?$").match(path)

@@ -63,6 +63,15 @@ class SCMCreator
             path(identifier)
         end
 
+        # get path of existing repository
+        def existing_path(identifier)
+            if File.directory?(default_path(identifier))
+                default_path(identifier)
+            else
+                false
+            end
+        end
+
         # extracts repository name from path
         def repository_name(path)
             base = Redmine::Platform.mswin? ? options['path'].gsub(%r{\\}, "/") : options['path']
