@@ -1,7 +1,7 @@
-<% if @project.repositories.any? %>
 <% unless ScmConfig.configured? %>
   <div class="warning"><%= l(:text_scm_creator_not_configured_warning) %></div>
 <% end %>
+<% if @project.repositories.any? %>
 <table class="list">
   <thead>
     <tr>

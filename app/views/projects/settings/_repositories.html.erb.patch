@@ -1,13 +1,32 @@
---- /usr/share/redmine/app/views/projects/settings/_repositories.html.erb	2012-05-13 22:10:22.000000000 +0300
-+++ _repositories.html.erb	2012-06-08 13:26:04.000000000 +0300
-@@ -1,4 +1,7 @@
- <% if @project.repositories.any? %>
+--- /usr/share/redmine/app/views/projects/settings/_repositories.html.erb	2012-06-18 23:23:44.000000000 +0300
++++ app/views/projects/settings/_repositories.html.erb	2013-05-20 01:12:33.000000000 +0300
+@@ -1,10 +1,13 @@
 +<% unless ScmConfig.configured? %>
 +  <div class="warning"><%= l(:text_scm_creator_not_configured_warning) %></div>
 +<% end %>
+ <% if @project.repositories.any? %>
  <table class="list">
    <thead>
      <tr>
+-      <th><%= l(:label_scm) %></th>
+       <th><%= l(:field_identifier) %></th>
+       <th><%= l(:field_repository_is_default) %></th>
++      <th><%= l(:label_scm) %></th>
+       <th><%= l(:label_repository) %></th>
+       <th></th>
+     </tr>
+@@ -12,9 +15,9 @@
+   <tbody>
+   <% @project.repositories.sort.each do |repository| %>
+     <tr class="<%= cycle 'odd', 'even' %>">
+-      <td><%=h repository.scm_name %></td>
+-      <td><%=h repository.identifier %></td>
++      <td><%= link_to(repository.identifier, { :controller => 'repositories', :action => 'show', :id => @project, :repository_id => repository.identifier_param }) if repository.identifier.present? %></td>
+       <td align="center"><%= checked_image repository.is_default? %></td>
++      <td><%=h repository.scm_name %></td>
+       <td><%=h repository.url %></td>
+       <td class="buttons">
+       <% if User.current.allowed_to?(:manage_repository, @project) %>
 @@ -25,7 +28,7 @@
          <%= link_to(l(:button_delete), repository_path(repository),
              :confirm => l(:text_are_you_sure),
