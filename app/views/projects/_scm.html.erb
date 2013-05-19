@@ -9,6 +9,7 @@
 <% end %>
 
 <% if ScmConfig['force_repository'] %>
+  <%= hidden_field_tag('project[enabled_module_names][]', 'repository') %>
   <!-- Rails 3.0 and below -->
   <% if defined? observe_field %>
     <%= javascript_tag("Event.observe(window, 'load', force_repository_module);") %>
