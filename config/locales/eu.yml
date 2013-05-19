@@ -11,7 +11,7 @@ eu:
   activerecord:
     errors:
       messages:
-        should_be_of_format_local: "%{format} formatua izan beharko luke"
+        should_be_of_format_local: "%{repository_format} formatua izan beharko luke"
         already_exists: dagoeneko existitzen da
         scm_not_supported: SCM honekin ez dabil
         repository_exists_for_identifier: Proiektu identifikadore honekin dagoeneko beste biltegi bat dago

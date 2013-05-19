@@ -1,4 +1,5 @@
 class SCMCreator
+    include Redmine::I18n
 
     class << self
 
@@ -140,9 +141,9 @@ class SCMCreator
         def append_options(args)
             if options['options']
                 if options['options'].is_a?(Array)
-                    args += options['options']
+                    args.concat(options['options'])
                 else
-                    args << options['options']
+                    args.push(options['options'])
                 end
             end
         end

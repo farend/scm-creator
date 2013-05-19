@@ -37,7 +37,8 @@ module ScmRepositoriesControllerPatch
             # Original function
             #def create
             #    attrs = pickup_extra_info
-            #    @repository = Repository.factory(params[:repository_scm], attrs[:attrs])
+            #    @repository = Repository.factory(params[:repository_scm])
+            #    @repository.safe_attributes = params[:repository]
             #    if attrs[:attrs_extra].keys.any?
             #        @repository.merge_extra_info(attrs[:attrs_extra])
             #    end
@@ -69,7 +70,12 @@ module ScmRepositoriesControllerPatch
                         end
                     end
 
-                    @repository = Repository.factory(params[:repository_scm], attributes)
+                    @repository = Repository.factory(params[:repository_scm])
+                    if @repository.safe_attribute_names.any?
+                        @repository.safe_attributes = attributes
+                    else # Redmine < 2.2
+                        @repository.attributes = attributes
+                    end
                     if extra_attrs.any?
                         @repository.merge_extra_info(extra_attrs)
                     end
@@ -245,7 +251,7 @@ module ScmRepositoriesControllerPatch
                     flash[:warning] = l(:text_cannot_be_used_redmine_auth)
                 end
             else
-                repository.errors.add(:url, :should_be_of_format_local, :format => interface.repository_format)
+                repository.errors.add(:url, :should_be_of_format_local, :repository_format => interface.repository_format)
             end
 
             # Otherwise input field will be disabled

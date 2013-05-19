@@ -16,7 +16,7 @@ Thanks to:
  o Blaž Podržaj for idea of custom scripts
  o Jonas Götze for help extending the custom scripts idea
  o James Ang and Mario Luzeiro for append option
- o Takashi Okamoto for Japanese translation
+ o Takashi Okamoto and Jun Naitoh for Japanese translation
  o Takashi Okamoto for patch supporting Redmine 1.4.x
  o Jonas Götze for German translation
  o Ales Zabala Alava for Basque translation
@@ -29,3 +29,6 @@ Thanks to:
  o Martin Corino for patch fixing .git stripping code
  o Manfred Kröhnert and Christian Rishøj for patch fixing creation with no .git extension
  o Martin Corino and Takashi Okamoto for patch supporting Redmine 2.1.x
+ o Lluís for patch fixing repository creation
+ o Alexandre Lessard for patch fixing multiple options issue
+ o Jun Naitoh for patch fixing translation-related errors

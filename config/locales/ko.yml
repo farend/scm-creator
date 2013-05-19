@@ -11,7 +11,7 @@ ko:
   activerecord:
     errors:
       messages:
-        should_be_of_format_local: 형식은 "%{format}" 입니다
+        should_be_of_format_local: 형식은 "%{repository_format}" 입니다
         already_exists: 이미 존재합니다
         scm_not_supported: 이 SCM은 서포트하지 않습니다
         repository_exists_for_identifier: 이 프로젝트 식별자의 저장소는 이미 존재합니다
