@@ -71,7 +71,7 @@ module ScmRepositoriesControllerPatch
                     end
 
                     @repository = Repository.factory(params[:repository_scm])
-                    if @repository.safe_attribute_names.any?
+                    if @repository.respond_to?(:safe_attribute_names) && @repository.safe_attribute_names.any?
                         @repository.safe_attributes = attributes
                     else # Redmine < 2.2
                         @repository.attributes = attributes
