@@ -55,6 +55,7 @@ module ScmRepositoriesHelperPatch
 
         def subversion_field_tags_with_add(form, repository)
             svntags = subversion_field_tags_without_add(form, repository)
+            svntags.gsub!('&lt;br /&gt;', '<br />')
 
             if @project.respond_to?(:repositories) &&
                 ScmConfig['max_repos'] && ScmConfig['max_repos'].to_i > 0 && @project.repositories.select{ |r| r.created_with_scm }.size >= ScmConfig['max_repos'].to_i
