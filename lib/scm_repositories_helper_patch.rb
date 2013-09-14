@@ -68,7 +68,7 @@ module ScmRepositoriesHelperPatch
                 else # Rails 3.1 and above
                     add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
                 end
-                svntags['<br />'] = ' ' + add + '<br />'
+                svntags.gsub!('<br />', ' ' + add + '<br />')
                 svntags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = SubversionCreator.access_root_url(SubversionCreator.default_path(@project.identifier))
@@ -86,7 +86,7 @@ module ScmRepositoriesHelperPatch
                 SubversionCreator.enabled? && SubversionCreator.options['url'].present?
                 name = SubversionCreator.repository_name(repository.root_url)
                 if name
-                    svntags['(file:///, http://, https://, svn://, svn+[tunnelscheme]://)'] = SubversionCreator.external_url(name)
+                    svntags.gsub!('(file:///, http://, https://, svn://, svn+[tunnelscheme]://)', SubversionCreator.external_url(name))
                 end
             end
 
@@ -108,9 +108,9 @@ module ScmRepositoriesHelperPatch
                     add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
                 end
                 if hgtags.include?('<br />')
-                    hgtags['<br />'] = ' ' + add + '<br />'
+                    hgtags.gsub!('<br />', ' ' + add + '<br />')
                 else
-                    hgtags['</p>'] = ' ' + add + '</p>'
+                    hgtags.gsub!('</p>', ' ' + add + '</p>')
                 end
                 hgtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
@@ -130,11 +130,11 @@ module ScmRepositoriesHelperPatch
                 name = MercurialCreator.repository_name(repository.root_url)
                 if name
                     if hgtags.include?(l(:text_mercurial_repository_note))
-                        hgtags[l(:text_mercurial_repository_note)] = MercurialCreator.external_url(name)
+                        hgtags.gsub!(l(:text_mercurial_repository_note), MercurialCreator.external_url(name))
                     elsif hgtags.include?(l(:text_mercurial_repo_example))
-                        hgtags[l(:text_mercurial_repo_example)] = MercurialCreator.external_url(name)
+                        hgtags.gsub!(l(:text_mercurial_repo_example), MercurialCreator.external_url(name))
                     else
-                        hgtags['</p>'] = '<br />' + MercurialCreator.external_url(name) + '</p>'
+                        hgtags.gsub!('</p>', '<br />' + MercurialCreator.external_url(name) + '</p>')
                     end
                 end
             end
@@ -156,7 +156,7 @@ module ScmRepositoriesHelperPatch
                 else # Rails 3.1 and above
                     add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
                 end
-                bzrtags['</p>'] = ' ' + add + '</p>'
+                bzrtags.gsub!('</p>', ' ' + add + '</p>')
                 bzrtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = BazaarCreator.access_root_url(BazaarCreator.default_path(@project.identifier))
@@ -181,7 +181,7 @@ module ScmRepositoriesHelperPatch
                 BazaarCreator.enabled? && BazaarCreator.options['url'].present?
                 name = BazaarCreator.repository_name(repository.root_url)
                 if name
-                    bzrtags['</p>'] = '<br />' + BazaarCreator.external_url(name) + '</p>'
+                    bzrtags.gsub!('</p>', '<br />' + BazaarCreator.external_url(name) + '</p>')
                 end
             end
 
@@ -203,9 +203,9 @@ module ScmRepositoriesHelperPatch
                     add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
                 end
                 if gittags.include?('<br />')
-                    gittags['<br />'] = ' ' + add + '<br />'
+                    gittags.gsub!('<br />', ' ' + add + '<br />')
                 else
-                    gittags['</p>'] = ' ' + add + '</p>'
+                    gittags.gsub!('</p>', ' ' + add + '</p>')
                 end
                 gittags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
@@ -225,11 +225,11 @@ module ScmRepositoriesHelperPatch
                 name = GitCreator.repository_name(repository.root_url)
                 if name
                     if gittags.include?(l(:text_git_repository_note))
-                        gittags[l(:text_git_repository_note)] = GitCreator.external_url(name)
+                        gittags.gsub!(l(:text_git_repository_note), GitCreator.external_url(name))
                     elsif gittags.include?(l(:text_git_repo_example))
-                        gittags[l(:text_git_repo_example)] = GitCreator.external_url(name)
+                        gittags.gsub!(l(:text_git_repo_example), GitCreator.external_url(name))
                     else
-                        gittags['</p>'] = '<br />' + GitCreator.external_url(name) + '</p>'
+                        gittags.gsub!('</p>', '<br />' + GitCreator.external_url(name) + '</p>')
                     end
                 end
             end

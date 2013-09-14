@@ -8,6 +8,8 @@ module ScmProjectPatch
         base.class_eval do
             unloadable
 
+            attr_accessor :scm
+
             safe_attributes 'scm' unless Redmine::VERSION::MAJOR == 1 && Redmine::VERSION::MINOR == 0 # Redmine 1.0.x
 
             validates_presence_of :scm, :if => Proc.new { |project| project.new_record? && project.module_enabled?(:repository) && ScmConfig['auto_create'] == 'force' }
@@ -15,14 +17,6 @@ module ScmProjectPatch
             validate :repository_exists
 
             after_create :create_scm
-
-            def scm=(type)
-                @scm = type
-            end
-
-            def scm
-                @scm
-            end
         end
     end
 
