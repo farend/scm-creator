@@ -50,7 +50,7 @@ module ScmRepositoriesHelperPatch
                 end
             end
 
-            return reptags
+            return reptags.html_safe
         end
 
         def subversion_field_tags_with_add(form, repository)
