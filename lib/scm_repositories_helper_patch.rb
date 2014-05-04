@@ -3,19 +3,16 @@ require_dependency 'repositories_helper'
 module ScmRepositoriesHelperPatch
 
     def self.included(base)
-        base.extend(ClassMethods)
         base.send(:include, InstanceMethods)
         base.class_eval do
             unloadable
+
             alias_method_chain :repository_field_tags, :add
             alias_method_chain :subversion_field_tags, :add
             alias_method_chain :mercurial_field_tags,  :add
             alias_method_chain :git_field_tags,        :add
             alias_method_chain :bazaar_field_tags,     :add
         end
-    end
-
-    module ClassMethods
     end
 
     module InstanceMethods
@@ -235,6 +232,14 @@ module ScmRepositoriesHelperPatch
             end
 
             return gittags
+        end
+
+        def github_field_tags(form, repository)
+            content_tag('p', form.text_field(:url, :size => 60,
+                                                   :required => true,
+                                                   :disabled => !repository.safe_attribute?('url')) +
+                             '<br />'.html_safe +
+                             '(https://github.com/, git@github.com:)')
         end
 
     end

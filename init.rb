@@ -15,6 +15,8 @@ Rails.logger.info 'Starting SCM Creator Plugin for Redmine'
 
 ActiveRecord::Base.observers << RepositoryObserver
 
+Redmine::Scm::Base.add('Github') if ScmConfig['github'] && ScmConfig['github']['path']
+
 Rails.configuration.to_prepare do
     unless Project.included_modules.include?(ScmProjectPatch)
         Project.send(:include, ScmProjectPatch)
@@ -28,10 +30,10 @@ Rails.configuration.to_prepare do
 end
 
 Redmine::Plugin.register :redmine_scm do
-    name 'SCM Creator'
-    author 'Andriy Lesyuk'
-    author_url 'http://www.andriylesyuk.com/'
+    name        'SCM Creator'
+    author      'Andriy Lesyuk'
+    author_url  'http://www.andriylesyuk.com/'
     description 'Allows creating Subversion, Git, Mercurial and Bazaar repositories within Redmine.'
-    url 'http://projects.andriylesyuk.com/projects/scm-creator'
-    version '0.4.3'
+    url         'http://projects.andriylesyuk.com/projects/scm-creator'
+    version     '0.4.3'
 end

@@ -30,5 +30,7 @@ production:
     bzr: /usr/bin/bzr
     init: init-repository
     log_encoding: UTF-8
+  github:
+    path: /var/lib/github
 
 development:
