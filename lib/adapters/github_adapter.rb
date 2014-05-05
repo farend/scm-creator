@@ -7,7 +7,7 @@ module Redmine
 
                 def clone
                     cmd_args = %w{clone --mirror}
-                    cmd_args << url
+                    cmd_args << url_with_credentials
                     cmd_args << root_url
                     git_cmd(cmd_args)
                 rescue ScmCommandAborted
@@ -19,6 +19,20 @@ module Redmine
                         git_cmd(cmd_args)
                     end
                 rescue ScmCommandAborted
+                end
+
+            private
+
+                def url_with_credentials
+                    if @login.present? && @password.present?
+                        if url =~ %r{^https://}
+                            url.gsub(%r{^https://}, "https://#{@login}:#{@password}@")
+                        else
+                            url.gsub(%r{^git@}, "#{@login}:#{@password}@") # FIXME does not work
+                        end
+                    else
+                        url
+                    end
                 end
 
             end

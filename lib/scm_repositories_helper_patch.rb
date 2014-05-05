@@ -239,7 +239,13 @@ module ScmRepositoriesHelperPatch
                                                    :required => true,
                                                    :disabled => !repository.safe_attribute?('url')) +
                              '<br />'.html_safe +
-                             '(https://github.com/, git@github.com:)')
+                             '(https://github.com/, git@github.com:)') +
+            content_tag('p', form.text_field(:login, :size => 30)) + # FIXME only for https://
+            content_tag('p', form.password_field(:password, :size => 30,
+                                                            :name => 'ignore',
+                                                            :value => ((repository.new_record? || repository.password.blank?) ? '' : ('x'*15)),
+                                                            :onfocus => "this.value=''; this.name='repository[password]';",
+                                                            :onchange => "this.name='repository[password]';"))
         end
 
     end
