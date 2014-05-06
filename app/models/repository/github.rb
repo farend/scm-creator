@@ -1,6 +1,6 @@
 require_dependency File.expand_path('../../../../lib/adapters/github_adapter', __FILE__)
 
-class Repository::Github < Repository::Git # TODO
+class Repository::Github < Repository::Git
     before_save :set_local_url
 
     # TODO validate
@@ -18,7 +18,7 @@ class Repository::Github < Repository::Git # TODO
     end
 
     def fetch_changesets
-        if File.directory?(ScmConfig['github']['path'])
+        if File.directory?(GithubCreator.options['path'])
             scm_brs = branches
             if scm_brs.blank?
                 path = File.dirname(root_url)
@@ -26,8 +26,8 @@ class Repository::Github < Repository::Git # TODO
                 Rails.logger.info "Cloning #{url} to #{root_url}"
                 scm.clone
             elsif File.directory?(root_url)
-                Rails.logger.info "Fetching updates for #{root_url}" # FIXME
-                #scm.fetch
+                Rails.logger.info "Fetching updates for #{root_url}"
+                scm.fetch
             end
         end
         super
@@ -39,8 +39,9 @@ class Repository::Github < Repository::Git # TODO
 protected
 
     def set_local_url
-        if new_record? && url.present? && root_url.blank? && ScmConfig['github'] && ScmConfig['github']['path']
-            self.root_url = ScmConfig['github']['path'] + '/' + url.gsub(%r{^.*[@/]github.com[:/]}, '')
+        if new_record? && url.present? && root_url.blank? && GithubCreator.options && GithubCreator.options['path']
+            # TODO if Redmine::Platform.mswin?
+            self.root_url = GithubCreator.options['path'] + '/' + url.gsub(%r{^.*[@/]github.com[:/]}, '')
         end
     end
 

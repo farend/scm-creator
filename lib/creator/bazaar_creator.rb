@@ -5,14 +5,10 @@ class BazaarCreator < SCMCreator
         def enabled?
             if options
                 if options['path']
-                    if options['bzr']
-                        if File.executable?(options['bzr'])
-                            return true
-                        else
-                            Rails.logger.warn "'#{options['bzr']}' cannot be found/executed - ignoring '#{scm_id}"
-                        end
+                    if !options['bzr'] || File.executable?(options['bzr'])
+                        return true
                     else
-                        Rails.logger.warn "missing path to the 'bzr' tool for '#{scm_id}'"
+                        Rails.logger.warn "'#{options['bzr']}' cannot be found/executed - ignoring '#{scm_id}"
                     end
                 else
                     Rails.logger.warn "missing path for '#{scm_id}'"
@@ -22,16 +18,12 @@ class BazaarCreator < SCMCreator
             false
         end
 
-        def external_url(name, regexp = %r{^(?:sftp|bzr(?:\+[a-z]+)?)://})
+        def external_url(repository, regexp = %r{^(?:sftp|bzr(?:\+[a-z]+)?)://})
             super
         end
 
-        def copy_hooks(path)
-            true
-        end
-
         def create_repository(path)
-            args = [ options['bzr'], options['init'] || 'init-repository' ]
+            args = [ bzr_command, options['init'] || 'init-repository' ]
             append_options(args)
             args << path
             system(*args)
@@ -41,6 +33,12 @@ class BazaarCreator < SCMCreator
             if repository.respond_to?(:log_encoding=)
                 repository.log_encoding = options['log_encoding'] || 'UTF-8'
             end
+        end
+
+    private
+
+        def bzr_command
+            options['bzr'] || Redmine::Scm::Adapters::BazaarAdapter::BZR_BIN
         end
 
     end

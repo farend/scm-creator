@@ -32,5 +32,7 @@ production:
     log_encoding: UTF-8
   github:
     path: /var/lib/github
+    api:
+      token: 36857b12efbccc64ce725ea8674fab6ecbd05c03
 
 development:

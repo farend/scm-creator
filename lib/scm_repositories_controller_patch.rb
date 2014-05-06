@@ -51,10 +51,7 @@ module ScmRepositoriesControllerPatch
             #end
 
             def create_with_add
-                begin
-                    interface = Object.const_get("#{params[:repository_scm]}Creator")
-                rescue NameError
-                end
+                interface = SCMCreator.interface(params[:repository_scm])
 
                 if (interface && (interface < SCMCreator) && interface.enabled? &&
                   ((params[:operation].present? && params[:operation] == 'add') || ScmConfig['only_creator'])) ||
@@ -147,10 +144,7 @@ module ScmRepositoriesControllerPatch
             #end
 
             def edit_with_add
-                begin
-                    interface = Object.const_get("#{params[:repository_scm]}Creator")
-                rescue NameError
-                end
+                interface = SCMCreator.interface(params[:repository_scm])
 
                 if (interface && (interface < SCMCreator) && interface.enabled? &&
                   ((params[:operation].present? && params[:operation] == 'add') || ScmConfig['only_creator'])) ||
@@ -232,12 +226,10 @@ module ScmRepositoriesControllerPatch
                 else
                     Rails.logger.info "Creating reporitory: #{path}"
                     interface.execute(ScmConfig['pre_create'], path, @project) if ScmConfig['pre_create']
-                    if interface.create_repository(path)
+                    if result = interface.create_repository(path)
+                        path = result if result.is_a?(String)
                         interface.execute(ScmConfig['post_create'], path, @project) if ScmConfig['post_create']
                         repository.created_with_scm = true
-                        unless interface.copy_hooks(path)
-                            Rails.logger.warn "Hooks copy failed"
-                        end
                     else
                         repository.errors.add(:base, :scm_repository_creation_failed)
                         Rails.logger.error "Repository creation failed"
@@ -247,7 +239,7 @@ module ScmRepositoriesControllerPatch
                 repository.root_url = interface.access_root_url(path)
                 repository.url = interface.access_url(path)
 
-                if !interface.belongs_to_project?(name, @project.identifier)
+                if interface.local? && !interface.belongs_to_project?(name, @project.identifier)
                     flash[:warning] = l(:text_cannot_be_used_redmine_auth)
                 end
             else

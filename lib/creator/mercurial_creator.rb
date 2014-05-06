@@ -5,14 +5,10 @@ class MercurialCreator < SCMCreator
         def enabled?
             if options
                 if options['path']
-                    if options['hg']
-                        if File.executable?(options['hg'])
-                            return true
-                        else
-                            Rails.logger.warn "'#{options['hg']}' cannot be found/executed - ignoring '#{scm_id}"
-                        end
+                    if !options['hg'] || File.executable?(options['hg'])
+                        return true
                     else
-                        Rails.logger.warn "missing path to the 'hg' tool for '#{scm_id}'"
+                        Rails.logger.warn "'#{options['hg']}' cannot be found/executed - ignoring '#{scm_id}"
                     end
                 else
                     Rails.logger.warn "missing path for '#{scm_id}'"
@@ -22,32 +18,21 @@ class MercurialCreator < SCMCreator
             false
         end
 
-        def external_url(name, regexp = %r{^(?:https?|ssh)://})
+        def external_url(repository, regexp = %r{^(?:https?|ssh)://})
             super
         end
 
         def create_repository(path)
-            args = [ options['hg'], 'init' ]
+            args = [ hg_command, 'init' ]
             append_options(args)
             args << path
             system(*args)
         end
 
-        def copy_hooks(path)
-            if options['hgrc']
-                Rails.logger.error "Option 'hgrc' is obsolete - use 'post_create' instead. See: http://projects.andriylesyuk.com/issues/1886."
-                #if File.exists?(options['hgrc'])
-                #    args = [ '/bin/cp' ]
-                #    args << options['hgrc']
-                #    args << "#{path}/.hg/hgrc"
-                #    system(*args)
-                #else
-                #    Rails.logger.error "File #{options['hgrc']} does not exist."
-                    false
-                #end
-            else
-                true
-            end
+    private
+
+        def hg_command
+            options['hg'] || Redmine::Scm::Adapters::MercurialAdapter::HG_BIN
         end
 
     end

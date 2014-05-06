@@ -2,14 +2,11 @@ class ScmHook  < Redmine::Hook::ViewListener
 
     def controller_project_aliases_rename_after(context = {})
         if context[:project].repository && context[:project].repository.created_with_scm
-
-            type = context[:project].repository.class.name.demodulize
-
-            begin
-                interface = Object.const_get("#{type}Creator")
+            interface = SCMCreator.interface(context[:project].repository)
+            if interface
 
                 name = interface.repository_name(context[:project].repository.root_url)
-                if name && interface.belongs_to_project?(name, context[:old_identifier])
+                if name && interface.local? && interface.belongs_to_project?(name, context[:old_identifier])
                     old_path = interface.existing_path(name)
                     if old_path
                         new_path = interface.default_path(context[:new_identifier])
@@ -20,7 +17,6 @@ class ScmHook  < Redmine::Hook::ViewListener
                         context[:project].repository.update_attributes(:root_url => root_url, :url => url)
                     end
                 end
-            rescue NameError
             end
         end
     end

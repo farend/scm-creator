@@ -19,10 +19,9 @@
       <td align="center"><%= checked_image repository.is_default? %></td>
       <td><%=h repository.scm_name %></td>
       <td>
-        <% interface = Object.const_get("#{repository.class.name.demodulize}Creator") rescue nil %>
-        <% if repository.created_with_scm && interface && interface.enabled? && interface.options['url'].present? %>
-          <% name = interface.repository_name(repository.root_url) %>
-          <%= h(name ? interface.external_url(name) : repository.url) %>
+        <% interface = SCMCreator.interface(repository) %>
+        <% if repository.created_with_scm && interface && interface.enabled? %>
+          <%= h(interface.external_url(repository) || repository.url) %>
         <% else %>
           <%= h(repository.url) %>
         <% end %>

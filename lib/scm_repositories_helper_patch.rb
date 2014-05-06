@@ -23,10 +23,7 @@ module ScmRepositoriesHelperPatch
             button_disabled = repository.class.respond_to?(:scm_available) ? !repository.class.scm_available : false
 
             if ScmConfig['only_creator']
-                begin
-                    interface = Object.const_get("#{repository.class.name.demodulize}Creator")
-                rescue NameError
-                end
+                interface = SCMCreator.interface(repository)
 
                 if interface && (interface < SCMCreator) && interface.enabled? && repository.new_record?
                     button_disabled = true
@@ -79,11 +76,10 @@ module ScmRepositoriesHelperPatch
                     end
                 end
 
-            elsif !repository.new_record? && repository.created_with_scm &&
-                SubversionCreator.enabled? && SubversionCreator.options['url'].present?
-                name = SubversionCreator.repository_name(repository.root_url)
-                if name
-                    svntags.gsub!('(file:///, http://, https://, svn://, svn+[tunnelscheme]://)', SubversionCreator.external_url(name))
+            elsif !repository.new_record? && repository.created_with_scm && SubversionCreator.enabled?
+                url = SubversionCreator.external_url(repository)
+                if url
+                    svntags.gsub!('(file:///, http://, https://, svn://, svn+[tunnelscheme]://)', url)
                 end
             end
 
@@ -122,16 +118,15 @@ module ScmRepositoriesHelperPatch
                     end
                 end
 
-            elsif !repository.new_record? && repository.created_with_scm &&
-                MercurialCreator.enabled? && MercurialCreator.options['url'].present?
-                name = MercurialCreator.repository_name(repository.root_url)
-                if name
+            elsif !repository.new_record? && repository.created_with_scm && MercurialCreator.enabled?
+                url = MercurialCreator.external_url(repository)
+                if url
                     if hgtags.include?(l(:text_mercurial_repository_note))
-                        hgtags.gsub!(l(:text_mercurial_repository_note), MercurialCreator.external_url(name))
+                        hgtags.gsub!(l(:text_mercurial_repository_note), url)
                     elsif hgtags.include?(l(:text_mercurial_repo_example))
-                        hgtags.gsub!(l(:text_mercurial_repo_example), MercurialCreator.external_url(name))
+                        hgtags.gsub!(l(:text_mercurial_repo_example), url)
                     else
-                        hgtags.gsub!('</p>', '<br />' + MercurialCreator.external_url(name) + '</p>')
+                        hgtags.gsub!('</p>', '<br />' + url + '</p>')
                     end
                 end
             end
@@ -174,11 +169,10 @@ module ScmRepositoriesHelperPatch
                     end
                 end
 
-            elsif !repository.new_record? && repository.created_with_scm &&
-                BazaarCreator.enabled? && BazaarCreator.options['url'].present?
-                name = BazaarCreator.repository_name(repository.root_url)
-                if name
-                    bzrtags.gsub!('</p>', '<br />' + BazaarCreator.external_url(name) + '</p>')
+            elsif !repository.new_record? && repository.created_with_scm && BazaarCreator.enabled?
+                url = BazaarCreator.external_url(repository)
+                if url
+                    bzrtags.gsub!('</p>', '<br />' + url + '</p>')
                 end
             end
 
@@ -217,16 +211,15 @@ module ScmRepositoriesHelperPatch
                     end
                 end
 
-            elsif !repository.new_record? && repository.created_with_scm &&
-                GitCreator.enabled? && GitCreator.options['url'].present?
-                name = GitCreator.repository_name(repository.root_url)
-                if name
+            elsif !repository.new_record? && repository.created_with_scm && GitCreator.enabled?
+                url = GitCreator.external_url(repository)
+                if url
                     if gittags.include?(l(:text_git_repository_note))
-                        gittags.gsub!(l(:text_git_repository_note), GitCreator.external_url(name))
+                        gittags.gsub!(l(:text_git_repository_note), url)
                     elsif gittags.include?(l(:text_git_repo_example))
-                        gittags.gsub!(l(:text_git_repo_example), GitCreator.external_url(name))
+                        gittags.gsub!(l(:text_git_repo_example), url)
                     else
-                        gittags.gsub!('</p>', '<br />' + GitCreator.external_url(name) + '</p>')
+                        gittags.gsub!('</p>', '<br />' + url + '</p>')
                     end
                 end
             end
@@ -246,6 +239,7 @@ module ScmRepositoriesHelperPatch
                                                             :value => ((repository.new_record? || repository.password.blank?) ? '' : ('x'*15)),
                                                             :onfocus => "this.value=''; this.name='repository[password]';",
                                                             :onchange => "this.name='repository[password]';"))
+            # TODO Register hook (checkbox) You need to be an administrator of the repository
         end
 
     end

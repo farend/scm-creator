@@ -9,14 +9,10 @@ class SubversionCreator < SCMCreator
         def enabled?
             if options
                 if options['path']
-                    if options['svnadmin']
-                        if File.executable?(options['svnadmin'])
-                            return true
-                        else
-                            Rails.logger.warn "'#{options['svnadmin']}' cannot be found/executed - ignoring '#{scm_id}"
-                        end
+                    if !options['svnadmin'] || File.executable?(options['svnadmin'])
+                        return true
                     else
-                        Rails.logger.warn "missing path to the 'svnadmin' tool for '#{scm_id}'"
+                        Rails.logger.warn "'#{options['svnadmin']}' cannot be found/executed - ignoring '#{scm_id}"
                     end
                 else
                     Rails.logger.warn "missing path for '#{scm_id}'"
@@ -38,7 +34,7 @@ class SubversionCreator < SCMCreator
             'file://' + (Redmine::Platform.mswin? ? '/' + path.gsub(%r{\\}, "/") : path)
         end
 
-        def external_url(name, regexp = %r{^(?:file|https?|svn(?:\+[a-z]+)?)://})
+        def external_url(repository, regexp = %r{^(?:file|https?|svn(?:\+[a-z]+)?)://})
             super
         end
 
@@ -54,9 +50,15 @@ class SubversionCreator < SCMCreator
         end
 
         def create_repository(path)
-            args = [ options['svnadmin'], 'create', path ]
+            args = [ svnadmin_command, 'create', path ]
             append_options(args)
             system(*args)
+        end
+
+    private
+
+        def svnadmin_command
+            options['svnadmin'] || 'svnadmin'
         end
 
     end

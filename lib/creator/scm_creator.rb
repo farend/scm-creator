@@ -3,6 +3,20 @@ class SCMCreator
 
     class << self
 
+        # factory-like method that determines the actual creator
+        def interface(repository)
+            if repository.is_a?(Repository)
+                type = repository.class.name
+            elsif repository.is_a?(Class)
+                type = repository.name
+            else
+                type = repository.to_s
+            end
+            Object.const_get("#{type.demodulize}Creator")
+        rescue NameError
+            nil
+        end
+
         # returns config id used in scm.yml and ScmConfig
         def scm_id
             if self.name =~ %r{^(.+)Creator$}
@@ -15,6 +29,11 @@ class SCMCreator
         # returns true if SCM is enabled
         def enabled?
             false
+        end
+
+        # returns true if SCM creates local repository
+        def local?
+            true
         end
 
         # returns configuration from scm.yml
@@ -50,12 +69,16 @@ class SCMCreator
             end
         end
 
-        # returns url which can used to access the repository externally
-        def external_url(name, regexp = %r{^https?://})
-            if options['url'] =~ regexp
-                url = "#{options['url']}/#{name}"
+        # returns url which can be used to access the repository externally
+        def external_url(repository, regexp = %r{^https?://})
+            if options['url'] && name = repository_name(repository.root_url)
+                if options['url'] =~ regexp
+                    url = "#{options['url']}/#{name}"
+                else
+                    url = "#{Setting.protocol}://#{Setting.host_name}/#{options['url']}/#{name}"
+                end
             else
-                url = "#{Setting.protocol}://#{Setting.host_name}/#{options['url']}/#{name}"
+                nil
             end
         end
 
@@ -69,7 +92,7 @@ class SCMCreator
             if File.directory?(default_path(identifier))
                 default_path(identifier)
             else
-                false
+                nil
             end
         end
 
@@ -101,22 +124,10 @@ class SCMCreator
             false
         end
 
-        # copies hooks (obsolete)
-        def copy_hooks(path)
-            if options['hooks']
-                Rails.logger.error "Option 'hooks' is obsolete - use 'post_create' instead. See: http://projects.andriylesyuk.com/issues/1886."
-                #if File.directory?(options['hooks'])
-                #    args = [ '/bin/cp', '-aR' ]
-                #    args += Dir.glob("#{options['hooks']}/*")
-                #    args << "#{path}/hooks/"
-                #    system(*args)
-                #else
-                #    Rails.logger.error "Hooks directory #{options['hooks']} does not exist."
-                    false
-                #end
-            else
-                true
-            end
+        # removes repository
+        def delete_repository(path)
+            # See: http://www.ruby-doc.org/stdlib-1.9.3/libdoc/fileutils/rdoc/FileUtils.html#method-c-remove_entry_secure
+            FileUtils.remove_entry_secure(path, true)
         end
 
         # executes custom scripts

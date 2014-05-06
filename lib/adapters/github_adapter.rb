@@ -15,7 +15,7 @@ module Redmine
 
                 def fetch
                     Dir.chdir(root_url) do
-                        cmd_args = %{fetch --quiet --all --prune}
+                        cmd_args = %w{fetch --quiet --all --prune}
                         git_cmd(cmd_args)
                     end
                 rescue ScmCommandAborted

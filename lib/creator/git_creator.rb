@@ -5,14 +5,10 @@ class GitCreator < SCMCreator
         def enabled?
             if options
                 if options['path']
-                    if options['git']
-                        if File.executable?(options['git'])
-                            return true
-                        else
-                            Rails.logger.warn "'#{options['git']}' cannot be found/executed - ignoring '#{scm_id}"
-                        end
+                    if !options['git'] || File.executable?(options['git'])
+                        return true
                     else
-                        Rails.logger.warn "missing path to the 'git' tool for '#{scm_id}'"
+                        Rails.logger.warn "'#{options['git']}' cannot be found/executed - ignoring '#{scm_id}"
                     end
                 else
                     Rails.logger.warn "missing path for '#{scm_id}'"
@@ -22,7 +18,7 @@ class GitCreator < SCMCreator
             false
         end
 
-        def external_url(name, regexp = %r{^(?:https?|git|ssh)://})
+        def external_url(repository, regexp = %r{^(?:https?|git|ssh)://})
             super
         end
 
@@ -57,19 +53,25 @@ class GitCreator < SCMCreator
         end
 
         def create_repository(path)
-            args = [ options['git'], 'init' ]
+            args = [ git_command, 'init' ]
             append_options(args)
             args << path
             if system(*args)
                 if options['update_server_info']
                     Dir.chdir(path) do
-                        system(options['git'], 'update-server-info')
+                        system(git_command, 'update-server-info')
                     end
                 end
                 true
             else
                 false
             end
+        end
+
+    private
+
+        def git_command
+            options['git'] || Redmine::Scm::Adapters::GitAdapter::GIT_BIN
         end
 
     end
