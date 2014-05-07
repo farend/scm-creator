@@ -4,7 +4,10 @@ uk:
   label_repository_format: репозиторій
 
   field_scm: Тип репозиторію
+  field_github_url: Github URL
+  field_extra_register_hook: Зареєструвати хук для отримання доповнень
 
+  text_github_repository_note_new: '(https://github.com/, git@github.com: або просто назву для створення)'
   text_cannot_be_changed_later: Не можна буде змінити пізніше.
   text_cannot_be_used_redmine_auth: Ви не зможете використовувати аутентифікацію Redmine для цього репозиторію.
   text_scm_creator_not_configured_warning: SCM Creator встановлений але не налаштований.

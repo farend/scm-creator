@@ -10,7 +10,8 @@ module Redmine
                     cmd_args << url_with_credentials
                     cmd_args << root_url
                     git_cmd(cmd_args)
-                rescue ScmCommandAborted
+                rescue ScmCommandAborted => error
+                    Rails.logger.error "Github repository cloning failed: #{error.message}"
                 end
 
                 def fetch
@@ -18,7 +19,8 @@ module Redmine
                         cmd_args = %w{fetch --quiet --all --prune}
                         git_cmd(cmd_args)
                     end
-                rescue ScmCommandAborted
+                rescue ScmCommandAborted => error
+                    Rails.logger.error "commits fetching failed: #{error.message}"
                 end
 
             private

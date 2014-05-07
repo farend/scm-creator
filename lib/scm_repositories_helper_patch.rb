@@ -44,19 +44,14 @@ module ScmRepositoriesHelperPatch
                 end
             end
 
-            return reptags.html_safe
+            reptags.html_safe
         end
 
         def subversion_field_tags_with_add(form, repository)
             svntags = subversion_field_tags_without_add(form, repository)
             svntags.gsub!('&lt;br /&gt;', '<br />')
 
-            if @project.respond_to?(:repositories) &&
-                ScmConfig['max_repos'] && ScmConfig['max_repos'].to_i > 0 && @project.repositories.select{ |r| r.created_with_scm }.size >= ScmConfig['max_repos'].to_i
-                return svntags
-            end
-
-            if repository.new_record? && SubversionCreator.enabled?
+            if repository.new_record? && SubversionCreator.enabled? && !limit_exceeded
                 if defined? observe_field # Rails 3.0 and below
                     add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
                 else # Rails 3.1 and above
@@ -83,18 +78,13 @@ module ScmRepositoriesHelperPatch
                 end
             end
 
-            return svntags
+            svntags
         end
 
         def mercurial_field_tags_with_add(form, repository)
             hgtags = mercurial_field_tags_without_add(form, repository)
 
-            if @project.respond_to?(:repositories) &&
-                ScmConfig['max_repos'] && ScmConfig['max_repos'].to_i > 0 && @project.repositories.select{ |r| r.created_with_scm }.size >= ScmConfig['max_repos'].to_i
-                return hgtags
-            end
-
-            if repository.new_record? && MercurialCreator.enabled?
+            if repository.new_record? && MercurialCreator.enabled? && !limit_exceeded
                 if defined? observe_field # Rails 3.0 and below
                     add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
                 else # Rails 3.1 and above
@@ -131,18 +121,13 @@ module ScmRepositoriesHelperPatch
                 end
             end
 
-            return hgtags
+            hgtags
         end
 
         def bazaar_field_tags_with_add(form, repository)
             bzrtags = bazaar_field_tags_without_add(form, repository)
 
-            if @project.respond_to?(:repositories) &&
-                ScmConfig['max_repos'] && ScmConfig['max_repos'].to_i > 0 && @project.repositories.select{ |r| r.created_with_scm }.size >= ScmConfig['max_repos'].to_i
-                return bzrtags
-            end
-
-            if repository.new_record? && BazaarCreator.enabled?
+            if repository.new_record? && BazaarCreator.enabled? && !limit_exceeded
                 if defined? observe_field # Rails 3.0 and below
                     add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
                 else # Rails 3.1 and above
@@ -176,18 +161,13 @@ module ScmRepositoriesHelperPatch
                 end
             end
 
-            return bzrtags
+            bzrtags
         end
 
         def git_field_tags_with_add(form, repository)
             gittags = git_field_tags_without_add(form, repository)
 
-            if @project.respond_to?(:repositories) &&
-                ScmConfig['max_repos'] && ScmConfig['max_repos'].to_i > 0 && @project.repositories.select{ |r| r.created_with_scm }.size >= ScmConfig['max_repos'].to_i
-                return gittags
-            end
-
-            if repository.new_record? && GitCreator.enabled?
+            if repository.new_record? && GitCreator.enabled? && !limit_exceeded
                 if defined? observe_field # Rails 3.0 and below
                     add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
                 else # Rails 3.1 and above
@@ -224,22 +204,54 @@ module ScmRepositoriesHelperPatch
                 end
             end
 
-            return gittags
+            gittags
         end
 
         def github_field_tags(form, repository)
-            content_tag('p', form.text_field(:url, :size => 60,
-                                                   :required => true,
-                                                   :disabled => !repository.safe_attribute?('url')) +
-                             '<br />'.html_safe +
-                             '(https://github.com/, git@github.com:)') +
-            content_tag('p', form.text_field(:login, :size => 30)) + # FIXME only for https://
-            content_tag('p', form.password_field(:password, :size => 30,
-                                                            :name => 'ignore',
-                                                            :value => ((repository.new_record? || repository.password.blank?) ? '' : ('x'*15)),
-                                                            :onfocus => "this.value=''; this.name='repository[password]';",
-                                                            :onchange => "this.name='repository[password]';"))
-            # TODO Register hook (checkbox) You need to be an administrator of the repository
+            urltag = form.text_field(:url, :size => 60,
+                                           :required => true,
+                                           :disabled => !repository.safe_attribute?('url'))
+
+            if repository.new_record? && GithubCreator.enabled? && !limit_exceeded
+                if defined? observe_field # Rails 3.0 and below
+                    add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
+                else # Rails 3.1 and above
+                    add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
+                end
+                urltag << add
+                urltag << hidden_field_tag(:operation, '', :id => 'repository_operation')
+                unless request.post?
+                    path = @project.identifier
+                    if defined? observe_field # Rails 3.0 and below
+                        gittags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
+                    else # Rails 3.1 and above
+                        gittags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
+                    end
+                end
+                note = l(:text_github_repository_note_new)
+            else
+                note = '(https://github.com/, git@github.com:)'
+            end
+
+            githubtags  = content_tag('p', urltag + '<br />'.html_safe + note)
+            githubtags << content_tag('p', form.text_field(:login, :size => 30)) + # FIXME only for https://
+                          content_tag('p', form.password_field(:password, :size => 30,
+                                                                          :name => 'ignore',
+                                                                          :value => ((repository.new_record? || repository.password.blank?) ? '' : ('x'*15)),
+                                                                          :onfocus => "this.value=''; this.name='repository[password]';",
+                                                                          :onchange => "this.name='repository[password]';"))
+            githubtags << content_tag('p', form.check_box(:extra_register_hook))
+            # TODO You need to be an administrator of the repository + if autofetching is disabled + readonly if registered
+
+            githubtags
+        end
+
+    private
+
+        def limit_exceeded
+            @project.respond_to?(:repositories) &&
+            ScmConfig['max_repos'] && ScmConfig['max_repos'].to_i > 0 &&
+            @project.repositories.select{ |r| r.created_with_scm }.size >= ScmConfig['max_repos'].to_i
         end
 
     end

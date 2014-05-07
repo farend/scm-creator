@@ -4,7 +4,10 @@ ru:
   label_repository_format: хранилище
 
   field_scm: Тип хранилища
+  field_github_url: Github URL
+  field_extra_register_hook: Зарегистрировать перехватчик для слежения за изменениями
 
+  text_github_repository_note_new: '(https://github.com/, git@github.com: или просто имя для создания)'
   text_cannot_be_changed_later: Позже невозможно будет поменять.
   text_cannot_be_used_redmine_auth: Вы не сможете использовать аутентификацию Redmine для этого хранилища.
   text_scm_creator_not_configured_warning: SCM Creator инсталлирован но не настроен.

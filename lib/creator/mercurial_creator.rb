@@ -22,7 +22,7 @@ class MercurialCreator < SCMCreator
             super
         end
 
-        def create_repository(path)
+        def create_repository(path, params = {})
             args = [ hg_command, 'init' ]
             append_options(args)
             args << path

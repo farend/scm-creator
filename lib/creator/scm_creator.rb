@@ -88,7 +88,7 @@ class SCMCreator
         end
 
         # get path of existing repository
-        def existing_path(identifier)
+        def existing_path(identifier, repository = nil)
             if File.directory?(default_path(identifier))
                 default_path(identifier)
             else
@@ -120,7 +120,7 @@ class SCMCreator
         end
 
         # creates repository
-        def create_repository(path)
+        def create_repository(path, params = {})
             false
         end
 

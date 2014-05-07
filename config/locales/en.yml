@@ -4,7 +4,10 @@ en:
   label_repository_format: repository
 
   field_scm: SCM
+  field_github_url: Github URL
+  field_extra_register_hook: Register hook for fetching commits
 
+  text_github_repository_note_new: '(https://github.com/, git@github.com: or just name to create new)'
   text_cannot_be_changed_later: Cannot be changed later.
   text_cannot_be_used_redmine_auth: Redmine based authentication can not be used with this repository name.
   text_scm_creator_not_configured_warning: SCM Creator installed but not configured.

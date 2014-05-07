@@ -42,13 +42,12 @@ class GithubCreator < SCMCreator
         end
 
         # Just return the name, as it's remote repository
-        def default_path(identifier) # FIXME
+        def default_path(identifier)
             identifier
         end
 
-        # None as it's remote repository
-        def existing_path(identifier) # FIXME
-            nil
+        def existing_path(identifier, repository = nil)
+            repository.root_url
         end
 
         def repository_name(path)
@@ -60,24 +59,25 @@ class GithubCreator < SCMCreator
             "[[https://github.com/|git@github.com:]<username>/]<#{l(:label_repository_format)}>[.git]"
         end
 
-        def repository_exists?(identifier) # FIXME try fetching the repo?
+        # To check if repository exists we need username, which is not always available
+        def repository_exists?(identifier)
             false
         end
 
-        def create_repository(path)
+        def create_repository(path, params = {})
             response = client.create(repository_name(path), create_options)
             if response.is_a?(Hash) && response.has_key?(:clone_url)
-                response[:clone_url]
+                if params.has_key?(:url) && params[:url] =~ %r{^git@} && response.has_key?(:ssh_url)
+                    response[:ssh_url]
+                else
+                    response[:clone_url]
+                end
             else
                 false
             end
         rescue Octokit::Error => error
             Rails.logger.error error.message
             false
-        end
-
-        # Never delete the Github repository?
-        def delete_repository(path) # FIXME
         end
 
     private

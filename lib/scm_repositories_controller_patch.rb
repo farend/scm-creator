@@ -226,7 +226,7 @@ module ScmRepositoriesControllerPatch
                 else
                     Rails.logger.info "Creating reporitory: #{path}"
                     interface.execute(ScmConfig['pre_create'], path, @project) if ScmConfig['pre_create']
-                    if result = interface.create_repository(path)
+                    if result = interface.create_repository(path, params[:repository]) # FIXME + repository? params available?
                         path = result if result.is_a?(String)
                         interface.execute(ScmConfig['post_create'], path, @project) if ScmConfig['post_create']
                         repository.created_with_scm = true
@@ -236,8 +236,8 @@ module ScmRepositoriesControllerPatch
                     end
                 end
 
-                repository.root_url = interface.access_root_url(path)
-                repository.url = interface.access_url(path)
+                repository.root_url = interface.access_root_url(path) # FIXME + repository? or params?
+                repository.url      = interface.access_url(path)      # FIXME + repository? or params?
 
                 if interface.local? && !interface.belongs_to_project?(name, @project.identifier)
                     flash[:warning] = l(:text_cannot_be_used_redmine_auth)

@@ -30,7 +30,7 @@ class GitCreator < SCMCreator
             end
         end
 
-        def existing_path(identifier)
+        def existing_path(identifier, repository = nil)
             path = path(identifier)
             if File.directory?("#{path}.git")
                 path + '.git'
@@ -52,7 +52,7 @@ class GitCreator < SCMCreator
             File.directory?(path) || File.directory?("#{path}.git")
         end
 
-        def create_repository(path)
+        def create_repository(path, params = {})
             args = [ git_command, 'init' ]
             append_options(args)
             args << path

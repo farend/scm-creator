@@ -7,12 +7,12 @@ class ScmHook  < Redmine::Hook::ViewListener
 
                 name = interface.repository_name(context[:project].repository.root_url)
                 if name && interface.local? && interface.belongs_to_project?(name, context[:old_identifier])
-                    old_path = interface.existing_path(name)
+                    old_path = interface.existing_path(name, context[:project].repository)
                     if old_path
                         new_path = interface.default_path(context[:new_identifier])
                         File.rename(old_path, new_path)
 
-                        url = interface.access_url(new_path)
+                        url      = interface.access_url(new_path)
                         root_url = interface.access_root_url(new_path)
                         context[:project].repository.update_attributes(:root_url => root_url, :url => url)
                     end

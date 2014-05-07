@@ -8,7 +8,7 @@ class RepositoryObserver < ActiveRecord::Observer
 
                 name = interface.repository_name(repository.root_url)
                 if name
-                    path = interface.existing_path(name)
+                    path = interface.existing_path(name, repository)
                     if path
                         interface.execute(ScmConfig['pre_delete'], path, project) if ScmConfig['pre_delete']
                         interface.delete_repository(path)

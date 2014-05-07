@@ -49,7 +49,7 @@ class SubversionCreator < SCMCreator
             "file://#{path}/<#{l(:label_repository_format)}>/"
         end
 
-        def create_repository(path)
+        def create_repository(path, params = {})
             args = [ svnadmin_command, 'create', path ]
             append_options(args)
             system(*args)
