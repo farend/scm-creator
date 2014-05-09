@@ -30,7 +30,7 @@ module Redmine
                         if url =~ %r{^https://}
                             url.gsub(%r{^https://}, "https://#{@login}:#{@password}@")
                         else
-                            url.gsub(%r{^git@}, "#{@login}:#{@password}@") # FIXME does not work
+                            url.gsub(%r{^git@}, "#{@login}:#{@password}@")
                         end
                     else
                         url

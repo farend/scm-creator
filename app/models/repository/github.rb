@@ -1,11 +1,10 @@
 require_dependency File.expand_path('../../../../lib/adapters/github_adapter', __FILE__)
 
 class Repository::Github < Repository::Git
-    validates_format_of :url, :with => %r{^(https://github\.com/|git@github\.com:)?([a-z0-9\-]+/)?[a-z0-9\-]+(\.git/?)?$}i, :allow_blank => true
-
-    # TODO validate :repo_create_validation, :on => :create
+    validates_format_of :url, :with => %r{^(https://github\.com/|git@github\.com:)[a-z0-9\-_]+/[a-z0-9\-_]+\.git$}i, :allow_blank => true
 
     before_save :set_local_url
+    before_save :register_hook
 
     def self.human_attribute_name(attribute, *args)
         attribute_name = attribute.to_s
@@ -23,11 +22,20 @@ class Repository::Github < Repository::Git
         'Github'
     end
 
+    def self.scm_available
+        super && GithubCreator.options && GithubCreator.options['path']
+    end
+
+    def extra_created_with_scm
+        extra_boolean_attribute('extra_created_with_scm')
+    end
+
     def extra_register_hook
-        return false if extra_info.nil?
-        value = extra_info['extra_report_last_commit']
-        return false if value.nil?
-        value.to_s != '0'
+        extra_boolean_attribute('extra_register_hook')
+    end
+
+    def extra_hook_registered
+        extra_boolean_attribute('extra_hook_registered')
     end
 
     def extra_report_last_commit
@@ -55,10 +63,36 @@ class Repository::Github < Repository::Git
 
 protected
 
+    def extra_boolean_attribute(name)
+        return false if extra_info.nil?
+        value = extra_info[name]
+        return false if value.nil?
+        value.to_s != '0'
+    end
+
     def set_local_url
         if new_record? && url.present? && root_url.blank? && GithubCreator.options && GithubCreator.options['path']
-            # TODO if Redmine::Platform.mswin?
-            self.root_url = GithubCreator.options['path'] + '/' + url.gsub(%r{^.*[@/]github.com[:/]}, '')
+            path = url.gsub(%r{^.*[@/]github.com[:/]}, '')
+            if Redmine::Platform.mswin?
+                self.root_url = "#{GithubCreator.options['path']}\\#{path.gsub(%r{/}, '\\')}"
+            else
+                self.root_url = "#{GithubCreator.options['path']}/#{path}"
+            end
+        end
+    end
+
+    def register_hook
+        if extra_register_hook && !extra_hook_registered
+            if extra_created_with_scm
+                result = GithubCreator.register_hook(self)
+            else
+                result = GithubCreator.register_hook(self, login, password)
+            end
+            if result
+                self.merge_extra_info('extra_hook_registered' => 1)
+            else
+                self.merge_extra_info('extra_register_hook' => 0)
+            end
         end
     end
 

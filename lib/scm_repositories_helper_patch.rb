@@ -60,7 +60,7 @@ module ScmRepositoriesHelperPatch
                 svntags.gsub!('<br />', ' ' + add + '<br />')
                 svntags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
-                    path = SubversionCreator.access_root_url(SubversionCreator.default_path(@project.identifier))
+                    path = SubversionCreator.access_root_url(SubversionCreator.default_path(@project.identifier), repository)
                     if SubversionCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
                         path << '.' + @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                     end
@@ -97,7 +97,7 @@ module ScmRepositoriesHelperPatch
                 end
                 hgtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
-                    path = MercurialCreator.access_root_url(MercurialCreator.default_path(@project.identifier))
+                    path = MercurialCreator.access_root_url(MercurialCreator.default_path(@project.identifier), repository)
                     if MercurialCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
                         path << '.' + @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                     end
@@ -136,7 +136,7 @@ module ScmRepositoriesHelperPatch
                 bzrtags.gsub!('</p>', ' ' + add + '</p>')
                 bzrtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
-                    path = BazaarCreator.access_root_url(BazaarCreator.default_path(@project.identifier))
+                    path = BazaarCreator.access_root_url(BazaarCreator.default_path(@project.identifier), repository)
                     if BazaarCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
                         path << '.' + @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                     end
@@ -180,7 +180,7 @@ module ScmRepositoriesHelperPatch
                 end
                 gittags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
-                    path = GitCreator.access_root_url(GitCreator.default_path(@project.identifier))
+                    path = GitCreator.access_root_url(GitCreator.default_path(@project.identifier), repository)
                     if GitCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
                         path << '.' + @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                     end
@@ -223,28 +223,33 @@ module ScmRepositoriesHelperPatch
                 unless request.post?
                     path = @project.identifier
                     if defined? observe_field # Rails 3.0 and below
-                        gittags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
+                        urltag << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
                     else # Rails 3.1 and above
-                        gittags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
+                        urltag << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
                     end
                 end
                 note = l(:text_github_repository_note_new)
-            else
-                note = '(https://github.com/, git@github.com:)'
+            elsif repository.new_record?
+                note = '(https://github.com/)'
             end
 
             githubtags  = content_tag('p', urltag + '<br />'.html_safe + note)
-            githubtags << content_tag('p', form.text_field(:login, :size => 30)) + # FIXME only for https://
+            githubtags << content_tag('p', form.text_field(:login, :size => 30)) +
                           content_tag('p', form.password_field(:password, :size => 30,
                                                                           :name => 'ignore',
                                                                           :value => ((repository.new_record? || repository.password.blank?) ? '' : ('x'*15)),
                                                                           :onfocus => "this.value=''; this.name='repository[password]';",
-                                                                          :onchange => "this.name='repository[password]';"))
-            githubtags << content_tag('p', form.check_box(:extra_register_hook))
-            # TODO You need to be an administrator of the repository + if autofetching is disabled + readonly if registered
+                                                                          :onchange => "this.name='repository[password]';") +
+                                           '<br />'.html_safe + l(:text_github_credentials_note))
+            if !Setting.autofetch_changesets? && GithubCreator.can_register_hook?
+                githubtags << content_tag('p', form.check_box(:extra_register_hook, :disabled => repository.extra_hook_registered) + ' ' +
+                                               l(:text_github_register_hook_note))
+            end
 
             githubtags
         end
+
+        # FIXME switching SCMs after submit does not work: No route matches
 
     private
 

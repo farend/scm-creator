@@ -21,7 +21,7 @@ Rails.logger.info 'Starting SCM Creator Plugin for Redmine'
 
 ActiveRecord::Base.observers << RepositoryObserver
 
-Redmine::Scm::Base.add('Github') if ScmConfig['github'] && ScmConfig['github']['path'] # FIXME show error in Settings
+Redmine::Scm::Base.add('Github')
 
 Rails.configuration.to_prepare do
     unless Project.included_modules.include?(ScmProjectPatch)

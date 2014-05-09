@@ -67,6 +67,10 @@ module ScmRepositoriesControllerPatch
                         end
                     end
 
+                    if params[:operation].present? && params[:operation] == 'add'
+                        attributes = interface.sanitize(attributes)
+                    end
+
                     @repository = Repository.factory(params[:repository_scm])
                     if @repository.respond_to?(:safe_attribute_names) && @repository.safe_attribute_names.any?
                         @repository.safe_attributes = attributes
@@ -81,7 +85,8 @@ module ScmRepositoriesControllerPatch
                         @repository.project = @project
 
                         if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
-                            if !ScmConfig['max_repos'] || ScmConfig['max_repos'].to_i == 0 || @project.repositories.select{ |r| r.created_with_scm }.size < ScmConfig['max_repos'].to_i
+                            if !ScmConfig['max_repos'] || ScmConfig['max_repos'].to_i == 0 ||
+                               @project.repositories.select{ |r| r.created_with_scm }.size < ScmConfig['max_repos'].to_i
                                 scm_create_repository(@repository, interface, attributes['url'])
                             else
                                 @repository.errors.add(:base, :scm_repositories_maximum_count_exceeded, :max => ScmConfig['max_repos'].to_i)
@@ -167,7 +172,10 @@ module ScmRepositoriesControllerPatch
                                 attrs[name] = value
                             end
                         end
-                        @repository.attributes = attrs
+                        if params[:operation].present? && params[:operation] == 'add'
+                            attrs = interface.sanitize(attrs)
+                        end
+                        @repository.attributes = interface.sanitize(attrs)
 
                         if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
                             scm_create_repository(@repository, interface, attrs['url']) if attrs
@@ -226,7 +234,7 @@ module ScmRepositoriesControllerPatch
                 else
                     Rails.logger.info "Creating reporitory: #{path}"
                     interface.execute(ScmConfig['pre_create'], path, @project) if ScmConfig['pre_create']
-                    if result = interface.create_repository(path, params[:repository]) # FIXME + repository? params available?
+                    if result = interface.create_repository(path, repository)
                         path = result if result.is_a?(String)
                         interface.execute(ScmConfig['post_create'], path, @project) if ScmConfig['post_create']
                         repository.created_with_scm = true
@@ -236,8 +244,8 @@ module ScmRepositoriesControllerPatch
                     end
                 end
 
-                repository.root_url = interface.access_root_url(path) # FIXME + repository? or params?
-                repository.url      = interface.access_url(path)      # FIXME + repository? or params?
+                repository.root_url = interface.access_root_url(path, repository)
+                repository.url      = interface.access_url(path, repository)
 
                 if interface.local? && !interface.belongs_to_project?(name, @project.identifier)
                     flash[:warning] = l(:text_cannot_be_used_redmine_auth)

@@ -41,7 +41,7 @@ module ScmProjectPatch
                         else
                             Rails.logger.info "Automatically creating reporitory: #{path}"
                             interface.execute(ScmConfig['pre_create'], path, self) if ScmConfig['pre_create']
-                            if result = interface.create_repository(path)
+                            if result = interface.create_repository(path, @repository)
                                 path = result if result.is_a?(String)
                                 interface.execute(ScmConfig['post_create'], path, self) if ScmConfig['post_create']
                                 @repository.created_with_scm = true
@@ -51,10 +51,11 @@ module ScmProjectPatch
                         end
 
                         interface.init_repository(@repository) if @repository.new_record?
-                        @repository.root_url = interface.access_root_url(path)
-                        @repository.url = interface.access_url(path)
-                        @repository.save
 
+                        @repository.root_url = interface.access_root_url(path, @repository)
+                        @repository.url      = interface.access_url(path, @repository)
+
+                        @repository.save
                     else
                         Rails.logger.error "Can't find interface for #{@scm}."
                     end

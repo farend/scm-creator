@@ -22,15 +22,15 @@ class SubversionCreator < SCMCreator
             false
         end
 
-        def access_url(path)
+        def access_url(path, repository = nil)
             if options['append']
-                access_root_url(path) + '/' + options['append']
+                access_root_url(path, repository) + '/' + options['append']
             else
-                access_root_url(path)
+                access_root_url(path, repository)
             end
         end
 
-        def access_root_url(path)
+        def access_root_url(path, repository = nil)
             'file://' + (Redmine::Platform.mswin? ? '/' + path.gsub(%r{\\}, "/") : path)
         end
 
@@ -49,7 +49,7 @@ class SubversionCreator < SCMCreator
             "file://#{path}/<#{l(:label_repository_format)}>/"
         end
 
-        def create_repository(path, params = {})
+        def create_repository(path, repository = nil)
             args = [ svnadmin_command, 'create', path ]
             append_options(args)
             system(*args)

@@ -41,21 +41,26 @@ class SCMCreator
             @options ||= ScmConfig[scm_id]
         end
 
+        # can be used to sanitize attribute values
+        def sanitize(attributes)
+            attributes
+        end
+
         # returns local path used to access repository locally (with optional /.git/ etc)
-        def access_url(path)
+        def access_url(path, repository = nil)
             if options['append']
                 if Redmine::Platform.mswin?
-                    "#{access_root_url(path)}\\#{options['append']}"
+                    "#{access_root_url(path, repository)}\\#{options['append']}"
                 else
-                    "#{access_root_url(path)}/#{options['append']}"
+                    "#{access_root_url(path, repository)}/#{options['append']}"
                 end
             else
-                access_root_url(path)
+                access_root_url(path, repository)
             end
         end
 
         # returns local path used to access repository locally
-        def access_root_url(path)
+        def access_root_url(path, repository = nil)
             path
         end
 
@@ -120,7 +125,7 @@ class SCMCreator
         end
 
         # creates repository
-        def create_repository(path, params = {})
+        def create_repository(path, repository = nil)
             false
         end
 

@@ -26,22 +26,50 @@ class GithubCreator < SCMCreator
             false
         end
 
-        # Path should be the actual URL at this stage
-        def access_url(path)
-            path
+        # fix the name to avoid errors
+        def sanitize(attributes)
+            if attributes.has_key?('url')
+                url = attributes['url']
+                if url !~ %r{^(https://github\.com|git@github\.com)}
+                    if url.start_with?(':')
+                        url = 'git@github.com' + url
+                    elsif url.start_with?('/')
+                        url = 'https://github.com' + url
+                    elsif url.include?('/')
+                        url = 'https://github.com/' + url
+                    else
+                        url = 'https://github.com/user/' + url
+                    end
+                end
+                if url !~ %r{\.git$}
+                    url << '.git' unless url.end_with?('/')
+                end
+                attributes['url'] = url unless attributes['url'] == url
+            end
+            attributes
         end
 
-        # Let Repository::Github override it
-        def access_root_url(path)
+        # path should be the actual URL at this stage
+        def access_url(path, repository = nil)
+            if path !~ %r{^(https://github\.com/|git@github\.com:)} &&
+               repository.url =~ %r{^(https://github\.com/|git@github\.com:)}
+                repository.url
+            else
+                path
+            end
+        end
+
+        # let Repository::Github override it
+        def access_root_url(path, repository = nil)
             nil
         end
 
-        # Let Redmine use the repository URL
+        # let Redmine use the repository URL
         def external_url(repository, regexp = %r{^(?:https?://|git@)})
             repository.url
         end
 
-        # Just return the name, as it's remote repository
+        # just return the name, as it's remote repository
         def default_path(identifier)
             identifier
         end
@@ -56,22 +84,23 @@ class GithubCreator < SCMCreator
         end
 
         def repository_format
-            "[[https://github.com/|git@github.com:]<username>/]<#{l(:label_repository_format)}>[.git]"
+            "[https://github.com/<username>/]<#{l(:label_repository_format)}>[.git]"
         end
 
-        # To check if repository exists we need username, which is not always available
+        # to check if repository exists we need username, which is not always available
         def repository_exists?(identifier)
             false
         end
 
-        def create_repository(path, params = {})
+        def create_repository(path, repository = nil)
             response = client.create(repository_name(path), create_options)
-            if response.is_a?(Hash) && response.has_key?(:clone_url)
-                if params.has_key?(:url) && params[:url] =~ %r{^git@} && response.has_key?(:ssh_url)
+            if response.is_a?(Sawyer::Resource) && response.key?(:clone_url)
+                if repository && repository.url =~ %r{^git@} && repository.login.blank? && response.key?(:ssh_url)
                     response[:ssh_url]
                 else
                     response[:clone_url]
                 end
+                repository.merge_extra_info('extra_created_with_scm' => 1)
             else
                 false
             end
@@ -80,10 +109,38 @@ class GithubCreator < SCMCreator
             false
         end
 
+        def can_register_hook?
+            Setting.sys_api_enabled?
+        end
+
+        def register_hook(repository, login = nil, password = nil)
+            if login.present? && password.present?
+                registrar = Octokit::Client.new(:login => login, :password => password)
+            else
+                registrar = client
+            end
+            github_repository = Octokit::Repository.from_url(repository.url.gsub(%r{\.git$}, ''))
+            response = client.create_hook(github_repository, 'redmine', {
+                :address                             => "#{Setting.protocol}://#{Setting.host_name}",
+                :project                             => repository.project.identifier,
+                :api_key                             => Setting.sys_api_key,
+                :fetch_commits                       => true,
+                :update_redmine_issues_about_commits => true
+            }, {
+                :events => ['push'],
+                :active => true
+            })
+            Rails.logger.info "Registered hook for: #{repository.url}"
+            response.is_a?(Sawyer::Resource)
+        rescue Octokit::Error => error
+            Rails.logger.error error.message
+            false
+        end
+
     private
 
         def api
-            @api ||= ScmConfig[scm_id] && ScmConfig[scm_id]['api']
+            @api ||= options && options['api']
         end
 
         def client
