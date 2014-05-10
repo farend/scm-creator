@@ -12,9 +12,10 @@ module ScmRepositoriesControllerPatch
             alias_method_chain :destroy, :confirmation
 
             if Project.method_defined?(:repositories)
-                alias_method_chain :create, :add
+                alias_method_chain :create, :scm
+                alias_method_chain :update, :scm
             else
-                alias_method_chain :edit, :add
+                alias_method_chain :edit, :scm
             end
         end
     end
@@ -50,7 +51,7 @@ module ScmRepositoriesControllerPatch
             #    end
             #end
 
-            def create_with_add
+            def create_with_scm
                 interface = SCMCreator.interface(params[:repository_scm])
 
                 if (interface && (interface < SCMCreator) && interface.enabled? &&
@@ -110,7 +111,16 @@ module ScmRepositoriesControllerPatch
                     end
 
                 else
-                    create_without_add
+                    create_without_scm
+                end
+            end
+
+            def update_with_scm
+                update_without_scm
+
+                if @repository.is_a?(Repository::Github) && # special case for Github
+                   params[:repository][:extra_register_hook] == '1' && !@repository.extra_hook_registered
+                    flash[:warning] = l(:warning_github_hook_registration_failed)
                 end
             end
 
@@ -148,7 +158,7 @@ module ScmRepositoriesControllerPatch
             #    end
             #end
 
-            def edit_with_add
+            def edit_with_scm
                 interface = SCMCreator.interface(params[:repository_scm])
 
                 if (interface && (interface < SCMCreator) && interface.enabled? &&
@@ -203,7 +213,7 @@ module ScmRepositoriesControllerPatch
                     end
 
                 else
-                    edit_without_add
+                    edit_without_scm
                 end
             end
 

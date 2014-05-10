@@ -16,6 +16,8 @@ en:
   text_scm_repository_created_by_scm: The repository on the file system was created especially for Redmine. By deleting its Redmine entry you may make it useless.
   text_scm_repository_destroy_confirmation: Do you want to remove the repository from the file system as well?
 
+  warning_github_hook_registration_failed: Github service hook registration failed.
+
   activerecord:
     errors:
       messages:

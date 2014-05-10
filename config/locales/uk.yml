@@ -16,6 +16,8 @@ uk:
   text_scm_repository_created_by_scm: Репозиторій у файловій системі був створений спеціально для Redmine. Видаливши його запис Ви можете зробити його непотрібним.
   text_scm_repository_destroy_confirmation: Чи хочете Ви видалити репозиторій також з файлової системи?
 
+  warning_github_hook_registration_failed: Не вдалося зареєструвати хук на Github.
+
   activerecord:
     errors:
       messages:

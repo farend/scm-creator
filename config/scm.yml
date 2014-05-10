@@ -34,5 +34,6 @@ production:
     path: /var/lib/github
     api:
       token: 36857b12efbccc64ce725ea8674fab6ecbd05c03
+      register_hook: true
 
 development:

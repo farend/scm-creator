@@ -34,6 +34,7 @@ private
         options << [ 'Mercurial' ]  if MercurialCreator.enabled?
         options << [ 'Bazaar' ]     if BazaarCreator.enabled?
         options << [ 'Git' ]        if GitCreator.enabled?
+        options << [ 'Github' ]     if GithubCreator.enabled?
         options_for_select(options, selected)
     end
 

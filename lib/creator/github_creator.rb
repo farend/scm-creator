@@ -95,12 +95,12 @@ class GithubCreator < SCMCreator
         def create_repository(path, repository = nil)
             response = client.create(repository_name(path), create_options)
             if response.is_a?(Sawyer::Resource) && response.key?(:clone_url)
+                repository.merge_extra_info('extra_created_with_scm' => 1)
                 if repository && repository.url =~ %r{^git@} && repository.login.blank? && response.key?(:ssh_url)
                     response[:ssh_url]
                 else
                     response[:clone_url]
                 end
-                repository.merge_extra_info('extra_created_with_scm' => 1)
             else
                 false
             end
@@ -110,10 +110,12 @@ class GithubCreator < SCMCreator
         end
 
         def can_register_hook?
+            return false if api['register_hook'] == 'forbid'
             Setting.sys_api_enabled?
         end
 
         def register_hook(repository, login = nil, password = nil)
+            return false unless can_register_hook?
             if login.present? && password.present?
                 registrar = Octokit::Client.new(:login => login, :password => password)
             else
@@ -124,11 +126,11 @@ class GithubCreator < SCMCreator
                 :address                             => "#{Setting.protocol}://#{Setting.host_name}",
                 :project                             => repository.project.identifier,
                 :api_key                             => Setting.sys_api_key,
-                :fetch_commits                       => true,
-                :update_redmine_issues_about_commits => true
+                :fetch_commits                       => 1,
+                :update_redmine_issues_about_commits => 1
             }, {
                 :events => ['push'],
-                :active => true
+                :active => 1
             })
             Rails.logger.info "Registered hook for: #{repository.url}"
             response.is_a?(Sawyer::Resource)
@@ -137,11 +139,11 @@ class GithubCreator < SCMCreator
             false
         end
 
-    private
-
         def api
             @api ||= options && options['api']
         end
+
+    private
 
         def client
             @client ||= if api['token']

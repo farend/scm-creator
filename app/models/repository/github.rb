@@ -31,6 +31,13 @@ class Repository::Github < Repository::Git
     end
 
     def extra_register_hook
+        if new_record? && (extra_info.nil? || extra_info['extra_register_hook'].nil?)
+            default_value = GithubCreator.api['register_hook']
+            return true if default_value == 'force'
+            if default_value.is_a?(TrueClass) || default_value.is_a?(FalseClass)
+                return default_value
+            end
+        end
         extra_boolean_attribute('extra_register_hook')
     end
 
@@ -82,7 +89,8 @@ protected
     end
 
     def register_hook
-        if extra_register_hook && !extra_hook_registered
+        return if extra_hook_registered
+        if (new_record? && GithubCreator.api['register_hook'] == 'force') || extra_register_hook
             if extra_created_with_scm
                 result = GithubCreator.register_hook(self)
             else
