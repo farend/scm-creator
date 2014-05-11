@@ -182,7 +182,10 @@ module ScmRepositoriesHelperPatch
                 unless request.post?
                     path = GitCreator.access_root_url(GitCreator.default_path(@project.identifier), repository)
                     if GitCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
-                        path << '.' + @project.repositories.select{ |r| r.created_with_scm }.size.to_s
+                        offset = @project.repositories.select{ |r| r.created_with_scm }.size.to_s
+                        if path.sub!(%r{\.git$}, '.' + offset + '.git').nil?
+                            path << '.' + offset
+                        end
                     end
                     if defined? observe_field # Rails 3.0 and below
                         gittags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
