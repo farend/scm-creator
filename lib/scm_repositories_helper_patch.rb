@@ -78,14 +78,6 @@ module ScmRepositoriesHelperPatch
                 end
             end
 
-            unless ScmConfig['allow_add_local']
-                if defined? observe_field # Rails 3.0 and below
-                    svntags << javascript_tag("$('repository_login').up().hide(); $('repository_password').up().hide();")
-                else # Rails 3.1 and above
-                    svntags << javascript_tag("$('#repository_login').parent().hide(); $('#repository_password').parent().hide();")
-                end
-            end
-
             svntags
         end
 

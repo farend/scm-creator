@@ -19,7 +19,12 @@ class GitCreator < SCMCreator
         end
 
         def external_url(repository, regexp = %r{^(?:https?|git|ssh)://})
-            super
+            url = super
+            if repository.root_url =~ %r{\.git$}
+                url + '.git'
+            else
+                url
+            end
         end
 
         def default_path(identifier)
