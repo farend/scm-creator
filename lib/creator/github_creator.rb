@@ -121,7 +121,7 @@ class GithubCreator < SCMCreator
             else
                 registrar = client
             end
-            github_repository = Octokit::Repository.from_url(repository.url.gsub(%r{\.git$}, ''))
+            github_repository = Octokit::Repository.from_url(repository.url.sub(%r{\.git$}, ''))
             response = client.create_hook(github_repository, 'redmine', {
                 :address                             => "#{Setting.protocol}://#{Setting.host_name}",
                 :project                             => repository.project.identifier,

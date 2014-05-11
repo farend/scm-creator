@@ -79,7 +79,7 @@ protected
 
     def set_local_url
         if new_record? && url.present? && root_url.blank? && GithubCreator.options && GithubCreator.options['path']
-            path = url.gsub(%r{^.*[@/]github.com[:/]}, '')
+            path = url.sub(%r{^.*[@/]github.com[:/]}, '')
             if Redmine::Platform.mswin?
                 self.root_url = "#{GithubCreator.options['path']}\\#{path.gsub(%r{/}, '\\')}"
             else
@@ -98,6 +98,7 @@ protected
             end
             if result
                 self.merge_extra_info('extra_hook_registered' => 1)
+                self.merge_extra_info('extra_register_hook'   => 1) unless extra_register_hook
             else
                 self.merge_extra_info('extra_register_hook' => 0)
             end
