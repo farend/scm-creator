@@ -252,8 +252,6 @@ module ScmRepositoriesHelperPatch
             githubtags
         end
 
-        # FIXME switching SCMs after submit does not work: No route matches
-
     private
 
         def limit_exceeded
