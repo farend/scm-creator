@@ -18,9 +18,9 @@ class GitCreator < SCMCreator
             false
         end
 
-        def external_url(repository, regexp = %r{^(?:https?|git|ssh)://})
+        def external_url(repository, regexp = %r{\A(?:https?|git|ssh)://})
             url = super
-            if url.present? && repository.root_url =~ %r{\.git$}
+            if url.present? && repository.root_url =~ %r{\.git\z}
                 url + '.git'
             else
                 url
@@ -48,7 +48,7 @@ class GitCreator < SCMCreator
 
         def repository_name(path)
             base = Redmine::Platform.mswin? ? options['path'].gsub(%r{\\}, "/") : options['path']
-            matches = Regexp.new("^#{Regexp.escape(base)}/([^/]+?)(\\.git)?/?$").match(path)
+            matches = Regexp.new("\A#{Regexp.escape(base)}/([^/]+?)(\\.git)?/?\z").match(path)
             matches ? matches[1] : nil
         end
 

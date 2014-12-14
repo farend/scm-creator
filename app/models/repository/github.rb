@@ -1,7 +1,7 @@
 require_dependency File.expand_path('../../../../lib/adapters/github_adapter', __FILE__)
 
 class Repository::Github < Repository::Git
-    validates_format_of :url, :with => %r{^(https://github\.com/|git@github\.com:)[a-z0-9\-_]+/[a-z0-9\-_]+\.git$}i, :allow_blank => true
+    validates_format_of :url, :with => %r{\A(https://github\.com/|git@github\.com:)[a-z0-9\-_]+/[a-z0-9\-_]+\.git\z}i, :allow_blank => true
 
     before_save :set_local_url
     before_save :register_hook
@@ -79,7 +79,7 @@ protected
 
     def set_local_url
         if new_record? && url.present? && root_url.blank? && GithubCreator.options && GithubCreator.options['path']
-            path = url.sub(%r{^.*[@/]github.com[:/]}, '')
+            path = url.sub(%r{\A.*[@/]github.com[:/]}, '')
             if Redmine::Platform.mswin?
                 self.root_url = "#{GithubCreator.options['path']}\\#{path.gsub(%r{/}, '\\')}"
             else

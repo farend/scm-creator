@@ -34,13 +34,13 @@ class SubversionCreator < SCMCreator
             'file://' + (Redmine::Platform.mswin? ? '/' + path.gsub(%r{\\}, "/") : path)
         end
 
-        def external_url(repository, regexp = %r{^(?:file|https?|svn(?:\+[a-z]+)?)://})
+        def external_url(repository, regexp = %r{\A(?:file|https?|svn(?:\+[a-z]+)?)://})
             super
         end
 
         def repository_name(path)
             base = Redmine::Platform.mswin? ? '/' + options['path'].gsub(%r{\\}, "/") : options['path']
-            matches = Regexp.new("^file://#{Regexp.escape(base)}/([^/]+)/?$").match(path)
+            matches = Regexp.new("\Afile://#{Regexp.escape(base)}/([^/]+)/?\z").match(path)
             matches ? matches[1] : nil
         end
 

@@ -27,10 +27,10 @@ module Redmine
 
                 def url_with_credentials
                     if @login.present? && @password.present?
-                        if url =~ %r{^https://}
-                            url.sub(%r{^https://}, "https://#{@login}:#{@password}@")
+                        if url =~ %r{\Ahttps://}
+                            url.sub(%r{\Ahttps://}, "https://#{@login}:#{@password}@")
                         else
-                            url.sub(%r{^git@}, "#{@login}:#{@password}@")
+                            url.sub(%r{\Agit@}, "#{@login}:#{@password}@")
                         end
                     else
                         url

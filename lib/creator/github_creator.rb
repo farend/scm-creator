@@ -30,7 +30,7 @@ class GithubCreator < SCMCreator
         def sanitize(attributes)
             if attributes.has_key?('url')
                 url = attributes['url']
-                if url !~ %r{^(https://github\.com|git@github\.com)}
+                if url !~ %r{\A(https://github\.com|git@github\.com)}
                     if url.start_with?(':')
                         url = 'git@github.com' + url
                     elsif url.start_with?('/')
@@ -41,7 +41,7 @@ class GithubCreator < SCMCreator
                         url = 'https://github.com/user/' + url
                     end
                 end
-                if url !~ %r{\.git$}
+                if url !~ %r{\.git\z}
                     url << '.git' unless url.end_with?('/')
                 end
                 attributes['url'] = url unless attributes['url'] == url
@@ -51,8 +51,8 @@ class GithubCreator < SCMCreator
 
         # path should be the actual URL at this stage
         def access_url(path, repository = nil)
-            if path !~ %r{^(https://github\.com/|git@github\.com:)} &&
-               repository.url =~ %r{^(https://github\.com/|git@github\.com:)}
+            if path !~ %r{\A(https://github\.com/|git@github\.com:)} &&
+               repository.url =~ %r{\A(https://github\.com/|git@github\.com:)}
                 repository.url
             else
                 path
@@ -65,7 +65,7 @@ class GithubCreator < SCMCreator
         end
 
         # let Redmine use the repository URL
-        def external_url(repository, regexp = %r{^(?:https?://|git@)})
+        def external_url(repository, regexp = %r{\A(?:https?://|git@)})
             repository.url
         end
 
@@ -79,7 +79,7 @@ class GithubCreator < SCMCreator
         end
 
         def repository_name(path)
-            matches = %r{^(?:.*/)?([^/]+?)(\\.git)?/?$}.match(path)
+            matches = %r{\A(?:.*/)?([^/]+?)(\\.git)?/?\z}.match(path)
             matches ? matches[1] : nil
         end
 
@@ -96,7 +96,7 @@ class GithubCreator < SCMCreator
             response = client.create(repository_name(path), create_options)
             if response.is_a?(Sawyer::Resource) && response.key?(:clone_url)
                 repository.merge_extra_info('extra_created_with_scm' => 1)
-                if repository && repository.url =~ %r{^git@} && repository.login.blank? && response.key?(:ssh_url)
+                if repository && repository.url =~ %r{\Agit@} && repository.login.blank? && response.key?(:ssh_url)
                     response[:ssh_url]
                 else
                     response[:clone_url]
@@ -121,7 +121,7 @@ class GithubCreator < SCMCreator
             else
                 registrar = client
             end
-            github_repository = Octokit::Repository.from_url(repository.url.sub(%r{\.git$}, ''))
+            github_repository = Octokit::Repository.from_url(repository.url.sub(%r{\.git\z}, ''))
             response = client.create_hook(github_repository, 'redmine', {
                 :address                             => "#{Setting.protocol}://#{Setting.host_name}",
                 :project                             => repository.project.identifier,

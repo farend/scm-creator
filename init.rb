@@ -15,11 +15,7 @@ require_dependency 'creator/github_creator'
 require_dependency 'scm_config'
 require_dependency 'scm_hook'
 
-require_dependency File.expand_path(File.join(File.dirname(__FILE__), 'app/models/repository_observer'))
-
 Rails.logger.info 'Starting SCM Creator Plugin for Redmine'
-
-ActiveRecord::Base.observers << RepositoryObserver
 
 Redmine::Scm::Base.add('Github')
 
@@ -41,5 +37,5 @@ Redmine::Plugin.register :redmine_scm do
     author_url  'http://www.andriylesyuk.com/'
     description 'Allows creating Subversion, Git, Mercurial, Bazaar and Github repositories within Redmine.'
     url         'http://projects.andriylesyuk.com/projects/scm-creator'
-    version     '0.5.0b'
+    version     '0.5.1'
 end

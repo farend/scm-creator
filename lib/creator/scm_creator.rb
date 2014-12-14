@@ -19,7 +19,7 @@ class SCMCreator
 
         # returns config id used in scm.yml and ScmConfig
         def scm_id
-            if self.name =~ %r{^(.+)Creator$}
+            if self.name =~ %r{\A(.+)Creator\z}
                 $1.downcase
             else
                 nil
@@ -75,7 +75,7 @@ class SCMCreator
         end
 
         # returns url which can be used to access the repository externally
-        def external_url(repository, regexp = %r{^https?://})
+        def external_url(repository, regexp = %r{\Ahttps?://})
             if options['url'] && name = repository_name(repository.root_url)
                 if options['url'] =~ regexp
                     url = "#{options['url']}/#{name}"
@@ -104,13 +104,13 @@ class SCMCreator
         # extracts repository name from path
         def repository_name(path)
             base = Redmine::Platform.mswin? ? options['path'].gsub(%r{\\}, "/") : options['path']
-            matches = Regexp.new("^#{Regexp.escape(base)}/([^/]+)/?$").match(path)
+            matches = Regexp.new("\A#{Regexp.escape(base)}/([^/]+)/?\z").match(path)
             matches ? matches[1] : nil
         end
 
         # compares repository names (was created for multiple repositories support)
         def belongs_to_project?(name, identifier)
-            name =~ %r{^#{Regexp.escape(identifier)}(\..+)?$}
+            name =~ %r{\A#{Regexp.escape(identifier)}(\..+)?\z}
         end
 
         # returns format of repository path which is displayed in the form as a default value

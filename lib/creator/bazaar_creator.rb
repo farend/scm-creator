@@ -18,7 +18,7 @@ class BazaarCreator < SCMCreator
             false
         end
 
-        def external_url(repository, regexp = %r{^(?:sftp|bzr(?:\+[a-z]+)?)://})
+        def external_url(repository, regexp = %r{\A(?:sftp|bzr(?:\+[a-z]+)?)://})
             super
         end
 

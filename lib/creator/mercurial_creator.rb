@@ -18,7 +18,7 @@ class MercurialCreator < SCMCreator
             false
         end
 
-        def external_url(repository, regexp = %r{^(?:https?|ssh)://})
+        def external_url(repository, regexp = %r{\A(?:https?|ssh)://})
             super
         end
 

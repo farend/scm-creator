@@ -183,7 +183,7 @@ module ScmRepositoriesHelperPatch
                     path = GitCreator.access_root_url(GitCreator.default_path(@project.identifier), repository)
                     if GitCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
                         offset = @project.repositories.select{ |r| r.created_with_scm }.size.to_s
-                        if path.sub!(%r{\.git$}, '.' + offset + '.git').nil?
+                        if path.sub!(%r{\.git\z}, '.' + offset + '.git').nil?
                             path << '.' + offset
                         end
                     end
