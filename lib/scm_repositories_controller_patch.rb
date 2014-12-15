@@ -3,7 +3,6 @@ require_dependency 'repositories_controller'
 module ScmRepositoriesControllerPatch
 
     def self.included(base)
-        base.extend(ClassMethods)
         base.send(:include, InstanceMethods)
         base.class_eval do
             unloadable
@@ -18,9 +17,6 @@ module ScmRepositoriesControllerPatch
                 alias_method_chain :edit, :scm
             end
         end
-    end
-
-    module ClassMethods
     end
 
     module InstanceMethods
