@@ -221,7 +221,7 @@ module ScmRepositoriesHelperPatch
                 else # Rails 3.1 and above
                     add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
                 end
-                urltag << add
+                urltag << ' '.html_safe + add
                 urltag << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = @project.identifier
@@ -233,7 +233,7 @@ module ScmRepositoriesHelperPatch
                 end
                 note = l(:text_github_repository_note_new)
             elsif repository.new_record?
-                note = '(https://github.com/)'
+                note = '(https://github.com/...)'
             end
 
             githubtags  = content_tag('p', urltag + '<br />'.html_safe + note)

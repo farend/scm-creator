@@ -1,47 +1,32 @@
---- /usr/share/redmine/app/views/projects/settings/_repositories.html.erb	2012-06-18 23:23:44.000000000 +0300
-+++ app/views/projects/settings/_repositories.html.erb	2013-09-15 01:15:51.062028590 +0300
-@@ -1,10 +1,13 @@
+--- /usr/share/redmine/app/views/projects/settings/_repositories.html.erb	2013-11-11 23:01:21.000000000 +0200
++++ app/views/projects/settings/_repositories.html.erb	2014-05-11 01:11:19.257548792 +0300
+@@ -1,3 +1,6 @@
 +<% unless ScmConfig.configured? %>
 +  <div class="warning"><%= l(:text_scm_creator_not_configured_warning) %></div>
 +<% end %>
  <% if @project.repositories.any? %>
  <table class="list">
    <thead>
-     <tr>
--      <th><%= l(:label_scm) %></th>
-       <th><%= l(:field_identifier) %></th>
-       <th><%= l(:field_repository_is_default) %></th>
-+      <th><%= l(:label_scm) %></th>
-       <th><%= l(:label_repository) %></th>
-       <th></th>
-     </tr>
-@@ -12,10 +15,18 @@
-   <tbody>
-   <% @project.repositories.sort.each do |repository| %>
-     <tr class="<%= cycle 'odd', 'even' %>">
--      <td><%=h repository.scm_name %></td>
--      <td><%=h repository.identifier %></td>
-+      <td><%= link_to(repository.identifier, { :controller => 'repositories', :action => 'show', :id => @project, :repository_id => repository.identifier_param }) if repository.identifier.present? %></td>
-       <td align="center"><%= checked_image repository.is_default? %></td>
--      <td><%=h repository.url %></td>
-+      <td><%=h repository.scm_name %></td>
-+      <td>
-+        <% interface = Object.const_get("#{repository.class.name.demodulize}Creator") rescue nil %>
-+        <% if repository.created_with_scm && interface && interface.enabled? && interface.options['url'].present? %>
-+          <% name = interface.repository_name(repository.root_url) %>
-+          <%= h(name ? interface.external_url(name) : repository.url) %>
-+        <% else %>
-+          <%= h(repository.url) %>
-+        <% end %>
-+      </td>
+@@ -18,14 +21,22 @@
+       </td>
+       <td><%= checked_image repository.is_default? %></td>
+       <td><%=h repository.scm_name %></td>
++      <% interface = SCMCreator.interface(repository) %>
++      <% if repository.created_with_scm && interface && interface.enabled? %>
++      <td><%= h(interface.external_url(repository) || repository.url) %></td>
++      <% else %>
+       <td><%=h repository.url %></td>
++      <% end %>
        <td class="buttons">
        <% if User.current.allowed_to?(:manage_repository, @project) %>
          <%= link_to(l(:label_user_plural), committers_repository_path(repository),
-@@ -25,7 +36,7 @@
-         <%= link_to(l(:button_delete), repository_path(repository),
-             :confirm => l(:text_are_you_sure),
-             :method  => :delete,
--            :class   => 'icon icon-del') %>
+              :class => 'icon icon-user') %>
+         <%= link_to(l(:button_edit), edit_repository_path(repository),
+              :class => 'icon icon-edit') %>
+-        <%= delete_link repository_path(repository) %>
++        <%= link_to(l(:button_delete), repository_path(repository),
++            :confirm => l(:text_are_you_sure),
++            :method  => :delete,
 +            :class   => 'icon icon-del') unless repository.created_with_scm && ScmConfig['deny_delete'] %>
        <% end %>
        </td>

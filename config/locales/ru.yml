@@ -7,7 +7,7 @@ ru:
   field_github_url: Github URL
   field_extra_register_hook: Зарегистрировать перехватчик для слежения за изменениями
 
-  text_github_repository_note_new: "(https://github.com/ или просто имя для создания)"
+  text_github_repository_note_new: "(https://github.com/... или просто имя для создания)"
   text_github_credentials_note: Необходимо для доступа к приватным хранилищам
   text_github_register_hook_note: Нужен административный достук к хранилищу
   text_cannot_be_changed_later: Позже невозможно будет поменять.
