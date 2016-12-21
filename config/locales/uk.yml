@@ -7,7 +7,7 @@ uk:
   field_github_url: Github URL
   field_extra_register_hook: Зареєструвати хук для отримання доповнень
 
-  text_github_repository_note_new: "(https://github.com/... або просто назву для створення)"
+  text_github_repository_note_new: https://github.com/....git або просто назву для створення
   text_github_credentials_note: Необхідно для доступу до приватних репозиторіїв
   text_github_register_hook_note: Потрібен адміністративний достук до репозиторію
   text_cannot_be_changed_later: Не можна буде змінити пізніше.

@@ -12,6 +12,8 @@ module ScmRepositoriesHelperPatch
             alias_method_chain :mercurial_field_tags,  :add
             alias_method_chain :git_field_tags,        :add
             alias_method_chain :bazaar_field_tags,     :add
+            
+            alias_method_chain :scm_path_info_tag, :external if method_defined?(:scm_path_info_tag)
         end
     end
 
@@ -41,11 +43,10 @@ module ScmRepositoriesHelperPatch
 
         def subversion_field_tags_with_add(form, repository)
             svntags = subversion_field_tags_without_add(form, repository)
-            svntags.gsub!('&lt;br /&gt;', '<br />')
 
             if repository.new_record? && SubversionCreator.enabled? && !limit_exceeded
-                add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
-                svntags.sub!('<br />', ' ' + add + '<br />')
+                svntags << submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');",
+                                                                        :id => :scm_creator_button, :style => 'display: none;')
                 svntags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = SubversionCreator.access_root_url(SubversionCreator.default_path(@project.identifier), repository)
@@ -54,8 +55,9 @@ module ScmRepositoriesHelperPatch
                     end
                     svntags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
                 end
+                svntags << javascript_tag("$('#repository_url').after($('#scm_creator_button')).after(' ') && $('#scm_creator_button').show();")
 
-            elsif !repository.new_record? && repository.created_with_scm && SubversionCreator.enabled?
+            elsif !respond_to?(:scm_path_info_tag) && !repository.new_record? && repository.created_with_scm && SubversionCreator.enabled?
                 url = SubversionCreator.external_url(repository)
                 if url
                     svntags.sub!('(file:///, http://, https://, svn://, svn+[tunnelscheme]://)', url)
@@ -69,12 +71,8 @@ module ScmRepositoriesHelperPatch
             hgtags = mercurial_field_tags_without_add(form, repository)
 
             if repository.new_record? && MercurialCreator.enabled? && !limit_exceeded
-                add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
-                if hgtags.include?('<br />')
-                    hgtags.sub!('<br />', ' ' + add + '<br />')
-                else
-                    hgtags.sub!('</p>', ' ' + add + '</p>')
-                end
+                hgtags << submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');",
+                                                                       :id => :scm_creator_button, :style => 'display: none;')
                 hgtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = MercurialCreator.access_root_url(MercurialCreator.default_path(@project.identifier), repository)
@@ -83,14 +81,13 @@ module ScmRepositoriesHelperPatch
                     end
                     hgtags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
                 end
+                hgtags << javascript_tag("$('#repository_url').after($('#scm_creator_button')).after(' ') && $('#scm_creator_button').show();")
 
-            elsif !repository.new_record? && repository.created_with_scm && MercurialCreator.enabled?
+            elsif !respond_to?(:scm_path_info_tag) && !repository.new_record? && repository.created_with_scm && MercurialCreator.enabled?
                 url = MercurialCreator.external_url(repository)
                 if url
                     if hgtags.include?(l(:text_mercurial_repository_note))
                         hgtags.sub!(l(:text_mercurial_repository_note), url)
-                    elsif hgtags.include?(l(:text_mercurial_repo_example))
-                        hgtags.sub!(l(:text_mercurial_repo_example), url)
                     else
                         hgtags.sub!('</p>', '<br />' + url + '</p>')
                     end
@@ -104,8 +101,8 @@ module ScmRepositoriesHelperPatch
             bzrtags = bazaar_field_tags_without_add(form, repository)
 
             if repository.new_record? && BazaarCreator.enabled? && !limit_exceeded
-                add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
-                bzrtags.sub!('</p>', ' ' + add + '</p>')
+                bzrtags << submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');",
+                                                                        :id => :scm_creator_button, :style => 'display: none;')
                 bzrtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = BazaarCreator.access_root_url(BazaarCreator.default_path(@project.identifier), repository)
@@ -117,8 +114,9 @@ module ScmRepositoriesHelperPatch
                         bzrtags << javascript_tag("$('#repository_log_encoding').val('#{escape_javascript(BazaarCreator.options['log_encoding'])}');")
                     end
                 end
+                bzrtags << javascript_tag("$('#repository_url').after($('#scm_creator_button')).after(' ') && $('#scm_creator_button').show();")
 
-            elsif !repository.new_record? && repository.created_with_scm && BazaarCreator.enabled?
+            elsif !respond_to?(:scm_path_info_tag) && !repository.new_record? && repository.created_with_scm && BazaarCreator.enabled?
                 url = BazaarCreator.external_url(repository)
                 if url
                     bzrtags.sub!('</p>', '<br />' + url + '</p>')
@@ -132,12 +130,8 @@ module ScmRepositoriesHelperPatch
             gittags = git_field_tags_without_add(form, repository)
 
             if repository.new_record? && GitCreator.enabled? && !limit_exceeded
-                add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
-                if gittags.include?('<br />')
-                    gittags.sub!('<br />', ' ' + add + '<br />')
-                else
-                    gittags.sub!('</p>', ' ' + add + '</p>')
-                end
+                gittags << submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');",
+                                                                        :id => :scm_creator_button, :style => 'display: none;')
                 gittags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = GitCreator.access_root_url(GitCreator.default_path(@project.identifier), repository)
@@ -149,14 +143,13 @@ module ScmRepositoriesHelperPatch
                     end
                     gittags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
                 end
+                gittags << javascript_tag("$('#repository_url').after($('#scm_creator_button')).after(' ') && $('#scm_creator_button').show();")
 
-            elsif !repository.new_record? && repository.created_with_scm && GitCreator.enabled?
+            elsif !respond_to?(:scm_path_info_tag) && !repository.new_record? && repository.created_with_scm && GitCreator.enabled?
                 url = GitCreator.external_url(repository)
                 if url
                     if gittags.include?(l(:text_git_repository_note))
                         gittags.sub!(l(:text_git_repository_note), url)
-                    elsif gittags.include?(l(:text_git_repo_example))
-                        gittags.sub!(l(:text_git_repo_example), url)
                     else
                         gittags.sub!('</p>', '<br />' + url + '</p>')
                     end
@@ -172,32 +165,43 @@ module ScmRepositoriesHelperPatch
                                            :disabled => !repository.safe_attribute?('url'))
 
             if repository.new_record? && GithubCreator.enabled? && !limit_exceeded
-                add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
-                urltag << ' '.html_safe + add
+                urltag << ' '.html_safe
+                urltag << submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');",
+                                                                       :id => :scm_creator_button)
                 urltag << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = @project.identifier
                     urltag << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
                 end
-                note = l(:text_github_repository_note_new)
+                note = content_tag('em', l(:text_github_repository_note_new), :class => 'info')
             elsif repository.new_record?
-                note = '(https://github.com/...)'
+                note = content_tag('em', '(https://github.com/....git)', :class => 'info')
             end
 
-            githubtags  = content_tag('p', urltag + '<br />'.html_safe + note)
+            githubtags  = content_tag('p', urltag + note)
             githubtags << content_tag('p', form.text_field(:login, :size => 30)) +
                           content_tag('p', form.password_field(:password, :size => 30,
                                                                           :name => 'ignore',
                                                                           :value => ((repository.new_record? || repository.password.blank?) ? '' : ('x'*15)),
                                                                           :onfocus => "this.value=''; this.name='repository[password]';",
                                                                           :onchange => "this.name='repository[password]';") +
-                                           '<br />'.html_safe + l(:text_github_credentials_note))
+                                           content_tag('em', l(:text_github_credentials_note), :class => 'info'))
             if !Setting.autofetch_changesets? && GithubCreator.can_register_hook?
                 githubtags << content_tag('p', form.check_box(:extra_register_hook, :disabled => repository.extra_hook_registered) + ' ' +
                                                l(:text_github_register_hook_note))
             end
 
             githubtags
+        end
+
+        def scm_path_info_tag_with_external(repository)
+            if !repository.new_record? && repository.created_with_scm
+                interface = SCMCreator.interface(repository)
+                if interface && (url = interface.external_url(repository))
+                    return content_tag('em', url, :class => 'info')
+                end
+            end
+            scm_path_info_tag_without_external(repository)
         end
 
     private

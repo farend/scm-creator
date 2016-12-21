@@ -7,7 +7,7 @@ en:
   field_github_url: Github URL
   field_extra_register_hook: Register hook for fetching commits
 
-  text_github_repository_note_new: "(https://github.com/... or just name to create a new one)"
+  text_github_repository_note_new: https://github.com/....git or just name to create a new one
   text_github_credentials_note: Required to access private repositories
   text_github_register_hook_note: Requires administrative access to the repository
   text_cannot_be_changed_later: Cannot be changed later.
