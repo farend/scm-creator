@@ -30,18 +30,10 @@ module ScmRepositoriesHelperPatch
                 end
             end
 
-            if defined? observe_field # Rails 3.0 and below
-                if request.xhr?
-                    reptags << javascript_tag("$('repository_save')." + (button_disabled ? 'disable' : 'enable') + "();")
-                else
-                    reptags << javascript_tag("Event.observe(window, 'load', function() { $('repository_save')." + (button_disabled ? 'disable' : 'enable') + "(); });")
-                end
-            else # Rails 3.1 and above
-                if request.xhr?
-                    reptags << javascript_tag("$('#repository_save')." + (button_disabled ? "attr('disabled','disabled')" : "removeAttr('enable')") + ";")
-                else
-                    reptags << javascript_tag("$(document).ready(function() { $('#repository_save')." + (button_disabled ? "attr('disabled','disabled')" : "removeAttr('enable')") + "; });")
-                end
+            if request.xhr?
+                reptags << javascript_tag("$('input[type=submit][name=commit]')." + (button_disabled ? "attr('disabled','disabled')" : "removeAttr('enable')") + ";")
+            else
+                reptags << javascript_tag("$(document).ready(function() { $('input[type=submit][name=commit]')." + (button_disabled ? "attr('disabled','disabled')" : "removeAttr('enable')") + "; });")
             end
 
             reptags.html_safe
@@ -52,11 +44,7 @@ module ScmRepositoriesHelperPatch
             svntags.gsub!('&lt;br /&gt;', '<br />')
 
             if repository.new_record? && SubversionCreator.enabled? && !limit_exceeded
-                if defined? observe_field # Rails 3.0 and below
-                    add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
-                else # Rails 3.1 and above
-                    add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
-                end
+                add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
                 svntags.sub!('<br />', ' ' + add + '<br />')
                 svntags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
@@ -64,11 +52,7 @@ module ScmRepositoriesHelperPatch
                     if SubversionCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
                         path << '.' + @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                     end
-                    if defined? observe_field # Rails 3.0 and below
-                        svntags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
-                    else # Rails 3.1 and above
-                        svntags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
-                    end
+                    svntags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
                 end
 
             elsif !repository.new_record? && repository.created_with_scm && SubversionCreator.enabled?
@@ -85,11 +69,7 @@ module ScmRepositoriesHelperPatch
             hgtags = mercurial_field_tags_without_add(form, repository)
 
             if repository.new_record? && MercurialCreator.enabled? && !limit_exceeded
-                if defined? observe_field # Rails 3.0 and below
-                    add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
-                else # Rails 3.1 and above
-                    add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
-                end
+                add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
                 if hgtags.include?('<br />')
                     hgtags.sub!('<br />', ' ' + add + '<br />')
                 else
@@ -101,11 +81,7 @@ module ScmRepositoriesHelperPatch
                     if MercurialCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
                         path << '.' + @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                     end
-                    if defined? observe_field # Rails 3.0 and below
-                        hgtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
-                    else # Rails 3.1 and above
-                        hgtags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
-                    end
+                    hgtags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
                 end
 
             elsif !repository.new_record? && repository.created_with_scm && MercurialCreator.enabled?
@@ -128,11 +104,7 @@ module ScmRepositoriesHelperPatch
             bzrtags = bazaar_field_tags_without_add(form, repository)
 
             if repository.new_record? && BazaarCreator.enabled? && !limit_exceeded
-                if defined? observe_field # Rails 3.0 and below
-                    add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
-                else # Rails 3.1 and above
-                    add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
-                end
+                add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
                 bzrtags.sub!('</p>', ' ' + add + '</p>')
                 bzrtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
@@ -140,17 +112,9 @@ module ScmRepositoriesHelperPatch
                     if BazaarCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
                         path << '.' + @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                     end
-                    if defined? observe_field # Rails 3.0 and below
-                        bzrtags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
-                    else # Rails 3.1 and above
-                        bzrtags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
-                    end
+                    bzrtags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
                     if BazaarCreator.options['log_encoding']
-                        if defined? observe_field # Rails 3.0 and below
-                            bzrtags << javascript_tag("$('repository_log_encoding').value = '#{escape_javascript(BazaarCreator.options['log_encoding'])}';")
-                        else # Rails 3.1 and above
-                            bzrtags << javascript_tag("$('#repository_log_encoding').val('#{escape_javascript(BazaarCreator.options['log_encoding'])}');")
-                        end
+                        bzrtags << javascript_tag("$('#repository_log_encoding').val('#{escape_javascript(BazaarCreator.options['log_encoding'])}');")
                     end
                 end
 
@@ -168,11 +132,7 @@ module ScmRepositoriesHelperPatch
             gittags = git_field_tags_without_add(form, repository)
 
             if repository.new_record? && GitCreator.enabled? && !limit_exceeded
-                if defined? observe_field # Rails 3.0 and below
-                    add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
-                else # Rails 3.1 and above
-                    add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
-                end
+                add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
                 if gittags.include?('<br />')
                     gittags.sub!('<br />', ' ' + add + '<br />')
                 else
@@ -187,11 +147,7 @@ module ScmRepositoriesHelperPatch
                             path << '.' + offset
                         end
                     end
-                    if defined? observe_field # Rails 3.0 and below
-                        gittags << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
-                    else # Rails 3.1 and above
-                        gittags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
-                    end
+                    gittags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
                 end
 
             elsif !repository.new_record? && repository.created_with_scm && GitCreator.enabled?
@@ -216,20 +172,12 @@ module ScmRepositoriesHelperPatch
                                            :disabled => !repository.safe_attribute?('url'))
 
             if repository.new_record? && GithubCreator.enabled? && !limit_exceeded
-                if defined? observe_field # Rails 3.0 and below
-                    add = submit_tag(l(:button_create_new_repository), :onclick => "$('repository_operation').value = 'add';")
-                else # Rails 3.1 and above
-                    add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
-                end
+                add = submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');")
                 urltag << ' '.html_safe + add
                 urltag << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = @project.identifier
-                    if defined? observe_field # Rails 3.0 and below
-                        urltag << javascript_tag("$('repository_url').value = '#{escape_javascript(path)}';")
-                    else # Rails 3.1 and above
-                        urltag << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
-                    end
+                    urltag << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
                 end
                 note = l(:text_github_repository_note_new)
             elsif repository.new_record?

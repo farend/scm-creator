@@ -1,22 +1,10 @@
 <% content_for :header_tags do %>
-  <!-- Rails 3.0 and below -->
-  <% if defined? observe_field %>
-    <%= javascript_include_tag('scm_utils_prototype', :plugin => 'redmine_scm') %>
-  <!-- Rails 3.1 and above -->
-  <% else %>
-    <%= javascript_include_tag('scm_utils_jquery', :plugin => 'redmine_scm') %>
-  <% end %>
+  <%= javascript_include_tag('scm_utils_jquery', :plugin => 'redmine_scm') %>
 <% end %>
 
 <% if ScmConfig['force_repository'] %>
   <%= hidden_field_tag('project[enabled_module_names][]', 'repository') %>
-  <!-- Rails 3.0 and below -->
-  <% if defined? observe_field %>
-    <%= javascript_tag("Event.observe(window, 'load', force_repository_module);") %>
-  <!-- Rails 3.1 and above -->
-  <% else %>
-    <%= javascript_tag("$(document).ready(force_repository_module);") %>
-  <% end %>
+  <%= javascript_tag("$(document).ready(force_repository_module);") %>
 <% end %>
 
 <% if project.new_record? && ScmConfig['auto_create'] %>
@@ -41,19 +29,10 @@
     </p>
     <script type="text/javascript">
       //<![CDATA[
-      // Rails 3.0 and below
-      <% if defined? observe_field %>
-        Event.observe(window, 'load', function() {
-          Event.observe('project_enabled_module_names_repository', 'change', toggle_project_scm_visibility);
-          toggle_project_scm_visibility();
-        });
-      // Rails 3.1 and above
-      <% else %>
-        $(document).ready(function() {
-          $(document).on('change', '#project_enabled_module_names_repository', toggle_project_scm_visibility);
-          toggle_project_scm_visibility();
-        });
-      <% end %>
+      $(document).ready(function() {
+        $(document).on('change', '#project_enabled_module_names_repository', toggle_project_scm_visibility);
+        toggle_project_scm_visibility();
+      });
       //]]>
     </script>
   <% else %>
