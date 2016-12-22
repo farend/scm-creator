@@ -23,7 +23,8 @@ class ScmHook  < Redmine::Hook::ViewListener
         end
     end
 
-    render_on :view_projects_form, :partial => 'projects/scm'
+    render_on :view_projects_form,                :partial => 'projects/scm'
+    render_on :view_repositories_show_contextual, :partial => 'repositories/url'
 
 private
 

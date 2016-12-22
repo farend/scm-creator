@@ -1,6 +1,7 @@
 ru:
   button_create_new_repository: Создать новое хранилище
 
+  label_repository_url: URL хранилища
   label_repository_format: хранилище
 
   field_scm: Тип хранилища

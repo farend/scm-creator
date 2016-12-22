@@ -1,6 +1,7 @@
 en:
   button_create_new_repository: Create new repository
 
+  label_repository_url: Repository URL
   label_repository_format: repository
 
   field_scm: SCM

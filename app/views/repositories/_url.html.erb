@@ -1,0 +1,22 @@
+<% content_for(:header_tags) do %>
+  <%= stylesheet_link_tag('scm_creator', :plugin => 'redmine_scm') %>
+<% end %>
+
+<% content_for(:sidebar) do %>
+  <h3><%= l(:label_repository_url) %></h3>
+
+  <% if repository.created_with_scm && (interface = SCMCreator.interface(repository)) %>
+    <% repository_url = interface.external_url(repository) || repository.url %>
+  <% else %>
+    <% repository_url = repository.url %>
+  <% end %>
+  <%= text_field_tag('repository_url', repository_url, :size => 50, :readonly => true) %>
+
+  <%= javascript_tag do %>
+    $(document).ready(function() {
+      $('#repository_url').click(function() {
+        $(this).select();
+      });
+    });
+  <% end %>
+<% end %>

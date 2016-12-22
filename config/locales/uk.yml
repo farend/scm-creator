@@ -1,6 +1,7 @@
 uk:
   button_create_new_repository: Створити новий репозиторій
 
+  label_repository_url: URL репозиторію
   label_repository_format: репозиторій
 
   field_scm: Тип репозиторію
