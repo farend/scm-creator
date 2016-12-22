@@ -9,7 +9,7 @@ module ScmProjectPatch
 
             attr_accessor :scm
 
-            safe_attributes 'scm' unless Redmine::VERSION::MAJOR == 1 && Redmine::VERSION::MINOR == 0 # Redmine 1.0.x
+            safe_attributes 'scm'
 
             validates_presence_of :scm, :if => Proc.new { |project| project.new_record? && project.module_enabled?(:repository) && ScmConfig['auto_create'] == 'force' }
 

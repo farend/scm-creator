@@ -1,5 +1,5 @@
---- /usr/share/redmine/app/views/projects/settings/_repositories.html.erb	2013-11-11 23:01:21.000000000 +0200
-+++ app/views/projects/settings/_repositories.html.erb	2014-05-11 01:11:19.257548792 +0300
+--- /usr/share/redmine/app/views/projects/settings/_repositories.html.erb	2016-10-10 10:48:13.000000000 +0300
++++ app/views/projects/settings/_repositories.html.erb	2016-12-22 14:14:01.226879759 +0200
 @@ -1,3 +1,6 @@
 +<% unless ScmConfig.configured? %>
 +  <div class="warning"><%= l(:text_scm_creator_not_configured_warning) %></div>
@@ -10,12 +10,12 @@
 @@ -18,14 +21,22 @@
        </td>
        <td><%= checked_image repository.is_default? %></td>
-       <td><%=h repository.scm_name %></td>
+       <td><%= repository.scm_name %></td>
 +      <% interface = SCMCreator.interface(repository) %>
 +      <% if repository.created_with_scm && interface && interface.enabled? %>
 +      <td><%= h(interface.external_url(repository) || repository.url) %></td>
 +      <% else %>
-       <td><%=h repository.url %></td>
+       <td><%= repository.url %></td>
 +      <% end %>
        <td class="buttons">
        <% if User.current.allowed_to?(:manage_repository, @project) %>

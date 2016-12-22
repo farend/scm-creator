@@ -30,9 +30,7 @@ class BazaarCreator < SCMCreator
         end
 
         def init_repository(repository)
-            if repository.respond_to?(:log_encoding=)
-                repository.log_encoding = options['log_encoding'] || 'UTF-8'
-            end
+            repository.log_encoding = options['log_encoding'] || 'UTF-8'
         end
 
     private

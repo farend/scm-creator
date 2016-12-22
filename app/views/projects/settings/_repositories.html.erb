@@ -20,12 +20,12 @@
             {:controller => 'repositories', :action => 'show',:id => @project, :repository_id => repository.identifier_param} if repository.identifier.present? %>
       </td>
       <td><%= checked_image repository.is_default? %></td>
-      <td><%=h repository.scm_name %></td>
+      <td><%= repository.scm_name %></td>
       <% interface = SCMCreator.interface(repository) %>
       <% if repository.created_with_scm && interface && interface.enabled? %>
       <td><%= h(interface.external_url(repository) || repository.url) %></td>
       <% else %>
-      <td><%=h repository.url %></td>
+      <td><%= repository.url %></td>
       <% end %>
       <td class="buttons">
       <% if User.current.allowed_to?(:manage_repository, @project) %>

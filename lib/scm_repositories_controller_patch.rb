@@ -47,54 +47,38 @@ module ScmRepositoriesControllerPatch
               ((params[:operation].present? && params[:operation] == 'add') || ScmConfig['only_creator'])) ||
                !ScmConfig['allow_add_local']
 
-                attributes = {}
-                extra_attrs = {}
-                params[:repository].each do |name, value|
-                    if name =~ %r{\Aextra_}
-                        extra_attrs[name] = value
-                    else
-                        attributes[name] = value
-                    end
-                end
+                attrs = pickup_extra_info
 
                 if params[:operation].present? && params[:operation] == 'add'
-                    attributes = interface.sanitize(attributes)
+                    attrs[:attrs] = interface.sanitize(attrs[:attrs])
                 end
 
                 @repository = Repository.factory(params[:repository_scm])
-                if @repository.respond_to?(:safe_attribute_names) && @repository.safe_attribute_names.any?
-                    @repository.safe_attributes = attributes
-                else # Redmine < 2.2
-                    @repository.attributes = attributes
-                end
-                if extra_attrs.any?
-                    @repository.merge_extra_info(extra_attrs)
+                @repository.safe_attributes = params[:repository]
+                if attrs[:attrs_extra].keys.any?
+                    @repository.merge_extra_info(attrs[:attrs_extra])
                 end
 
-                if @repository
-                    @repository.project = @project
+                @repository.project = @project
 
-                    if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
-                        if !ScmConfig['max_repos'] || ScmConfig['max_repos'].to_i == 0 ||
-                           @project.repositories.select{ |r| r.created_with_scm }.size < ScmConfig['max_repos'].to_i
-                            scm_create_repository(@repository, interface, attributes['url'])
-                        else
-                            @repository.errors.add(:base, :scm_repositories_maximum_count_exceeded, :max => ScmConfig['max_repos'].to_i)
-                        end
-                    end
-
-                    if ScmConfig['only_creator'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm
-                        @repository.errors.add(:base, :scm_only_creator)
-                    elsif !ScmConfig['allow_add_local'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm &&
-                        attributes['url'] =~ %r{\A(file://|([a-z]:)?\.*[\\/])}i
-                        @repository.errors.add(:base, :scm_local_repositories_denied)
-                    end
-
-                    if request.post? && @repository.errors.empty? && @repository.save
-                        redirect_to(settings_project_path(@project, :tab => 'repositories'))
+                if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
+                    if !ScmConfig['max_repos'] || ScmConfig['max_repos'].to_i == 0 ||
+                       @project.repositories.select{ |r| r.created_with_scm }.size < ScmConfig['max_repos'].to_i
+                        scm_create_repository(@repository, interface, attrs[:attrs]['url'])
                     else
-                        render(:action => 'new')
+                        @repository.errors.add(:base, :scm_repositories_maximum_count_exceeded, :max => ScmConfig['max_repos'].to_i)
                     end
+                end
+
+                if ScmConfig['only_creator'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm
+                    @repository.errors.add(:base, :scm_only_creator)
+                elsif !ScmConfig['allow_add_local'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm &&
+                    attrs[:attrs]['url'] =~ %r{\A(file://|([a-z]:)?\.*[\\/])}i
+                    @repository.errors.add(:base, :scm_local_repositories_denied)
+                end
+
+                if request.post? && @repository.errors.empty? && @repository.save
+                    redirect_to(settings_project_path(@project, :tab => 'repositories'))
                 else
                     render(:action => 'new')
                 end

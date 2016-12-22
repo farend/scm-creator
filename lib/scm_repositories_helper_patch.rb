@@ -50,7 +50,7 @@ module ScmRepositoriesHelperPatch
                 svntags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = SubversionCreator.access_root_url(SubversionCreator.default_path(@project.identifier), repository)
-                    if SubversionCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
+                    if SubversionCreator.repository_exists?(@project.identifier)
                         path << '.' + @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                     end
                     svntags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
@@ -76,7 +76,7 @@ module ScmRepositoriesHelperPatch
                 hgtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = MercurialCreator.access_root_url(MercurialCreator.default_path(@project.identifier), repository)
-                    if MercurialCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
+                    if MercurialCreator.repository_exists?(@project.identifier)
                         path << '.' + @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                     end
                     hgtags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
@@ -106,7 +106,7 @@ module ScmRepositoriesHelperPatch
                 bzrtags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = BazaarCreator.access_root_url(BazaarCreator.default_path(@project.identifier), repository)
-                    if BazaarCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
+                    if BazaarCreator.repository_exists?(@project.identifier)
                         path << '.' + @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                     end
                     bzrtags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
@@ -135,7 +135,7 @@ module ScmRepositoriesHelperPatch
                 gittags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = GitCreator.access_root_url(GitCreator.default_path(@project.identifier), repository)
-                    if GitCreator.repository_exists?(@project.identifier) && @project.respond_to?(:repositories)
+                    if GitCreator.repository_exists?(@project.identifier)
                         offset = @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                         if path.sub!(%r{\.git\z}, '.' + offset + '.git').nil?
                             path << '.' + offset
@@ -207,7 +207,6 @@ module ScmRepositoriesHelperPatch
     private
 
         def limit_exceeded
-            @project.respond_to?(:repositories) &&
             ScmConfig['max_repos'] && ScmConfig['max_repos'].to_i > 0 &&
             @project.repositories.select{ |r| r.created_with_scm }.size >= ScmConfig['max_repos'].to_i
         end
