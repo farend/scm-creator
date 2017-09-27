@@ -12,7 +12,7 @@ module ScmRepositoriesHelperPatch
             alias_method_chain :mercurial_field_tags,  :add
             alias_method_chain :git_field_tags,        :add
             alias_method_chain :bazaar_field_tags,     :add
-            
+
             alias_method_chain :scm_path_info_tag, :external if method_defined?(:scm_path_info_tag)
         end
     end
@@ -187,7 +187,7 @@ module ScmRepositoriesHelperPatch
                                                                           :onchange => "this.name='repository[password]';") +
                                            content_tag('em', l(:text_github_credentials_note), :class => 'info'))
             if !Setting.autofetch_changesets? && GithubCreator.can_register_hook?
-                githubtags << content_tag('p', form.check_box(:extra_register_hook, :disabled => repository.extra_hook_registered) + ' ' +
+                githubtags << content_tag('p', form.check_box(:register_hook, :disabled => repository.extra_hook_registered) + ' ' +
                                                l(:text_github_register_hook_note))
             end
 

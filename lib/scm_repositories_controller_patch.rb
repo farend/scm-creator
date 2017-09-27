@@ -26,18 +26,11 @@ module ScmRepositoriesControllerPatch
 
         # Original function
         #def create
-        #    attrs = pickup_extra_info
-        #    @repository = Repository.factory(params[:repository_scm])
-        #    @repository.safe_attributes = params[:repository]
-        #    if attrs[:attrs_extra].keys.any?
-        #        @repository.merge_extra_info(attrs[:attrs_extra])
-        #    end
-        #    @repository.project = @project
-        #    if request.post? && @repository.save
-        #        redirect_to settings_project_path(@project, :tab => 'repositories')
-        #    else
-        #        render :action => 'new'
-        #    end
+        #  if @repository.save
+        #    redirect_to settings_project_path(@project, :tab => 'repositories')
+        #  else
+        #    render :action => 'new'
+        #  end
         #end
 
         def create_with_scm
@@ -47,24 +40,14 @@ module ScmRepositoriesControllerPatch
               ((params[:operation].present? && params[:operation] == 'add') || ScmConfig['only_creator'])) ||
                !ScmConfig['allow_add_local']
 
-                attrs = pickup_extra_info
-
                 if params[:operation].present? && params[:operation] == 'add'
-                    attrs[:attrs] = interface.sanitize(attrs[:attrs])
+                    @repository.attributes = interface.sanitize(@repository.attributes)
                 end
-
-                @repository = Repository.factory(params[:repository_scm])
-                @repository.safe_attributes = params[:repository]
-                if attrs[:attrs_extra].keys.any?
-                    @repository.merge_extra_info(attrs[:attrs_extra])
-                end
-
-                @repository.project = @project
 
                 if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
                     if !ScmConfig['max_repos'] || ScmConfig['max_repos'].to_i == 0 ||
                        @project.repositories.select{ |r| r.created_with_scm }.size < ScmConfig['max_repos'].to_i
-                        scm_create_repository(@repository, interface, attrs[:attrs]['url'])
+                        scm_create_repository(@repository, interface)
                     else
                         @repository.errors.add(:base, :scm_repositories_maximum_count_exceeded, :max => ScmConfig['max_repos'].to_i)
                     end
@@ -73,7 +56,7 @@ module ScmRepositoriesControllerPatch
                 if ScmConfig['only_creator'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm
                     @repository.errors.add(:base, :scm_only_creator)
                 elsif !ScmConfig['allow_add_local'] && request.post? && @repository.errors.empty? && !@repository.created_with_scm &&
-                    attrs[:attrs]['url'] =~ %r{\A(file://|([a-z]:)?\.*[\\/])}i
+                    @repository.url =~ %r{\A(file://|([a-z]:)?\.*[\\/])}i
                     @repository.errors.add(:base, :scm_local_repositories_denied)
                 end
 
@@ -92,7 +75,7 @@ module ScmRepositoriesControllerPatch
             update_without_scm
 
             if @repository.is_a?(Repository::Github) && # special case for Github
-               params[:repository][:extra_register_hook] == '1' && !@repository.extra_hook_registered
+               params[:repository][:register_hook] == '1' && !@repository.extra_hook_registered
                 flash[:warning] = l(:warning_github_hook_registration_failed)
             end
         end
@@ -113,8 +96,8 @@ module ScmRepositoriesControllerPatch
 
     private
 
-        def scm_create_repository(repository, interface, url)
-            name = interface.repository_name(url)
+        def scm_create_repository(repository, interface)
+            name = interface.repository_name(repository.url)
             if name
                 path = interface.default_path(name)
                 if interface.repository_exists?(name)
