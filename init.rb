@@ -32,6 +32,7 @@ Rails.configuration.to_prepare do
 end
 
 Redmine::Plugin.register :redmine_scm do
+    requires_redmine version_or_higher: '3.4.0'
     name        'SCM Creator'
     author      'Andriy Lesyuk'
     author_url  'http://www.andriylesyuk.com/'
