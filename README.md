@@ -90,13 +90,13 @@ When the automatic creation is enabled the project registration form will have a
 
 To install the plugin do:
 
-+ Install Ruby [Octokit](http://octokit.github.io/)
-	+ If you plan to create Github repositories or register hooks there.
 + Install plugin:
 
 ````
 cd /path/to/redmine/plugins  
 git clone https://github.com/farend/scm-creator.git redmine_scm
+cd ..
+bundle install --without development test
 rake redmine:plugins:migrate RAILS_ENV=production
 ````
 
