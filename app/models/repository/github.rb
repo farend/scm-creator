@@ -51,21 +51,31 @@ class Repository::Github < Repository::Git
 
     def fetch_changesets
         if File.directory?(GithubCreator.options['path'])
-            scm_brs = branches
-            if scm_brs.blank?
+            if File.directory?(root_url)
+                Rails.logger.info "Fetching updates for #{root_url}"
+                scm.fetch
+            else
                 path = File.dirname(root_url)
                 Dir.mkdir(path) unless File.directory?(path)
                 Rails.logger.info "Cloning #{url} to #{root_url}"
                 scm.clone
-            elsif File.directory?(root_url)
-                Rails.logger.info "Fetching updates for #{root_url}"
-                scm.fetch
             end
         end
         super
     end
 
     def clear_extra_info_of_changesets
+    end
+
+    def local_url
+      if GithubCreator.options && GithubCreator.options['path']
+          path = url.sub(%r{\A.*[@/]github.com[:/]}, '')
+          if Redmine::Platform.mswin?
+              return "#{GithubCreator.options['path']}\\#{path.gsub(%r{/}, '\\')}"
+          else
+              return "#{GithubCreator.options['path']}/#{path}"
+          end
+      end
     end
 
 protected
@@ -78,13 +88,8 @@ protected
     end
 
     def set_local_url
-        if new_record? && url.present? && root_url.blank? && GithubCreator.options && GithubCreator.options['path']
-            path = url.sub(%r{\A.*[@/]github.com[:/]}, '')
-            if Redmine::Platform.mswin?
-                self.root_url = "#{GithubCreator.options['path']}\\#{path.gsub(%r{/}, '\\')}"
-            else
-                self.root_url = "#{GithubCreator.options['path']}/#{path}"
-            end
+        if new_record?
+            self.root_url = self.local_url
         end
     end
 
