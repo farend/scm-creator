@@ -95,10 +95,14 @@ To install the plugin do:
 ````
 cd /path/to/redmine/plugins  
 git clone https://github.com/farend/scm-creator.git redmine_scm
-cd ..
+cd /path/to/redmine
 bundle install --without development test
 rake redmine:plugins:migrate RAILS_ENV=production
 ````
+
++ Make sure the directory name of the plugin is 'redmine_scm'.  
+:warning:The plugin does not work if the directory name is not 'redmine_scm'.  
+If the directory name is not 'redmine_scm', please fix it.
 
 + Restart Redmine
 
