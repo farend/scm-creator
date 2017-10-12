@@ -5,6 +5,7 @@ class Repository::Github < Repository::Git
 
     before_save :set_local_url
     before_save :register_hook
+    safe_attributes 'register_hook'
 
     def self.human_attribute_name(attribute, *args)
         attribute_name = attribute.to_s
@@ -39,6 +40,10 @@ class Repository::Github < Repository::Git
             end
         end
         extra_boolean_attribute('extra_register_hook')
+    end
+
+    def register_hook=(arg)
+        merge_extra_info "extra_register_hook" => arg
     end
 
     def extra_hook_registered
