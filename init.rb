@@ -29,6 +29,9 @@ Rails.configuration.to_prepare do
     unless RepositoriesController.included_modules.include?(ScmRepositoriesControllerPatch)
         RepositoriesController.send(:include, ScmRepositoriesControllerPatch)
     end
+    unless Repository.included_modules.include?(ScmRepositoryPatch)
+        Repository.send(:include, ScmRepositoryPatch)
+    end
 end
 
 Redmine::Plugin.register :redmine_scm do
