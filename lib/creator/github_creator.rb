@@ -97,9 +97,9 @@ class GithubCreator < SCMCreator
             if response.is_a?(Sawyer::Resource) && response.key?(:clone_url)
                 repository.merge_extra_info('extra_created_with_scm' => 1)
                 if repository && repository.url =~ %r{\Agit@} && repository.login.blank? && response.key?(:ssh_url)
-                    url = response[:ssh_url]
+                    response[:ssh_url]
                 else
-                    url = response[:clone_url]
+                    response[:clone_url]
                 end
             else
                 false
@@ -107,15 +107,6 @@ class GithubCreator < SCMCreator
         rescue Octokit::Error => error
             Rails.logger.error error.message
             false
-        else
-            repository.url = url
-            repository.root_url = repository.local_url
-            path = File.dirname(repository.root_url)
-            Dir.mkdir(path) unless File.directory?(path)
-            Rails.logger.info "Cloning #{repository.url} to #{repository.root_url}"
-            repository.scm.clone
-        ensure
-            return url
         end
 
         def can_register_hook?

@@ -12,6 +12,13 @@ module Redmine
                     git_cmd(cmd_args)
                 rescue ScmCommandAborted => error
                     Rails.logger.error "Github repository cloning failed: #{error.message}"
+                    false
+                else
+                    if File.directory?(root_url)
+                        true
+                    else
+                        false
+                    end
                 end
 
                 def fetch

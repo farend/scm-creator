@@ -3,8 +3,8 @@ require_dependency File.expand_path('../../../../lib/adapters/github_adapter', _
 class Repository::Github < Repository::Git
     validates_format_of :url, :with => %r{\A(https://github\.com/|git@github\.com:)[a-z0-9\-_]+/[a-z0-9\-_]+\.git\z}i, :allow_blank => true
 
-    before_save :set_local_url
-    before_save :register_hook
+    before_save :set_local_url, :register_hook
+    before_create :clone_repository
     safe_attributes 'register_hook'
 
     def self.human_attribute_name(attribute, *args)
@@ -55,32 +55,27 @@ class Repository::Github < Repository::Git
     end
 
     def fetch_changesets
-        if File.directory?(GithubCreator.options['path'])
-            if File.directory?(root_url)
-                Rails.logger.info "Fetching updates for #{root_url}"
-                scm.fetch
-            else
-                path = File.dirname(root_url)
-                Dir.mkdir(path) unless File.directory?(path)
-                Rails.logger.info "Cloning #{url} to #{root_url}"
-                scm.clone
-            end
+        if File.directory?(root_url)
+            Rails.logger.info "Fetching updates for #{root_url}"
+            scm.fetch
         end
         super
     end
 
-    def clear_extra_info_of_changesets
+    def clone_repository
+      if File.directory?(GithubCreator.options['path'])
+        path = File.dirname(root_url)
+        Dir.mkdir(path) unless File.directory?(path)
+        Rails.logger.info "Cloning #{url} to #{root_url}"
+        unless scm.clone
+          errors.add(:base, :scm_repository_cloning_failed)
+        end
+      else
+        errors.add(:base, :scm_repository_cloning_failed)
+      end
     end
 
-    def local_url
-      if GithubCreator.options && GithubCreator.options['path']
-          path = url.sub(%r{\A.*[@/]github.com[:/]}, '')
-          if Redmine::Platform.mswin?
-              return "#{GithubCreator.options['path']}\\#{path.gsub(%r{/}, '\\')}"
-          else
-              return "#{GithubCreator.options['path']}/#{path}"
-          end
-      end
+    def clear_extra_info_of_changesets
     end
 
 protected
@@ -93,8 +88,13 @@ protected
     end
 
     def set_local_url
-        if new_record?
-            self.root_url = self.local_url
+        if new_record? && url.present? && root_url.blank? && GithubCreator.options && GithubCreator.options['path']
+            path = url.sub(%r{\A.*[@/]github.com[:/]}, '')
+            if Redmine::Platform.mswin?
+                self.root_url = "#{GithubCreator.options['path']}\\#{path.gsub(%r{/}, '\\')}"
+            else
+                self.root_url = "#{GithubCreator.options['path']}/#{path}"
+            end
         end
     end
 
