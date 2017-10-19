@@ -103,15 +103,18 @@ protected
     end
 
     def clone_repository
-        if File.directory?(GithubCreator.options['path'])
+        unless File.directory?(GithubCreator.options['path'])
             path = File.dirname(root_url)
             Dir.mkdir(path) unless File.directory?(path)
             Rails.logger.info "Cloning #{url} to #{root_url}"
             unless scm.clone
                 errors.add(:base, :scm_repository_cloning_failed)
+                false
             end
         else
+            Rails.logger.warn "Can't find directory: #{GithubCreator.options['path']} ( path for #{scm_name} )"
             errors.add(:base, :scm_repository_cloning_failed)
+            false
         end
     end
 end
