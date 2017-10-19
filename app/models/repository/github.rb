@@ -103,7 +103,7 @@ protected
     end
 
     def clone_repository
-        unless File.directory?(GithubCreator.options['path'])
+        if File.directory?(GithubCreator.options['path'])
             path = File.dirname(root_url)
             Dir.mkdir(path) unless File.directory?(path)
             Rails.logger.info "Cloning #{url} to #{root_url}"
