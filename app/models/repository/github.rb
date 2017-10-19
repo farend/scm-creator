@@ -62,19 +62,6 @@ class Repository::Github < Repository::Git
         super
     end
 
-    def clone_repository
-      if File.directory?(GithubCreator.options['path'])
-        path = File.dirname(root_url)
-        Dir.mkdir(path) unless File.directory?(path)
-        Rails.logger.info "Cloning #{url} to #{root_url}"
-        unless scm.clone
-          errors.add(:base, :scm_repository_cloning_failed)
-        end
-      else
-        errors.add(:base, :scm_repository_cloning_failed)
-      end
-    end
-
     def clear_extra_info_of_changesets
     end
 
@@ -115,4 +102,16 @@ protected
         end
     end
 
+    def clone_repository
+        if File.directory?(GithubCreator.options['path'])
+            path = File.dirname(root_url)
+            Dir.mkdir(path) unless File.directory?(path)
+            Rails.logger.info "Cloning #{url} to #{root_url}"
+            unless scm.clone
+                errors.add(:base, :scm_repository_cloning_failed)
+            end
+        else
+            errors.add(:base, :scm_repository_cloning_failed)
+        end
+    end
 end
