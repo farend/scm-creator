@@ -80,6 +80,12 @@ module ScmRepositoriesControllerPatch
             end
         end
 
+        # Original function
+        #def destroy
+        #  @repository.destroy if request.delete?
+        #  redirect_to settings_project_path(@project, :tab => 'repositories')
+        #end
+
         def destroy_with_confirmation
             if @repository.created_with_scm
                 if params[:confirm]
@@ -87,7 +93,12 @@ module ScmRepositoriesControllerPatch
                         @repository.created_with_scm = false
                     end
 
-                    destroy_without_confirmation
+                    if request.delete?
+                        unless @repository.destroy
+                          flash[:warning] = l(:warning_repository_deletion_failed)
+                        end
+                    end
+                    redirect_to settings_project_path(@project, :tab => 'repositories')
                 end
             else
                 destroy_without_confirmation
