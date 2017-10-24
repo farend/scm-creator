@@ -11,6 +11,8 @@ ja:
   text_scm_repository_created_by_scm: ファイルシステム上のリポジトリはRedmineで使用するために作成しました。Redmineエントリの削除により、作成したリポジトリが使われない状態にになるかもしれません。
   text_scm_repository_destroy_confirmation: ファイルシステムから同様にリポジトリを削除しますか？
 
+  warning_repository_deletion_failed: リポジトリの削除に失敗しました。
+
   activerecord:
     errors:
       messages:
