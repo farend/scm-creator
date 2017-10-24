@@ -132,7 +132,11 @@ class SCMCreator
         # removes repository
         def delete_repository(path)
             # See: http://www.ruby-doc.org/stdlib-1.9.3/libdoc/fileutils/rdoc/FileUtils.html#method-c-remove_entry_secure
-            FileUtils.remove_entry_secure(path, true)
+            FileUtils.remove_entry_secure(path, false)
+            true
+        rescue => error
+            Rails.logger.error "Failed to delete repository on file system: #{error.message}"
+            false
         end
 
         # executes custom scripts
