@@ -31,14 +31,7 @@ module ScmProjectPatch
                     if interface
                         path = interface.default_path(self.identifier)
 
-                        if interface.local? && File.directory?(path)
-                            if ScmConfig['allow_pickup']
-                                Rails.logger.warn "Automatically using reporitory: #{path}"
-                            else
-                                Rails.logger.warn "Repository already exists: #{path}"
-                                return
-                            end
-                        else
+                        unless interface.local? && File.directory?(path)
                             Rails.logger.info "Automatically creating reporitory: #{path}"
                             interface.execute(ScmConfig['pre_create'], path, self) if ScmConfig['pre_create']
                             if result = interface.create_repository(path, @repository)
@@ -67,8 +60,13 @@ module ScmProjectPatch
             if @scm.present? && self.identifier.present? && self.module_enabled?(:repository) && ScmConfig['auto_create']
                 interface = SCMCreator.interface(@scm)
                 if interface
-                    if interface.repository_exists?(self.identifier)
-                        errors.add(:base, :repository_exists_for_identifier)
+                    if interface.local? && interface.repository_exists?(self.identifier)
+                        if ScmConfig['allow_pickup']
+                            Rails.logger.warn "Automatically using reporitory: #{interface.default_path(self.identifier)}"
+                        else
+                            Rails.logger.warn "Repository already exists: #{interface.default_path(self.identifier)}"
+                            errors.add(:base, :repository_exists_for_identifier)
+                        end
                     end
                 else
                     Rails.logger.error "Can't find interface for #{@scm}."
