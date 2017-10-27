@@ -31,7 +31,7 @@ module ScmProjectPatch
                     if interface
                         path = interface.default_path(self.identifier)
 
-                        unless interface.local? && File.directory?(path)
+                        unless File.directory?(path)
                             Rails.logger.info "Automatically creating reporitory: #{path}"
                             interface.execute(ScmConfig['pre_create'], path, self) if ScmConfig['pre_create']
                             if result = interface.create_repository(path, @repository)
