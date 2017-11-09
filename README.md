@@ -76,7 +76,7 @@ The plugin reads its configuration from *#{RAILS_ROOT}/config/scm.yml*.
 Copy sample *scm.yml* file from the plugin directory to *#{RAILS_ROOT}/config/* and modify it.
 
 The configuration of the plugin is described in details on the corresponding page.
-Check this page for common configuration scenarios.
+Check [this page](http://projects.andriylesyuk.com/projects/scm-creator/wiki/Configuration) for common configuration scenarios.
 
 ### 3. Automatic creation
 
