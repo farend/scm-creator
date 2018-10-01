@@ -5,6 +5,8 @@ The following explanation is adapted from a [Origin of fork](http://projects.and
 
 Simple [Subversion](http://subversion.apache.org/), [Git](https://git-scm.com/), [Mercurial](https://www.mercurial-scm.org/),[Bazaar](http://bazaar.canonical.com/en/) and [Github](https://github.com/) repository creation plugin for [Redmine](http://www.redmine.org/). With this plugin repository creation and registration becomes very easy and needs just one click (or even no click).
 
+This repository contains fixes to support Redmine3.4 in addition to the original code of the fork.
+
 This plugin requires __Redmine version 3.4.0__ or higher.
 
 ## Description
