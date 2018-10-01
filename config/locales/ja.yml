@@ -11,6 +11,8 @@ ja:
   text_scm_repository_created_by_scm: ファイルシステム上のリポジトリはRedmineで使用するために作成しました。Redmineエントリの削除により、作成したリポジトリが使われない状態にになるかもしれません。
   text_scm_repository_destroy_confirmation: ファイルシステムから同様にリポジトリを削除しますか？
 
+  warning_repository_deletion_failed: リポジトリの削除に失敗しました。
+
   activerecord:
     errors:
       messages:
@@ -22,3 +24,4 @@ ja:
         scm_local_repositories_denied: ローカルリポジトリの追加は管理者によって拒否されました。
         scm_only_creator: リポジトリの作成/追加には「リポジトリの作成」ボタンを使用します。
         scm_repository_creation_failed: リポジトリ作成に失敗しました。
+        scm_repository_cloning_failed: リポジトリのcloneに失敗しました。

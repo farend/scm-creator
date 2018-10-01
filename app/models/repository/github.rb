@@ -3,8 +3,9 @@ require_dependency File.expand_path('../../../../lib/adapters/github_adapter', _
 class Repository::Github < Repository::Git
     validates_format_of :url, :with => %r{\A(https://github\.com/|git@github\.com:)[a-z0-9\-_]+/[a-z0-9\-_]+\.git\z}i, :allow_blank => true
 
-    before_save :set_local_url
-    before_save :register_hook
+    before_save :set_local_url, :register_hook
+    before_create :clone_repository
+    safe_attributes 'register_hook'
 
     def self.human_attribute_name(attribute, *args)
         attribute_name = attribute.to_s
@@ -41,6 +42,10 @@ class Repository::Github < Repository::Git
         extra_boolean_attribute('extra_register_hook')
     end
 
+    def register_hook=(arg)
+        merge_extra_info "extra_register_hook" => arg
+    end
+
     def extra_hook_registered
         extra_boolean_attribute('extra_hook_registered')
     end
@@ -50,17 +55,9 @@ class Repository::Github < Repository::Git
     end
 
     def fetch_changesets
-        if File.directory?(GithubCreator.options['path'])
-            scm_brs = branches
-            if scm_brs.blank?
-                path = File.dirname(root_url)
-                Dir.mkdir(path) unless File.directory?(path)
-                Rails.logger.info "Cloning #{url} to #{root_url}"
-                scm.clone
-            elsif File.directory?(root_url)
-                Rails.logger.info "Fetching updates for #{root_url}"
-                scm.fetch
-            end
+        if File.directory?(root_url)
+            Rails.logger.info "Fetching updates for #{root_url}"
+            scm.fetch
         end
         super
     end
@@ -105,4 +102,19 @@ protected
         end
     end
 
+    def clone_repository
+        if File.directory?(GithubCreator.options['path'])
+            path = File.dirname(root_url)
+            Dir.mkdir(path) unless File.directory?(path)
+            Rails.logger.info "Cloning #{url} to #{root_url}"
+            unless scm.clone
+                errors.add(:base, :scm_repository_cloning_failed)
+                false
+            end
+        else
+            Rails.logger.warn "Can't find directory: #{GithubCreator.options['path']} ( path for #{scm_name} )"
+            errors.add(:base, :scm_repository_cloning_failed)
+            false
+        end
+    end
 end

@@ -5,6 +5,13 @@ The following explanation is adapted from a [Origin of fork](http://projects.and
 
 Simple [Subversion](http://subversion.apache.org/), [Git](https://git-scm.com/), [Mercurial](https://www.mercurial-scm.org/),[Bazaar](http://bazaar.canonical.com/en/) and [Github](https://github.com/) repository creation plugin for [Redmine](http://www.redmine.org/). With this plugin repository creation and registration becomes very easy and needs just one click (or even no click).
 
+This repository is different from the original repository forked
+in the following point.
+* Change for use with Redmine 3.4
+* Bug fixese
+
+This plugin requires __Redmine version 3.4.0__ or higher.
+
 ## Description
 
 The plugin adds “Create new repository” button to the repository addition form (Project → Settings → Repository → Subversion/Git/Mercurial/Bazaar/Github).  
@@ -74,7 +81,7 @@ The plugin reads its configuration from *#{RAILS_ROOT}/config/scm.yml*.
 Copy sample *scm.yml* file from the plugin directory to *#{RAILS_ROOT}/config/* and modify it.
 
 The configuration of the plugin is described in details on the corresponding page.
-Check this page for common configuration scenarios.
+Check [this page](http://projects.andriylesyuk.com/projects/scm-creator/wiki/Configuration) for common configuration scenarios.
 
 ### 3. Automatic creation
 
@@ -88,15 +95,19 @@ When the automatic creation is enabled the project registration form will have a
 
 To install the plugin do:
 
-+ Install Ruby [Octokit](http://octokit.github.io/)
-	+ If you plan to create Github repositories or register hooks there.
 + Install plugin:
 
 ````
 cd /path/to/redmine/plugins  
 git clone https://github.com/farend/scm-creator.git redmine_scm
+cd /path/to/redmine
+bundle install --without development test
 rake redmine:plugins:migrate RAILS_ENV=production
 ````
+
++ Make sure the directory name of the plugin is 'redmine_scm'.  
+:warning:The plugin does not work if the directory name is not 'redmine_scm'.  
+If the directory name is not 'redmine_scm', please fix it.
 
 + Restart Redmine
 
