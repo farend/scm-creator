@@ -41,7 +41,7 @@ module ScmRepositoriesControllerPatch
                !ScmConfig['allow_add_local']
 
                 if params[:operation].present? && params[:operation] == 'add'
-                    @repository.attributes = interface.sanitize(@repository.attributes)
+                    @repository.safe_attributes = interface.sanitize(@repository.attributes)
                 end
 
                 if @repository.valid? && params[:operation].present? && params[:operation] == 'add'
