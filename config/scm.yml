@@ -22,6 +22,7 @@ production:
     update_server_info: true
     git_ext: true
     append: trunk
+    in_subdir: false
   mercurial:
     path: /var/lib/mercurial
     hg: /usr/bin/hg
