@@ -137,8 +137,8 @@ module ScmRepositoriesHelperPatch
                     path = GitCreator.access_root_url(GitCreator.default_path(@project.identifier), repository)
                     if GitCreator.repository_exists?(@project.identifier)
                         offset = @project.repositories.select{ |r| r.created_with_scm }.size.to_s
-                        if path.sub!(%r{\.git\z}, '.' + offset + '.git').nil?
-                            path << '.' + offset
+                        if path.sub!(%r{\.git\z}, '/' + offset + '.git').nil?
+                            path << '/' + offset
                         end
                     end
                     gittags << javascript_tag("$('#repository_url').val('#{escape_javascript(path)}');")
