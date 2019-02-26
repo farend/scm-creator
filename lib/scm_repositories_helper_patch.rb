@@ -135,7 +135,7 @@ module ScmRepositoriesHelperPatch
                 gittags << hidden_field_tag(:operation, '', :id => 'repository_operation')
                 unless request.post?
                     path = GitCreator.access_root_url(GitCreator.default_path(@project.identifier), repository)
-                    if GitCreator.repository_exists?(@project.identifier)
+                    if GitCreator.repository_exists?(@project.identifier) or GitCreator.options['in_subdir']
                         offset = @project.repositories.select{ |r| r.created_with_scm }.size.to_s
                         
                         seperator = '.'
