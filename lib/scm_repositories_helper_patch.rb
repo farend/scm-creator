@@ -6,21 +6,13 @@ module ScmRepositoriesHelperPatch
         base.send(:include, InstanceMethods)
         base.class_eval do
             unloadable
-
-            alias_method_chain :repository_field_tags, :add
-            alias_method_chain :subversion_field_tags, :add
-            alias_method_chain :mercurial_field_tags,  :add
-            alias_method_chain :git_field_tags,        :add
-            alias_method_chain :bazaar_field_tags,     :add
-
-            alias_method_chain :scm_path_info_tag, :external if method_defined?(:scm_path_info_tag)
         end
     end
 
     module InstanceMethods
 
-        def repository_field_tags_with_add(form, repository)
-            reptags = repository_field_tags_without_add(form, repository)
+        def repository_field_tags(form, repository)
+            reptags = super(form, repository)
 
             button_disabled = repository.class.respond_to?(:scm_available) ? !repository.class.scm_available : false
 
@@ -41,8 +33,8 @@ module ScmRepositoriesHelperPatch
             reptags.html_safe
         end
 
-        def subversion_field_tags_with_add(form, repository)
-            svntags = subversion_field_tags_without_add(form, repository)
+        def subversion_field_tags(form, repository)
+            svntags = super(form, repository)
 
             if repository.new_record? && SubversionCreator.enabled? && !limit_exceeded
                 svntags << submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');",
@@ -67,8 +59,8 @@ module ScmRepositoriesHelperPatch
             svntags
         end
 
-        def mercurial_field_tags_with_add(form, repository)
-            hgtags = mercurial_field_tags_without_add(form, repository)
+        def mercurial_field_tags(form, repository)
+            hgtags = super(form, repository)
 
             if repository.new_record? && MercurialCreator.enabled? && !limit_exceeded
                 hgtags << submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');",
@@ -97,8 +89,8 @@ module ScmRepositoriesHelperPatch
             hgtags
         end
 
-        def bazaar_field_tags_with_add(form, repository)
-            bzrtags = bazaar_field_tags_without_add(form, repository)
+        def bazaar_field_tags(form, repository)
+            bzrtags = super(form, repository)
 
             if repository.new_record? && BazaarCreator.enabled? && !limit_exceeded
                 bzrtags << submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');",
@@ -126,8 +118,8 @@ module ScmRepositoriesHelperPatch
             bzrtags
         end
 
-        def git_field_tags_with_add(form, repository)
-            gittags = git_field_tags_without_add(form, repository)
+        def git_field_tags(form, repository)
+            gittags = super(form, repository)
 
             if repository.new_record? && GitCreator.enabled? && !limit_exceeded
                 gittags << submit_tag(l(:button_create_new_repository), :onclick => "$('#repository_operation').val('add');",
@@ -194,14 +186,14 @@ module ScmRepositoriesHelperPatch
             githubtags
         end
 
-        def scm_path_info_tag_with_external(repository)
+        def scm_path_info_tag(repository)
             if !repository.new_record? && repository.created_with_scm
                 interface = SCMCreator.interface(repository)
                 if interface && (url = interface.external_url(repository))
                     return content_tag('em', url, :class => 'info')
                 end
             end
-            scm_path_info_tag_without_external(repository)
+            super(repository)
         end
 
     private

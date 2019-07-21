@@ -7,11 +7,6 @@ module ScmRepositoriesControllerPatch
         base.class_eval do
             unloadable
             before_filter :delete_scm, :only => :destroy
-
-            alias_method_chain :destroy, :confirmation
-
-            alias_method_chain :create, :scm
-            alias_method_chain :update, :scm
         end
     end
 
@@ -33,7 +28,7 @@ module ScmRepositoriesControllerPatch
         #  end
         #end
 
-        def create_with_scm
+        def create
             interface = SCMCreator.interface(params[:repository_scm])
 
             if (interface && (interface < SCMCreator) && interface.enabled? &&
@@ -67,12 +62,12 @@ module ScmRepositoriesControllerPatch
                 end
 
             else
-                create_without_scm
+                super
             end
         end
 
-        def update_with_scm
-            update_without_scm
+        def update
+            super
 
             if @repository.is_a?(Repository::Github) && # special case for Github
                params[:repository][:register_hook] == '1' && !@repository.extra_hook_registered
@@ -86,7 +81,7 @@ module ScmRepositoriesControllerPatch
         #  redirect_to settings_project_path(@project, :tab => 'repositories')
         #end
 
-        def destroy_with_confirmation
+        def destroy
             if @repository.created_with_scm
                 if params[:confirm]
                     unless params[:confirm_with_scm]
@@ -101,7 +96,7 @@ module ScmRepositoriesControllerPatch
                     redirect_to settings_project_path(@project, :tab => 'repositories')
                 end
             else
-                destroy_without_confirmation
+                super
             end
         end
 
