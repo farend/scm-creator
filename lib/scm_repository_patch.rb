@@ -5,8 +5,6 @@ module ScmRepositoryPatch
     def self.included(base)
         base.send(:include, InstanceMethods)
         base.class_eval do
-            unloadable
-
             before_destroy :remove_repository_files
         end
     end

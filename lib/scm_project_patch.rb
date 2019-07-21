@@ -5,8 +5,6 @@ module ScmProjectPatch
     def self.included(base)
         base.send(:include, InstanceMethods)
         base.class_eval do
-            unloadable
-
             attr_accessor :scm
 
             safe_attributes 'scm'

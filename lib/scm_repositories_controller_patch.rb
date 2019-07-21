@@ -5,7 +5,6 @@ module ScmRepositoriesControllerPatch
     def self.prepended(base)
         base.send(:include, InstanceMethods)
         base.class_eval do
-            unloadable
             before_action :delete_scm, :only => :destroy
         end
     end

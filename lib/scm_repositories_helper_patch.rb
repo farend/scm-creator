@@ -4,9 +4,6 @@ module ScmRepositoriesHelperPatch
 
     def self.prepended(base)
         base.send(:include, InstanceMethods)
-        base.class_eval do
-            unloadable
-        end
     end
 
     module InstanceMethods
