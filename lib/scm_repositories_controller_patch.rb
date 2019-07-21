@@ -2,7 +2,7 @@ require_dependency 'repositories_controller'
 
 module ScmRepositoriesControllerPatch
 
-    def self.included(base)
+    def self.prepended(base)
         base.send(:include, InstanceMethods)
         base.class_eval do
             unloadable

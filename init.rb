@@ -24,10 +24,10 @@ Rails.configuration.to_prepare do
         Project.send(:include, ScmProjectPatch)
     end
     unless RepositoriesHelper.included_modules.include?(ScmRepositoriesHelperPatch)
-        RepositoriesHelper.send(:include, ScmRepositoriesHelperPatch)
+        RepositoriesHelper.send(:prepend, ScmRepositoriesHelperPatch)
     end
     unless RepositoriesController.included_modules.include?(ScmRepositoriesControllerPatch)
-        RepositoriesController.send(:include, ScmRepositoriesControllerPatch)
+        RepositoriesController.send(:prepend, ScmRepositoriesControllerPatch)
     end
     unless Repository.included_modules.include?(ScmRepositoryPatch)
         Repository.send(:include, ScmRepositoryPatch)
