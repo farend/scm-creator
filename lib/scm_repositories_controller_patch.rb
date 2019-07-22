@@ -3,7 +3,7 @@ require_dependency 'repositories_controller'
 module ScmRepositoriesControllerPatch
 
     def self.prepended(base)
-        base.send(:include, InstanceMethods)
+        base.send(:prepend, InstanceMethods)
         base.class_eval do
             before_action :delete_scm, :only => :destroy
         end
