@@ -20,7 +20,9 @@ module ScmRepositoryPatch
                         path = interface.existing_path(name, self)
                         if path
                             interface.execute(ScmConfig['pre_delete'], path, project) if ScmConfig['pre_delete']
-                            return false unless interface.delete_repository(path)
+                            unless interface.delete_repository(path)
+                                throw(:abort)
+                            end
                             interface.execute(ScmConfig['post_delete'], path, project) if ScmConfig['post_delete']
                         end
                     end
