@@ -10,7 +10,7 @@ in the following point.
 * Change for use with Redmine 3.4
 * Bug fixese
 
-This plugin requires __Redmine version 3.4.0__ or higher.
+This plugin requires __Redmine version 3.4__ or lower.
 
 ## Description
 
